@@ -1,0 +1,47 @@
+<%- include('../partials/header') %>
+
+<body>
+    <div class="container-lg mt-5 mb-5 p-auto">
+
+        <h3 class="mb-3">เปลี่ยนรหัสผ่าน</h3>
+        <% if(success_msg != "") { %>
+            <% success_msg.forEach((item) => { %>
+                <div class="alert alert-success">
+                    <%- item %>
+                </div>
+            <% }); %>
+        <% }else if(errors != "") {%>
+            <% errors.forEach((item) => { %>
+                <div class="alert alert-danger">
+                    <%- item %>
+                </div>
+            <% }); %>
+        <% } %>
+        <div class="d-flex">
+            <%- include('../partials/usermenu') %>
+            <div class="setting-box">
+                <div class="w-50">
+                    <form action="/changepassword" method="post">
+                        <div class="form-outline mb-4">
+                            <input type="password" id="form1Example1" class="form-control" name="currentPassword"/>
+                            <label class="form-label" for="form1Example1">รหัสผ่านเก่า</label>
+                        </div>
+
+                        <div class="form-outline mb-4">
+                            <input type="password" id="form1Example2" class="form-control" name="newPassword"/>
+                            <label class="form-label" for="form1Example2">รหัสผ่านใหม่</label>
+                        </div>
+
+                        <div class="form-outline mb-4">
+                            <input type="password" id="form1Example2" class="form-control" name="confirmPassword"/>
+                            <label class="form-label" for="form1Example2">ยืนยันรหัสผ่านใหม่</label>
+                        </div>
+                        <!-- Submit button -->
+                        <button type="submit" class="btn btn-primary btn-block">ยืนยัน</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<%- include('../partials/footer') %>

@@ -1,0 +1,55 @@
+<%- include('../partials/header') %>
+
+<body style="background-color: #FCFCFC;">
+  <div class="container-lg mt-5">
+    <div style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="#">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page"><%= currentMenu %></li>
+      </ol>
+    </div>
+
+    <div class="mt-3">
+      <h3>งานพิมพ์</h3>
+      <div class="d-flex mb-5">
+        <!-- ประเภท -->
+        <div class="list-group" style="width: 230px;">
+          <a href="/product/all"
+            class="list-group-item list-group-item-action <%= currentLink == 'allproduct' ? 'active' : ''%>">สินค้าทั้งหมด</a>
+          <% if(types.length > 0) {%>
+          <% types.forEach((type) => { %>
+          <a href="/product/categories/<%= type.categories_id %>"
+            class="list-group-item list-group-item-action <%= currentLink == type.categories_name ? 'active' : ''%>">
+            <%= type.categories_name %> </a>
+          <% }); %>
+          <% } %>
+        </div>
+
+        <!-- สินค้า -->
+        <div class="itemlist">
+          <% if(products.length > 0){ %>
+          <% products.forEach((product) => { %>
+          <div class="card m-0 me-4">
+            <a href="/product/item/<%= product.product_id %>">
+              <div class="ripple p-3 pb-1 product_list_card" data-mdb-ripple-color="light">
+                <img src="<%= product.picture %>" class="img-fluid rounded" />
+              </div>
+            </a>
+            <div class="card-body p-3">
+              <h5 class="card-title"><%= product.productName %></h5>
+              <p class="card-text text-truncate"><%= product.description %></p>
+            </div>
+            <a href="/product/item/<%= product.product_id %>" class="w-100 position-static p-3 pb-4">
+              <button class="btn btn-primary w-100">สั่งทำ</button>
+            </a>
+          </div>
+          <% }); %>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+
+<%- include('../partials/footer') %>

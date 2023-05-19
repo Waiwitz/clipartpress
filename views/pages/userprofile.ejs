@@ -1,0 +1,91 @@
+<%- include('../partials/header') %>
+
+<body>
+    <div class="container-lg mt-5 mb-5 p-auto">
+
+        <h3 class="mb-3">ตั้งค่าบัญชี</h3>
+        <% if(success_msg != "") { %>
+        <% success_msg.forEach((item) => { %>
+        <div class="alert alert-success">
+            <%- item %>
+        </div>
+        <% }); %>
+        <% }else if(errors != "") {%>
+        <% errors.forEach((item) => { %>
+        <div class="alert alert-danger">
+            <%- item %>
+        </div>
+        <% }); %>
+        <% } %>
+        <div class="d-flex">
+            <%- include('../partials/usermenu') %>
+            <div class="setting-box">
+                <form action="/userprofile" method="post" enctype="multipart/form-data">
+                    <div class="d-flex">
+                        <div class="profile-box">
+                            <div class="profile">
+                                <img src="<%= user.picture %>" alt="profile" id="preview" draggable="false">
+                            </div>
+                            <input type="file" name="profilePicture" id="profilePicture" onchange="previewImage()" accept="image/png, image/jpeg" />
+                            <p>ขนาดไฟล์ไม่เกิน 2mb</p>
+                            <p>รองรับไฟล์ PNG, JPEG</p>
+                        </div>
+                        <div class="w-50">
+                            <div class="form-outline mb-4">
+                                <input type="text" id="form1Example1" class="form-control" name="username"
+                                    value="<%= user.username %>" />
+                                <label class="form-label" for="form1Example1">ชื่อผู้ใช้</label>
+                            </div>
+
+                            <div class="form-outline mb-4">
+                                <input type="email" id="form1Example2" class="form-control" name="email"
+                                    value="<%= user.email %>" />
+                                <label class="form-label" for="form1Example2">อีเมล</label>
+                            </div>
+
+                            <div class="form-outline mb-4">
+                                <input type="text" id="form1Example2" class="form-control" name="name"
+                                    value="<%= user.name %>" />
+                                <label class="form-label" for="form1Example2">ชื่อ-นามสกุล</label>
+                            </div>
+
+                            <div class="form-outline mb-4">
+                                <input type="text" id="form1Example2" class="form-control" name="telephone"
+                                    value="<%= user.telephone %>" />
+                                <label class="form-label" for="form1Example2">เบอร์โทรศัพท์</label>
+                            </div>
+
+                            <div class="form-outline mb-4">
+                                <input type="text" id="form1Example2" class="form-control" name="lineid"
+                                    value="<%= user.lineid %>" />
+                                <label class="form-label" for="form1Example2">ไอดีไลน์</label>
+                            </div>
+                            <!-- Submit button -->
+                            <button type="submit" class="btn btn-primary btn-block">บันทึก</button>
+                        </div>
+                    </div>
+
+                </form>
+
+
+            </div>
+
+        </div>
+    </div>
+    <script>
+        function previewImage() {
+            const preview = document.getElementById('preview');
+            const file = document.getElementById('profilePicture').files[0];
+            const reader = new FileReader();
+
+            reader.addEventListener('load', function () {
+                preview.src = reader.result;
+            }, false);
+
+            if (file) {
+                reader.readAsDataURL(file);
+            }
+        }
+    </script>
+</body>
+<%- include('../partials/footer') %>

@@ -1,0 +1,60 @@
+<%- include('../partials/head') %>
+<div class="mb-5">
+    <!-- <div class="text-end flag-lang container-lg d-flex justify-content-end">
+      <p class="line pe-4">Line : <a href="#" class="link-light">0800000000</a></p>
+      <i class="flag flag-thailand align-self-center"></i>
+      <i class="flag flag-united-states align-self-center"></i>
+    </div> -->
+  </div>
+ <nav class="nav-admin navbar-light" style="z-index: 10 !important;">
+    <div class="text-center mt-3 ">
+        <img src="/assets/img/logo.png" alt="clipartpress" width="150" class="center">
+    </div>
+    <hr class="ms-3 me-3">
+    <div class="  " id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="admin-navlink  " aria-current="page" href="/dashborad">
+                <i class="fa fa-chart-line"></i>
+                <p>แดชบอร์ด</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="<%= currentLink == 'allproduct' ? 'admin-navlink admin-nav-active' : 'admin-navlink'%>" href="/product-list">
+                <i class="fas fa-list"></i>
+                <p>สินค้า</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="<%= currentLink == "typeproduct" ? 'admin-navlink admin-nav-active' : 'admin-navlink' %>" href="/typeproduct">
+                <i class="fas fa-sort-amount-down"></i>
+                <p>ประเภทสินค้า</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="admin-navlink" href="#">
+                <i class="fas fa-clipboard-list"></i>
+                <p>รายการสั่งทำ</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="admin-navlink" href="#">
+                <i class="fas fa-ban"></i>
+                <p>คำขอยกเลิกรายการ</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="<%= currentLink == "member" ? 'admin-navlink admin-nav-active' : 'admin-navlink' %>" href="/member">
+                <i class="fas fa-user-friends"></i>
+                <p>สมาชิก</p>
+            </a>
+          </li>    
+          <li class="nav-item">
+            <a class="admin-navlink" href="#">
+                <i class="fas fa-sign-out-alt"></i>
+                <p>ออกจากระบบ</p>
+            </a>
+          </li>  
+        </ul>
+      </div>
+ </nav>

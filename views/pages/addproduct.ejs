@@ -1,0 +1,244 @@
+<%- include('../partials/admin-nav') %>
+
+<body>
+    <div class="box-admin">
+        <h4>เพิ่มสินค้า</h4>
+        <% if(success_msg != "") { %>
+        <% success_msg.forEach((item) => { %>
+        <div class="alert alert-success">
+            <%- item %>
+        </div>
+        <% }); %>
+        <% }else if(errors != "") {%>
+        <% errors.forEach((item) => { %>
+        <div class="alert alert-danger">
+            <%- item %>
+        </div>
+        <% }); %>
+        <% } %>
+        <div class="mb-5"
+            style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='%236c757d'/%3E%3C/svg%3E&#34;);"
+            aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Library</li>
+            </ol>
+        </div>
+        <form action="/addproduct" method="post" enctype="multipart/form-data">
+            <!-- 2 column grid layout with text inputs for the first and last names -->
+            <div class="row row-cols-lg-auto mb-4">
+                <div class="col align-self-end">
+                    <div class="form-outline">
+                        <input type="text" id="product-name" class="form-control" name="product_name" />
+                        <label class="form-label" for="form6Example1">ชื่อสินค้า</label>
+                    </div>
+                </div>
+
+                <div class="col align-self-end">
+                    <label class="form-label" for="inlineFormSelectPref">ประเภท</label> <br>
+                    <select class="form-select" style="height: 35px;" name="categories">
+                        <% if(types.length > 0) {%>
+                        <% types.forEach((type) => { %>
+                        <option value="<%= type.categories_id %>"><%= type.categories_name %></option>
+                        <% }); %>
+                        <% } %>
+                    </select>
+                </div>
+
+                <div class="col align-self-end">
+                    <label class="form-label" for="inlineFormSelectPref">สถานะ</label> <br>
+                    <select class="form-select" style="height: 35px;" name="status">
+                        <option value="1">เปิดรับทำ</option>
+                        <option value="0">งดรับทำ</option>
+                    </select>
+                </div>
+
+                <div class="col">
+                    <label class="form-label" for="customFile">เลือกรูปภาพสินค้า</label>
+                    <input type="file" class="form-control" name="imgproduct" id="imgproduct"
+                        accept="image/png, image/jpeg" />
+                </div>
+            </div>
+
+            <div class="row row-cols-lg-auto mb-4">
+                <div class="col">
+                    <div class="form-outline">
+                        <input type="number" id="discount" class="form-control" name="discount" value="0" />
+                        <label class="form-label" for="form6Example1">ส่วนลด(%)</label>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-outline">
+                        <input type="number" id="price_per_unit" class="form-control" name="price_per_unit" />
+                        <label class="form-label" for="price_per_unit">ราคาต่อหน่วย</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Message input -->
+            <div class="form-outline mb-4">
+                <textarea class="form-control" id="description" rows="4" name="product_description"></textarea>
+                <label class="form-label" for="description">รายละเอียดสินค้า</label>
+            </div>
+
+            <div class="mb-4 border-bottom">
+                <h4>กำหนดสเปคสินค้า</h4>
+            </div>
+            <div class="card mb-4 spec" id="spec">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between border-bottom mb-3">
+                        <div class="form-outline mb-3" style="width: 200px;">
+                            <input type="text" class="spec-name form-control" name="spec_name[0][]" required>
+                            <label class="form-label">ชื่อสเปค</label>
+                        </div>
+                    </div>
+                    <div class="sub-options mb-4">
+                        <div class="sub-option-row">
+                            <div class="row row-cols-lg-auto mb-4">
+                                <div class="col">
+                                    <div class="option-img ">
+                                        <i class="fa-solid fa-plus"></i>
+                                        <input type="file" name="option_img[0][]" onchange="previewImage(event, [0])" accept="image/png, image/jpeg"/>
+                                        <img src="https://www.solidbackgrounds.com/images/950x350/950x350-white-solid-color-background.jpg" alt="" id="option_preview[0]" draggable="false"
+                                            class="img_option">
+
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="form-outline mb-3">
+                                        <input type="text" name="sub_options[0][]" class="sub-option-name form-control"
+                                            required>
+                                        <label class="form-label">ชื่อตัวเลือก</label>                                      
+                                    </div>
+                                    <div class="form-outline">
+                                        <input type="number" name="sub_option_prices[0][]"
+                                            class="sub-option-price form-control" required>
+                                        <label class="form-label">ราคาต่อหน่วย</label>
+                                    </div>
+                                </div> 
+
+                                <button type="button" class="btn btn-secondary" id="add-sub-btn"
+                                    data-spec-id="${specCount}">เพิ่มตัวเลือก</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="newRow"></div>
+
+            <button type="button" id="add-spec" class="btn btn-secondary w-100">เพิ่มสเปค</button>
+            <button type="submit" class="btn btn-primary btn-block mt-5 float-end" style="width: 150px;">ยืนยัน</button>
+        </form>
+    </div>
+
+
+    <script>
+        function previewImage(event, index) {
+            var input = event.target;
+            var imgPreview = document.getElementById('option_preview[' + index + ']');
+            console.log(imgPreview)
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    imgPreview.src = e.target.result;
+                }
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                imgPreview.src = "";
+            }
+        }
+
+        var specCount = 0;
+        var img = 0
+        $('#add-spec').on('click', function () {
+            specCount++;
+            img++
+            var newSpecCard = `
+    <div class="card mb-4 newcard spec" id="spec${specCount}">
+        <div class="card-body">
+        <div class="d-flex justify-content-between border-bottom mb-3">
+          <div class="form-outline mb-3" style="width: 200px;">
+            <input type="text" name="spec_name[${specCount}][]" class="spec-name form-control" required>
+            <label class="form-label">ชื่อสเปค</label>
+          </div>
+          <button type="button" class="btn btn-danger remove-spec">ลบ</button>
+        </div>
+        <div class="sub-options mb-4">
+          <div class="sub-option-row">
+            <div class="row row-cols-lg-auto mb-4">
+                <div class="col">
+                    <div class="option-img">
+                        <i class="fa-solid fa-plus"></i>
+                            <input type="file"
+                                            onchange="previewImage(event, [${img}])" accept="image/png, image/jpeg" />
+                            <img src="" alt="profile" id="option_preview[${img}]" draggable="false">
+                    </div>
+                </div>
+              <div class="col">
+                <div class="form-outline">
+                  <input type="text" name="sub_options[${specCount}][]" class="sub-option-name form-control" required>
+                  <label class="form-label">ชื่อตัวเลือก</label>
+                </div>
+                <div class="form-outline">
+                  <input type="number" name="sub_option_prices[${specCount}][]" class="sub-option-price form-control" required>
+                  <label class="form-label">ราคาต่อหน่วย</label>
+                </div>
+              </div>
+              <button type="button" class="btn btn-secondary" id="add-sub-btn">เพิ่มตัวเลือก</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+            $('#newRow').append(newSpecCard);
+        });
+
+        // ลบแถวหลัก
+        $('#newRow').on('click', '.remove-spec', function () {
+            $(this).closest(`.newcard`).remove();
+        });
+
+        // เพิ่มแถวย่อย
+        $(document).on('click', '#add-sub-btn', function () {
+            img++
+            var specId = $(this).closest('.card').attr('id');
+            var specCount = $(this).closest('.card').index('.card');
+            console.log(specCount)
+            var subOptionCount = $('#' + specId + ' .spec').length;
+
+            var newSubOption = `
+    <div class="sub-option-row">
+      <div class="row row-cols-lg-auto mb-4">
+        <div class="col">
+            <div class="option-img">
+                <i class="fa-solid fa-plus"></i>
+                <input type="file" name="option_img[${specCount}][]"
+                onchange="previewImage(event, [${img}])" accept="image/png, image/jpeg" />
+                <img src="" alt="profile" id="option_preview[${img}]" draggable="false">
+            </div>
+            </div>
+        <div class="col">
+          <div class="form-outline">
+            <input type="text" name="sub_options[${specCount}][]" class="sub-option-name form-control" required>
+            <label class="form-label">ชื่อตัวเลือก</label>
+          </div>
+          <div class="form-outline">
+            <input type="number" name="sub_option_prices[${specCount}][]" class="sub-option-price form-control" required>
+            <label class="form-label">ราคาต่อหน่วย</label>
+          </div>
+        </div>
+        <button type="button" class="btn btn-danger remove-sub-option" data-spec-id="${specCount}">ลบ</button>
+      </div>
+    </div>
+  `;
+            $('#' + specId + ' .sub-options').append(newSubOption);
+
+            // ลบแถวย่อย
+            $('.sub-options').on('click', '.remove-sub-option', function () {
+                $(this).closest(`.sub-option-row`).remove();
+            });
+        });
+    </script>
+</body>

@@ -1,0 +1,45 @@
+<%- include('../partials/header') %>
+
+<body>
+    <div class="container-lg mt-5 mb-5 p-auto">
+
+        <h3 class="mb-3">ตระกร้าสินค้า</h3>
+        <% if(success_msg != "") { %>
+        <% success_msg.forEach((item) => { %>
+        <div class="alert alert-success">
+            <%- item %>
+        </div>
+        <% }); %>
+        <% }else if(errors != "") {%>
+        <% errors.forEach((item) => { %>
+        <div class="alert alert-danger">
+            <%- item %>
+        </div>
+        <% }); %>
+        <% } %>
+        <div class="w-100">
+            <% if(cartlist.length > 0) { %>
+            <% cartlist.forEach((cart) => { %>
+            <div class="card mx-0">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="" style="width: 200px;">
+                            <img src="<%= cart.picture %>" class="imageFitBox" alt="">
+                        </div>
+                        <div>
+                            <% const specs = JSON.parse(cart.spec_name); %>
+                            <% const option = JSON.parse(cart.option_name); %>
+                            <p><%= cart.productName %></p>
+                    
+                            <p><%= cart.printing_name %></p>
+                            <p><%= cart.spce_name %></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <% }) %>
+            <% } %>
+        </div>
+    </div>
+</body>
+<%- include('../partials/footer') %>

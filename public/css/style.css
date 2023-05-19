@@ -1,0 +1,437 @@
+@import url('https://fonts.googleapis.com/css2?family=Bai+Jamjuree&family=Kanit&display=swap');
+
+* {
+    font-family: 'Kanit', sans-serif;
+}
+
+/* Navbar */
+.navtoptap {
+    width: 100%;
+    height: 50px;
+    background-color: #588cb3;
+
+}
+
+.navbar {
+    background-color: rgb(255, 255, 255);
+}
+
+.navbar .active {
+    color: white !important;
+    background-color: #588cb3;
+    border-radius: 8px;
+    box-shadow: inset 0px 10px 15px rgba(0, 0, 0, 0.212);
+}
+
+
+.navbar .dropdown:hover>.dropdown-menu {
+    display: block;
+}
+
+.navbar .dropdown>.dropdown-toggle:active {
+    /*Without this, clicking will make it sticky*/
+    pointer-events: none;
+}
+
+.navbar .nav-link {
+    transition: 0.1s;
+    border-radius: 8px;
+}
+
+.navbar .nav-link:hover {
+    transition: 0.2s;
+    color: white !important;
+    background-color: #588cb3;
+    border-radius: 8px;
+    box-shadow: inset 0px 10px 15px rgba(0, 0, 0, 0.341);
+}
+
+.btn-primary {
+    background-color: #588cb3 !important;
+}
+
+.mini-profile {
+    width: 30px;
+    height: 30px;
+    overflow: hidden;
+    border-radius: 100%;
+}
+
+.mini-profile img {
+    width: 100%;
+    object-fit: cover;
+}
+
+.line {
+    color: white;
+    margin: 0.75em;
+    text-decoration: none;
+}
+
+.fa-line {
+    color: #06c755;
+}
+
+.navmenu {
+    margin: auto;
+}
+
+.navusermenu {
+    margin: auto 0 auto auto;
+}
+
+.navbar {
+    /* height: 120px; */
+    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.389);
+    z-index: 5;
+}
+
+.sign-in::before {
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    content: "\f2f6"
+}
+
+/* หน้าแรก */
+.carousel-inner {
+    background: linear-gradient(0deg, rgba(255 255 255 / 54%), rgba(255 0 150 / 69%)) !important;
+    background-repeat: no-repeat;
+    background-size: cover;
+    height: 300px;
+}
+
+.homed {
+    text-align: center;
+    padding: 5em;
+}
+
+.wrap-home-content {
+    width: 100%;
+    height: 550px;
+    background-color: #f4f4f4;
+    text-align: center;
+    padding: 2em;
+}
+
+.card {
+    margin: 1rem;
+}
+
+.card img {
+    height: 80%;
+    width: 100%;
+}
+
+/* Login */
+.login {
+    display: flex;
+    width: 75%;
+    margin: auto;
+}
+
+.login form {
+    width: 50%;
+    padding: 2em;
+}
+
+.other-login {
+    width: 50%;
+    padding: 5em 2em;
+    display: block;
+}
+
+.login-fb {
+    background-color: #5771bb;
+    border: none;
+    border-radius: 10px;
+    color: white;
+    box-shadow: 1px 3px 5px rgba(142, 142, 142, 0.473);
+    width: 250px;
+    height: 40px;
+    margin-bottom: 1em;
+}
+
+.login-fb p,
+.login-google p {
+    margin: 0;
+}
+
+.login-google {
+    padding-right: 1.5em;
+    background-color: white;
+    border: none;
+    border-radius: 10px;
+    color: black;
+    box-shadow: 1px 3px 5px rgba(142, 142, 142, 0.473);
+    width: 250px;
+    height: 40px;
+    justify-content: center;
+}
+
+.login-fb p::before {
+    font-family: "Font Awesome 5 Brands";
+    content: "\f09a";
+    margin-right: 10px;
+    font-size: 20px;
+}
+
+.line-or {
+    border-left: 2px solid rgb(209, 209, 209);
+    height: 310px;
+    top: 0;
+}
+
+.line-or span {
+    position: absolute;
+    top: auto;
+}
+
+/* Footer */
+
+footer {
+    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.389);
+}
+
+/* product */
+.product-list {
+    border: 1px solid rgb(199, 199, 199);
+    padding: auto;
+}
+
+.itemlist {
+    display: flex;
+    flex-wrap: wrap;
+    flex: 1;
+    justify-content: start;
+    margin: 0 2em;
+}
+
+.itemlist .card {
+    width: 270px;
+    height: 450px;
+}
+
+
+.product_list_card {
+    height: 250px;
+}
+
+
+.product_list_card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+
+/* ตั้งค่าบัญชี */
+/* .setting-button {
+    list-style: none;
+    padding: 1em;
+    box-shadow: 1px 1px 5px rgba(171, 171, 171, 0.229);
+} */
+.setting-user {
+    width: 20%;
+}
+
+.setting-box {
+    margin: auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    flex: 1;
+    width: 80%;
+}
+
+.profile-box {
+    /* background-color: #5771bb; */
+    width: 300px;
+    margin: 3em 1.5em;
+    text-align: center;
+}
+
+.profile {
+    margin: auto;
+    width: 150px;
+    height: 150px;
+    overflow: hidden;
+    border-radius: 100px;
+    margin-bottom: 10px;
+}
+
+.profile img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-box p {
+    color: rgb(154, 154, 154);
+    font-size: 12px;
+    margin: 5px 10px 0;
+}
+
+.imageFitBox {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* หน้าในสินค้า */
+.left-box-product {
+    width: 40%;
+}
+
+.right-box-product {
+    width: 60%;
+}
+
+.left-box-product .productPic {
+    height: 250px;
+    overflow: hidden;
+    border: 2px solid rgb(221, 221, 221);
+}
+
+.select-conclusion {
+    height: fit-content;
+    border: 2px solid rgb(221, 221, 221) !important;
+
+}
+
+.radio-choice {
+    border: 1px solid rgb(173, 173, 173);
+    width: 100%;
+    height: 80px;
+}
+
+.option-select {
+    display: flex;
+    padding: 1px;
+}
+
+
+
+.product_name {
+    width: 100%;
+    height: 40px;
+    top: 70%;
+    color: white;
+    font-size: 18px;
+    padding-top: 5px;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.428);
+    backdrop-filter: blur(3px);
+    position: absolute;
+}
+
+
+/* Nav admin */
+
+.nav-admin {
+    top: 0;
+    position: fixed;
+    display: block;
+    width: 300px;
+    height: 100vh;
+    box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.239);
+}
+
+.admin-navlink {
+    display: flex;
+    color: black;
+    padding: 10px 3em;
+    align-self: center;
+}
+
+.admin-navlink:hover {
+    width: 100%;
+    color: white;
+    background-color: #83a9c6;
+    border-right: solid 5px #d3eafc;
+    transition: 0.2s;
+}
+
+
+.admin-navlink i {
+    width: 30px;
+    margin-right: 15px;
+    align-self: center;
+}
+
+.admin-navlink p {
+    margin-top: 1em;
+}
+
+.admin-nav-active {
+    width: 100%;
+    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.179);
+    border-right: solid 5px #d3eafc;
+}
+
+/* ระบบแอดมิน */
+
+.box-admin {
+    /* background-color: #5771bb; */
+    margin-left: 300px;
+    padding: 2em 5em;
+}
+
+.product-picture {
+    width: 30px;
+    overflow: hidden;
+}
+
+.product-picture img {
+    object-fit: cover;
+}
+
+.option-img {
+    width: 100px;
+    height: 89px;
+    overflow: hidden;
+    border-radius: 5px;
+    border: 2px solid rgb(214, 214, 214);
+}
+
+.option-img .fa-plus {
+    position: absolute;
+    font-size: 40px;
+    margin: 0.55em 0.80em;
+}
+
+.option-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 2;
+}
+
+.option-img input[type="file"] {
+    width: 100px;
+    height: 89px;
+    opacity: 0;
+    position: absolute;
+    /* z-index: -1; */
+
+}
+
+/* ตัวอย่างงาน */
+
+.btn-ex-cat {
+    background: #eaeaea;
+    padding: 5px 10px;
+    margin: 10px 0px 10px 10px;
+    border-radius: 2px;
+    transition: 0.2s;
+}
+
+.btn-ex-cat:hover {
+    background: #d7d7d7;
+    transition: 0.2s;
+}
+
+.example-pic {
+    width: 300px;
+    height: 400px;
+    margin-right: 1em;
+}

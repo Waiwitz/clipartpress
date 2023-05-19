@@ -1,0 +1,197 @@
+<%- include('../partials/header') %>
+
+<body>
+    <div class="container-lg mt-5 mb-5 p-auto">
+
+        <h3 class="mb-3">ที่อยู่</h3>
+        <% if(success_msg != "") { %>
+        <% success_msg.forEach((item) => { %>
+        <div class="alert alert-success">
+            <%- item %>
+        </div>
+        <% }); %>
+        <% }else if(errors != "") {%>
+        <% errors.forEach((item) => { %>
+        <div class="alert alert-danger">
+            <%- item %>
+        </div>
+        <% }); %>
+        <% } %>
+        <div class="d-flex">
+            <%- include('../partials/usermenu') %>
+            <div class="">
+                <button type="button" class="btn btn-secondary mb-3" data-mdb-toggle="modal"
+                    data-mdb-target="#exampleModal">
+                    เพิ่มที่อยู่
+                </button>
+
+                <!-- Modal -->
+                <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">เพิ่มที่อยู่</h5>
+                                <button type="button" class="btn-close" data-mdb-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form action="/address" method="post">
+                                    <div class="form-outline mb-4">
+                                        <input type="text" id="form1Example1" class="form-control" name="name" />
+                                        <label class="form-label" for="form1Example1">ชื่อ-นามสกุล</label>
+                                    </div>
+                                    <div class="form-outline mb-4">
+                                        <input type="text" id="form1Example1" class="form-control" name="address" />
+                                        <label class="form-label" for="form1Example1">ที่อยู่</label>
+                                    </div>
+                                    <div class="form-outline mb-4">
+                                        <input type="text" id="form1Example1" class="form-control" name="province" />
+                                        <label class="form-label" for="form1Example1">จังหวัด</label>
+                                    </div>
+                                    <div class="form-outline mb-4">
+                                        <input type="text" id="form1Example1" class="form-control" name="zipcode" />
+                                        <label class="form-label" for="form1Example1">รหัสไปรษณีย์</label>
+                                    </div>
+                                    <div class="form-outline mb-4">
+                                        <input type="text" id="form1Example1" class="form-control" name="telephone" />
+                                        <label class="form-label" for="form1Example1">เบอร์โทรศัพท์</label>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-mdb-dismiss="modal">Close</button>
+                                        <button type="submit" class="btn btn-primary">Save changes</button>
+                                    </div>
+                                </form>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex">
+                    <% if(address.length > 0) {%>
+                    <% address.forEach((data) => { %>
+                    <div class="card" style="width: 350px;">
+                        <div class="d-flex justify-content-between m-2">
+                            <button type="button" class="btn btn-link btn-sm btn-rounded btn-edit editbtn"
+                                data-mdb-toggle="modal" data-mdb-target="#editModal"
+                                data-address-id="<%= data.address_id %>" data-name="<%= data.name %>"
+                                data-address="<%= data.address %>" data-province="<%= data.province %>"
+                                data-postcode="<%= data.postcode %>" data-telephone="<%= data.telephone%>">
+                                แก้ไข
+                            </button>
+                            <button type="button" class="btn btn-link btn-sm btn-rounded btn-edit deletebtn"
+                                data-mdb-toggle="modal" data-mdb-target="#deleteModal"
+                                data-address-id="<%= data.address_id %>">
+                                ลบ
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title"><%= data.name %></h5>
+                            <p class="card-text">
+                                <%= data.address %> <%= data.province %> <%= data.postcode %>
+                            </p>
+                            <p class="card-text">
+                                <%= data.telephone%>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel"
+                        aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="editModalLabel">แก้ไขที่อยู่</h5>
+                                    <button type="button" class="btn-close" data-mdb-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form action="/updateAddress" method="post">
+                                        <div class="form-outline mb-4">
+                                            <input type="text" id="new_name" class="form-control" name="new_name" />
+                                            <label class="form-label" for="form1Example1">ชื่อ-นามสกุล</label>
+                                        </div>
+                                        <div class="form-outline mb-4">
+                                            <input type="text" id="new_address" class="form-control"
+                                                name="new_address" />
+                                            <label class="form-label" for="form1Example1">ที่อยู่</label>
+                                        </div>
+                                        <div class="form-outline mb-4">
+                                            <input type="text" id="new_province" class="form-control"
+                                                name="new_province" />
+                                            <label class="form-label" for="form1Example1">จังหวัด</label>
+                                        </div>
+                                        <div class="form-outline mb-4">
+                                            <input type="text" id="new_zipcode" class="form-control"
+                                                name="new_zipcode" />
+                                            <label class="form-label" for="form1Example1">รหัสไปรษณีย์</label>
+                                        </div>
+                                        <div class="form-outline mb-4">
+                                            <input type="text" id="new_tel" class="form-control" name="new_tel" />
+                                            <label class="form-label" for="form1Example1">เบอร์โทรศัพท์</label>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary"
+                                                data-mdb-dismiss="modal">Close</button>
+                                            <button type="submit" class="btn btn-primary">Save changes</button>
+                                        </div>
+                                        <input type="hidden" id="id" name="addressID" value="" />
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel"
+                        aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="editModalLabel">ลบที่อยู่</h5>
+                                    <button type="button" class="btn-close" data-mdb-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form action="/deleteAddress" id="editForm" method="post">
+                                        <div>
+                                            <p>ต้องการลบที่อยู่นี้ใช่หรือไม่ ?</p>
+                                        </div>
+                                        <input type="hidden" id="id2" name="addressID" value="" />
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary "
+                                                data-mdb-dismiss="modal">ยกเลิก</button>
+                                            <button type="submit" class="btn btn-danger">ยืนยัน</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <% }); %>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        $(document).on("click", ".editbtn", function () {
+            var Id = $(this).data("address-id");
+            var name = $(this).data("name");
+            var address = $(this).data("address");
+            var province = $(this).data("province");
+            var postcode = $(this).data("postcode");
+            var telephone = $(this).data("telephone");
+            $("#new_name").val(name);
+            $("#new_address").val(address);
+            $("#new_province").val(province);
+            $("#new_zipcode").val(postcode);
+            $("#new_tel").val(telephone);
+            $("#id").val(Id);
+        });
+
+        $(document).on("click", ".deletebtn", function () {
+            var Id = $(this).data("address-id");
+            $("#id2").val(Id);
+        });
+    </script>
+</body>
+<%- include('../partials/footer') %>

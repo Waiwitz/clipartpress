@@ -1,0 +1,29 @@
+<%- include('../partials/header') %>
+
+<body>
+    <div class="container-lg mt-5 mb-5 p-auto">
+        <div>
+            <% if(errors != "") { %>
+            <% errors.forEach((item) => { %>
+            <div class="alert alert-danger">
+                <%- item %>
+            </div>
+            <% }); %>
+            <% } %>
+        </div>
+        <div class="w-50 m-auto">
+            <h3 class="mb-3">ลืมรหัสผ่าน</h3>
+            <form method="post" action="/identify">
+                <!-- username input -->
+                <p>กรอกอีเมลที่ใช้ในการสมัครสมาชิก ระบบจะส่งลิ้งค์รีเซ็ทรหัสผ่านให้คุณทางอีเมล</p>
+                <div class="form-outline mb-4">
+                    <input type="email" id="email" class="form-control" name="email" value="" />
+                    <label class="form-label" for="form1Example1">อีเมล</label>
+                </div>
+                <!-- Submit button -->
+                <button type="submit" class="btn btn-primary btn-block">ยืนยัน</button>
+            </form>
+        </div>
+    </div>
+</body>
+<%- include('../partials/footer') %>
