@@ -8,6 +8,7 @@ const {
 } = require("express-validator");
 const bcrypt = require('bcrypt');
 const multer = require('multer');
+const path = require('path');
 
 let validate = [
     check("username", "กรุณากรอกชื่อผู้ใช้").not().isEmpty().custom((value) => {
@@ -72,12 +73,19 @@ const updateProfile = async (req, res) => {
         telephone,
         lineid
     } = req.body;
-    const profilePicturePath = req.file.path.replace('public', '');
+    let profilePicturePath;
+    let query;
+    if (req.file) {
+        profilePicturePath = req.file.path.replace('public', '');
+        query = 'UPDATE users SET username = ?, email = ?, picture = ? ,name = ?, telephone = ?, lineid = ? WHERE user_id = ?'
+    } else {
+        query = 'UPDATE users SET username = ?, email = ? ,name = ?, telephone = ?, lineid = ? WHERE user_id = ?'
+    }
 
   
     try {
         const data = [username, email, profilePicturePath, name, telephone, lineid, req.session.user_id];
-        await dbConnection.query('UPDATE users SET username = ?, email = ?, picture = ? ,name = ?, telephone = ?, lineid = ? WHERE user_id = ?', data);
+        await dbConnection.query(query, data);
         // return res.render('pages/userprofile', { success_msg: ['แก้ไขโปรไฟล์สำเร็จ'] });
         req.flash("success_msg", 'แก้ไขโปรไฟล์สำเร็จ');
         req.session.picture = profilePicturePath;

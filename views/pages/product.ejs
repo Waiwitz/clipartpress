@@ -1,10 +1,20 @@
 <%- include('../partials/header') %>
 
 <body style="background-color: #FCFCFC;">
+  <script>
+    $(document).ready(function () {
+      $('#cardSection').hide();
+      $('#flyerSection').hide();
+      $('#leafletSection').hide();
+      $('#stickerSection').hide();
+      $('#billSection').hide();
+      $('#letterSection').hide();
+    });
+  </script>
   <div class="container-lg mt-5">
     <div style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
       <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="#">Home</a></li>
+        <li class="breadcrumb-item"><a href="#">หน้าแรก</a></li>
         <li class="breadcrumb-item active" aria-current="page"><%= currentMenu %></li>
       </ol>
     </div>
@@ -14,42 +24,197 @@
       <div class="d-flex mb-5">
         <!-- ประเภท -->
         <div class="list-group" style="width: 230px;">
-          <a href="/product/all"
-            class="list-group-item list-group-item-action <%= currentLink == 'allproduct' ? 'active' : ''%>">สินค้าทั้งหมด</a>
-          <% if(types.length > 0) {%>
-          <% types.forEach((type) => { %>
-          <a href="/product/categories/<%= type.categories_id %>"
-            class="list-group-item list-group-item-action <%= currentLink == type.categories_name ? 'active' : ''%>">
-            <%= type.categories_name %> </a>
-          <% }); %>
-          <% } %>
+          <div href="/product/all"
+            class="list-group-item list-group-item-action cate-button"
+            data-target="allSection">สินค้าทั้งหมด</div>
+          <div class="list-group-item list-group-item-action cate-button" data-target="cardSection">นามบัตร</div>
+          <div class="list-group-item list-group-item-action cate-button" data-target="flyerSection">ใบปลิว</div>
+          <div class="list-group-item list-group-item-action cate-button" data-target="leafletSection">แผ่บพับ</div>
+          <div class="list-group-item list-group-item-action cate-button" data-target="stickerSection">สติ๊กเกอร์</div>
+          <div class="list-group-item list-group-item-action cate-button" data-target="billSection">ใบบิล</div>
+          <div class="list-group-item list-group-item-action cate-button" data-target="letterSection">ซองจดหมาย</div>
         </div>
 
-        <!-- สินค้า -->
-        <div class="itemlist">
-          <% if(products.length > 0){ %>
-          <% products.forEach((product) => { %>
-          <div class="card m-0 me-4">
-            <a href="/product/item/<%= product.product_id %>">
-              <div class="ripple p-3 pb-1 product_list_card" data-mdb-ripple-color="light">
-                <img src="<%= product.picture %>" class="img-fluid rounded" />
+
+        <div>
+          <!-- สินค้าทั้งหมด -->
+          <div class="itemlist" id="allSection">
+            <% if(products.length > 0){ %>
+            <% products.forEach((product) => { %>
+            <div class="card m-0 me-4">
+              <a href="/product/item/<%= product.product_id %>">
+                <div class="ripple p-3 pb-1 product_list_card" data-mdb-ripple-color="light">
+                  <img src="<%= product.picture %>" class="img-fluid rounded" />
+                </div>
+              </a>
+              <div class="card-body p-3">
+                <h5 class="card-title"><%= product.productName %></h5>
+                <p class="card-text text-truncate"><%= product.description %></p>
               </div>
-            </a>
-            <div class="card-body p-3">
-              <h5 class="card-title"><%= product.productName %></h5>
-              <p class="card-text text-truncate"><%= product.description %></p>
+              <a href="/product/item/<%= product.product_id %>" class="w-100 position-static p-3 pb-4">
+                <button class="btn btn-primary w-100">สั่งทำ</button>
+              </a>
             </div>
-            <a href="/product/item/<%= product.product_id %>" class="w-100 position-static p-3 pb-4">
-              <button class="btn btn-primary w-100">สั่งทำ</button>
-            </a>
+            <% }); %>
+            <% } %>
           </div>
-          <% }); %>
-          <% } %>
+
+          <!-- นามบัตร -->
+          <div class="itemlist" id="cardSection">
+            <% if(products.length > 0){ %>
+            <% products.forEach((product) => { %>
+            <% if(product.categories === "card"){ %>
+            <div class="card m-0 me-4">
+              <a href="/product/item/<%= product.product_id %>">
+                <div class="ripple p-3 pb-1 product_list_card" data-mdb-ripple-color="light">
+                  <img src="<%= product.picture %>" class="img-fluid rounded" />
+                </div>
+              </a>
+              <div class="card-body p-3">
+                <h5 class="card-title"><%= product.productName %></h5>
+                <p class="card-text text-truncate"><%= product.description %></p>
+              </div>
+              <a href="/product/item/<%= product.product_id %>" class="w-100 position-static p-3 pb-4">
+                <button class="btn btn-primary w-100">สั่งทำ</button>
+              </a>
+            </div>
+            <% } %>
+            <% }); %>
+            <% } %>
+          </div>
+
+          <div class="itemlist" id="flyerSection">
+            <% if(products.length > 0){ %>
+            <% products.forEach((product) => { %>
+            <% if(product.categories === "flyer"){ %>
+            <div class="card m-0 me-4">
+              <a href="/product/item/<%= product.product_id %>">
+                <div class="ripple p-3 pb-1 product_list_card" data-mdb-ripple-color="light">
+                  <img src="<%= product.picture %>" class="img-fluid rounded" />
+                </div>
+              </a>
+              <div class="card-body p-3">
+                <h5 class="card-title"><%= product.productName %></h5>
+                <p class="card-text text-truncate"><%= product.description %></p>
+              </div>
+              <a href="/product/item/<%= product.product_id %>" class="w-100 position-static p-3 pb-4">
+                <button class="btn btn-primary w-100">สั่งทำ</button>
+              </a>
+            </div>
+            <% } %>
+            <% }); %>
+            <% } %>
+          </div>
+
+          <div class="itemlist" id="leafletSection">
+            <% if(products.length > 0){ %>
+            <% products.forEach((product) => { %>
+            <% if(product.categories === "leaflet"){ %>
+            <div class="card m-0 me-4">
+              <a href="/product/item/<%= product.product_id %>">
+                <div class="ripple p-3 pb-1 product_list_card" data-mdb-ripple-color="light">
+                  <img src="<%= product.picture %>" class="img-fluid rounded" />
+                </div>
+              </a>
+              <div class="card-body p-3">
+                <h5 class="card-title"><%= product.productName %></h5>
+                <p class="card-text text-truncate"><%= product.description %></p>
+              </div>
+              <a href="/product/item/<%= product.product_id %>" class="w-100 position-static p-3 pb-4">
+                <button class="btn btn-primary w-100">สั่งทำ</button>
+              </a>
+            </div>
+            <% } %>
+            <% }); %>
+            <% } %>
+          </div>
+
+          <div class="itemlist" id="stickerSection">
+            <% if(products.length > 0){ %>
+            <% products.forEach((product) => { %>
+            <% if(product.categories === "sticker"){ %>
+            <div class="card m-0 me-4">
+              <a href="/product/item/<%= product.product_id %>">
+                <div class="ripple p-3 pb-1 product_list_card" data-mdb-ripple-color="light">
+                  <img src="<%= product.picture %>" class="img-fluid rounded" />
+                </div>
+              </a>
+              <div class="card-body p-3">
+                <h5 class="card-title"><%= product.productName %></h5>
+                <p class="card-text text-truncate"><%= product.description %></p>
+              </div>
+              <a href="/product/item/<%= product.product_id %>" class="w-100 position-static p-3 pb-4">
+                <button class="btn btn-primary w-100">สั่งทำ</button>
+              </a>
+            </div>
+            <% } %>
+            <% }); %>
+            <% } %>
+          </div>
+
+          <div class="itemlist" id="billSection">
+            <% if(products.length > 0){ %>
+            <% products.forEach((product) => { %>
+            <% if(product.categories === "bill"){ %>
+            <div class="card m-0 me-4">
+              <a href="/product/item/<%= product.product_id %>">
+                <div class="ripple p-3 pb-1 product_list_card" data-mdb-ripple-color="light">
+                  <img src="<%= product.picture %>" class="img-fluid rounded" />
+                </div>
+              </a>
+              <div class="card-body p-3">
+                <h5 class="card-title"><%= product.productName %></h5>
+                <p class="card-text text-truncate"><%= product.description %></p>
+              </div>
+              <a href="/product/item/<%= product.product_id %>" class="w-100 position-static p-3 pb-4">
+                <button class="btn btn-primary w-100">สั่งทำ</button>
+              </a>
+            </div>
+            <% } %>
+            <% }); %>
+            <% } %>
+          </div>
+
+          <div class="itemlist" id="letterSection">
+            <% if(products.length > 0){ %>
+            <% products.forEach((product) => { %>
+            <% if(product.categories === "letter"){ %>
+            <div class="card m-0 me-4">
+              <a href="/product/item/<%= product.product_id %>">
+                <div class="ripple p-3 pb-1 product_list_card" data-mdb-ripple-color="light">
+                  <img src="<%= product.picture %>" class="img-fluid rounded" />
+                </div>
+              </a>
+              <div class="card-body p-3">
+                <h5 class="card-title"><%= product.productName %></h5>
+                <p class="card-text text-truncate"><%= product.description %></p>
+              </div>
+              <a href="/product/item/<%= product.product_id %>" class="w-100 position-static p-3 pb-4">
+                <button class="btn btn-primary w-100">สั่งทำ</button>
+              </a>
+            </div>
+            <% } %>
+            <% }); %>
+            <% } %>
+          </div>
+
         </div>
       </div>
     </div>
   </div>
-
+  <script>
+   $(document).ready(function () {
+    $(".cate-button").on("click", function () {
+      const targetSection = $(this).data("target");
+      $(".cate-button").removeClass("active");
+      $(this).addClass("active");
+      $(".itemlist").hide();
+      $("#" + targetSection).show();
+    });
+  });
+  </script>
 </body>
+
+
 
 <%- include('../partials/footer') %>

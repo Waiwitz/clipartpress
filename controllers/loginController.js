@@ -9,6 +9,7 @@ const login = (req, res) => {
     try {
         const username = req.body.username;
         const password = req.body.password;
+        const remember = req.body.rememberMe;
         if (!username || !password) {
             return res.render('pages/login', {
                 errors: ['กรุณากรอกอีเมลและรหัสผ่าน']
@@ -41,7 +42,7 @@ const login = (req, res) => {
                             req.session.telephone = row[0].telephone;
                             req.session.lineid = row[0].lineid;
                             req.session.picture = row[0].picture;
-                            req.session.role = row[0].role;
+                            req.session.role = row[0].user_role;
                             const id = row[0].user_id;
                             const role = row[0].user_role;
                             console.log(role)
@@ -52,11 +53,17 @@ const login = (req, res) => {
                                 expiresIn: 86400
                             })
                             req.session.token = token;
-
-                            if (role === true) {
-                                res.status(200).redirect("/dashborad");
+                            // dbConnection.query('SELECT * FROM chats WHERE sender_id = ?' [d])
+                            if (role === 1) {
+                                res.status(200).redirect("/admin/dashborad");
                             } else {
                                 res.status(200).redirect("/");
+                            }
+
+                            if (remember) {
+                                req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000;
+                            } else {
+                                req.session.cookie.expires = false; 
                             }
 
                         } else {

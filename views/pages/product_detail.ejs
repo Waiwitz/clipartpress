@@ -6,9 +6,9 @@
             <div class="left-box-product">
                 <div class="card productPic">
                     <div class="card-body p-0">
-                        <span class="product_name"><%= products.productName %></span>
+                        <span class="product_name"><%= product.productName %></span>
                         <div class="product_img">
-                            <img src="<%= products.picture %>" alt="" class="imageFitBox" draggable="false">
+                            <img src="<%= product.picture %>" alt="" class="imageFitBox" draggable="false">
                         </div>
                     </div>
                 </div>
@@ -17,11 +17,13 @@
                         <h3>สรุปสิ่งที่เลือก</h3>
                     </div>
                     <div class="card-body">
-                        <% for (var specName in specs) { %>
-                        <% if (specs.hasOwnProperty(specName)) { %>
+                        <% let i = 0; %>
+                        <% for (var optionName in options) { %>
+                        <% i++ %>
+                        <% if (options.hasOwnProperty(optionName)) { %>
                         <div class="col">
-                            <h4><%= specName %></h4>
-                            <p></p>
+                            <h4><%= optionName %></h4>
+                            <p class="select-option" id="select-option-<%= i %>"></p>
                         </div>
                         <% } %>
                         <% } %>
@@ -32,56 +34,26 @@
             <div class="right-box-product p-3">
                 <form action="/addtocart" method="post" enctype="multipart/form-data">
                     <div class="w-75 m-auto">
-                        <div class="form-outline mb-4">
-                            <input type="text" name="jobname" class="form-control w-100" />
-                            <label class="form-label" for="form4Example1">ชื่องาน</label>
-                        </div>
                         <div class="spec-picking">
-                            <div class="form-outline mb-4">
-                                <input type="number" name="quantity" class="form-control" id="quantity" value="50"
-                                    min="50" max="500" onchange="calculatePrice()">
-                                <label class="form-label" for="form4Example1">จำนวน</label>
-
-                            </div>
-                            <% let i = 0; %>
-                            <input type="text" name="productid" value="<%= products.product_id %>" hidden>
-                            <% for (var specName in specs) { %>
-                            <% if (specs.hasOwnProperty(specName)) { %>
-                            <% i++ %>
-                            <div class="mb-5" id="<% i %>">
-                                <input type="text" name="spec" value="<%= specName %>" hidden>
-                                <legend><%= specName %></legend>
-                                <hr>
-                                <div class="form-check ps-0">
-                                    <div class="option-select">
-                                        <div>
-                                            <img src="" alt=""
-                                                style="width: 80px; height: 80px;">
-                                        </div>
-                                        <select name="option" id="option" class="radio-choice">
-                                            <% for (var j = 0; j < specs[specName].length; j++) { %>
-                                            <option value="<%= specs[specName][j].option_name %>"
-                                                data-price="<%= specs[specName][j].option_perPrice %>">
-                                                <%= specs[specName][j].option_name %>
-                                            </option>
-                                            <% } %>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
+                            <input type="text" name="productid" value="<%= product.product_id %>" hidden>
+                            <% let count = 0; %>
+                            <% if(product.categories === 'sticker'){ %>
+                            <% count++ %>
+                            <%- include('./product_select/sticker', { count: count, options: options }) %> 
                             <% } %>
-                            <% } %>
-                            <div>
+                          
+                            <div class="my-4">
                                 <h4>การออกแบบ</h4>
                                 <hr>
-                                <input type="file" class="btn d-block" id="customFile" name="designfile"/>
-                                <a href="#">
-                                    <button class="btn btn-secondary d-block mt-3">ออกแบบด้วยเครื่องมือในเว็บ</button>
+                                <input type="file" class="btn d-block" id="customFile" name="designfile" />
+                                <a href="/konva">
+                                    <div class="btn btn-secondary d-block mt-3">ออกแบบด้วยเครื่องมือในเว็บ</div>
                                 </a>
                             </div>
-                            <div class="float-end">
+                            <div class="float-end mt-5">
                                 <span>ยอดรวม: </span>
-                                <span id="total-price">฿0</span>
+                                <input type="text" name="total_price" id="total-price" readonly>
+                                <!-- <span id="total-price">฿0</span> -->
                                 <% if(!login){ %>
                                 <p>กรุณาเข้าสู่ระบบก่อนที่จะเพิ่มสินค้าลงตระกร้า</p>
                                 <% }else if(login === true) { %>
@@ -90,7 +62,6 @@
                                         class="btn btn-primary d-block mt-3">ยืนยันรายการลงตระกร้า</button>
                                 </a>
                                 <% } %>
-
                             </div>
                         </div>
                     </div>
@@ -101,25 +72,69 @@
 </body>
 
 <script>
-    $(document).ready(function () {
-        const total = $('#total-price');
-        let totalPrice = 0;
+    // function calculatePrice() {
+    //     const quantity = parseInt($('#floatingSelect').val());
+    //     const quantityPerUnit = parseInt($('#floatingSelect option:selected').data('perUnit'));
 
-        // listen for changes to the radio buttons
-        $('input[type="radio"]').change(function () {
-            const selectedOptionPrice = parseFloat($(this).data('price'));
-            const specName = $(this).attr('name');
+    //     const optionPrice = parseFloat($('#option option:selected').data('price'));
 
-            // update the total price
-            totalPrice -= specs[specName].selectedOptionPrice;
-            totalPrice += selectedOptionPrice;
+    //     const totalPricePerUnit = optionPrice * quantityPerUnit;
+    //     const totalPrice = totalPricePerUnit * quantity;
 
-            // update the total price element
-            totalPriceElement.text(`Total Price: $${totalPrice.toFixed(2)}`);
+    //     $('#total-price').val(totalPrice.toFixed(2)); // Display the total price in the input field
+    // }
+
+    $(document).ready(() => {
+        $('.radio-choice, #floatingSelect').change(calculatePrice);
+    });
+
+    function calculatePrice() {
+        const quantity = parseInt($('#floatingSelect').val());
+        const quantityPerUnit = parseInt($('#floatingSelect option:selected').data('perunit'));
+        const optionPrice = parseFloat($('#option option:selected').data('price'));
+
+        if (isNaN(quantity) || isNaN(quantityPerUnit) || isNaN(optionPrice)) {
+            $('#total-price').val('Invalid selection');
+            return;
+        }
+
+        const totalPricePerUnit = optionPrice * quantityPerUnit;
+        const totalPrice = totalPricePerUnit * quantity;
+
+        $('#total-price').val(totalPrice.toFixed(2));
+    }
+
+    // Update the code to set data-perUnit and data-quantity attributes in the quantity select options
+    $(document).ready(() => {
+        $('.form-select').change(() => {
+            const selectedQuantityOption = $('#floatingSelect option:selected');
+            const perUnit = selectedQuantityOption.data('perunit');
+            const quantity = selectedQuantityOption.val();
+
+            $('.radio-choice option').attr('data-perUnit', perUnit).attr('data-quantity', quantity);
         });
+    });
 
-        // set the initial total price
-        totalPriceElement.text(`Total Price: $${totalPrice.toFixed(2)}`);
+
+
+    $(document).ready(() => {
+        $('.radio-choice').change(function () {
+            const selectedOption = $(this).find('option:selected');
+            const imagePath = selectedOption.data('img');
+            const index = $('.radio-choice').index(this);
+            const selectedImage = $('.selectedimg').eq(index);
+
+            selectedImage.attr('src', imagePath);
+        });
+    });
+
+    $(document).ready(() => {
+        $('.radio-choice').change(function () {
+            const selectedOption = $(this).find('option:selected');
+            const selectedText = selectedOption.val();
+            const index = $(this).closest('.mb-2').attr('id');
+            $('#select-option-' + index).text(selectedText);
+        });
     });
 </script>
 

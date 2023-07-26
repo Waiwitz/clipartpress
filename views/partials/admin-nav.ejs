@@ -1,60 +1,81 @@
 <%- include('../partials/head') %>
-<div class="mb-5">
-    <!-- <div class="text-end flag-lang container-lg d-flex justify-content-end">
-      <p class="line pe-4">Line : <a href="#" class="link-light">0800000000</a></p>
-      <i class="flag flag-thailand align-self-center"></i>
-      <i class="flag flag-united-states align-self-center"></i>
-    </div> -->
+<nav class="nav-admin navbar-light" style="z-index: 10 !important;">
+  <div class="text-center mt-3 ">
+    <img src="/assets/img/logo.png" alt="clipartpress" width="150" class="center">
   </div>
- <nav class="nav-admin navbar-light" style="z-index: 10 !important;">
-    <div class="text-center mt-3 ">
-        <img src="/assets/img/logo.png" alt="clipartpress" width="150" class="center">
-    </div>
-    <hr class="ms-3 me-3">
-    <div class="  " id="navbarSupportedContent">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li class="nav-item">
-            <a class="admin-navlink  " aria-current="page" href="/dashborad">
-                <i class="fa fa-chart-line"></i>
-                <p>แดชบอร์ด</p>
+  <hr class="ms-3 me-3">
+  <div class="  " id="navbarSupportedContent">
+    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+      <li class="nav-item">
+        <a class="admin-navlink  " aria-current="page" href="/admin/dashborad">
+          <i class="fa fa-chart-line"></i>
+          <p>แดชบอร์ด</p>
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <div class="admin-navlink d-flex justify-content-between" data-mdb-toggle="collapse" data-mdb-target="#product"
+          aria-expanded="false" aria-controls="product">
+
+          <div class="d-flex">
+            <i class="fas fa-list"></i>
+            <p>สินค้า</p>
+          </div>
+          <i class="fa-solid fa-caret-down" style="padding-left: 50px;"></i>
+        </div>
+        <div>
+          <div
+            class="collapse collapse-horizontal <%= currentLink == 'allproduct' || currentLink == "typeproduct" || currentLink == "option" ? 'show' : " "%>"
+            id="product">
+            <a class="ps-5 <%= currentLink == 'allproduct' ? 'admin-navlink admin-nav-active' : 'admin-navlink'%>"
+              href="/admin/product-list">
+              <p class="ms-5">จัดการสินค้า</p>
             </a>
-          </li>
-          <li class="nav-item">
-            <a class="<%= currentLink == 'allproduct' ? 'admin-navlink admin-nav-active' : 'admin-navlink'%>" href="/product-list">
-                <i class="fas fa-list"></i>
-                <p>สินค้า</p>
+            <a class="<%= currentLink == "option" ? 'admin-navlink admin-nav-active' : 'admin-navlink' %>"
+              href="/admin/options">
+              <p class="ms-5">จัดการตัวเลือกสินค้า</p>
             </a>
-          </li>
-          <li class="nav-item">
-            <a class="<%= currentLink == "typeproduct" ? 'admin-navlink admin-nav-active' : 'admin-navlink' %>" href="/typeproduct">
-                <i class="fas fa-sort-amount-down"></i>
-                <p>ประเภทสินค้า</p>
+            <a class="<%= currentLink == "typeproduct" ? 'admin-navlink admin-nav-active' : 'admin-navlink' %>"
+              href="/admin/typeproduct">
+              <p class="ms-5">จัดการขนาดของชิ้นงาน</p>
             </a>
-          </li>
-          <li class="nav-item">
-            <a class="admin-navlink" href="#">
-                <i class="fas fa-clipboard-list"></i>
-                <p>รายการสั่งทำ</p>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="admin-navlink" href="#">
-                <i class="fas fa-ban"></i>
-                <p>คำขอยกเลิกรายการ</p>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="<%= currentLink == "member" ? 'admin-navlink admin-nav-active' : 'admin-navlink' %>" href="/member">
-                <i class="fas fa-user-friends"></i>
-                <p>สมาชิก</p>
-            </a>
-          </li>    
-          <li class="nav-item">
-            <a class="admin-navlink" href="#">
-                <i class="fas fa-sign-out-alt"></i>
-                <p>ออกจากระบบ</p>
-            </a>
-          </li>  
-        </ul>
-      </div>
- </nav>
+          </div>
+        </div>
+      </li>
+
+      <li class="nav-item">
+        <a class="admin-navlink" href="#">
+          <i class="fas fa-clipboard-list"></i>
+          <p>รายการสั่งทำ</p>
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a class="<%= currentLink == "chat" ? 'admin-navlink admin-nav-active' : 'admin-navlink' %>" aria-current="page"
+          href="/admin/chat/*">
+          <i class="fa-solid fa-comment"></i>
+          <p>แชท</p>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="admin-navlink" href="#">
+          <i class="fas fa-ban"></i>
+          <p>คำขอยกเลิกรายการ</p>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="<%= currentLink == "member" ? 'admin-navlink admin-nav-active' : 'admin-navlink' %>"
+          href="/admin/member">
+          <i class="fas fa-user-friends"></i>
+          <p>สมาชิก</p>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="admin-navlink" href="#">
+          <i class="fas fa-sign-out-alt"></i>
+          <p>ออกจากระบบ</p>
+        </a>
+      </li>
+    </ul>
+  </div>
+</nav>

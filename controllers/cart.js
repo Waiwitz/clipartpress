@@ -23,27 +23,44 @@ const insertCart = async (req, res) => {
     const design = req.file.path.replace('public', '');
     const specs = req.body.spec;
     const options = req.body.option;
+    const price = req.body.total_price;
 
-    // for (let i = 0; i < specs.length; i++) {
-    //     // const specObj = {
-    //     //     [specs[i]]: options[i]
-    //     // };
-    //     // specObjects.push(specObj);
-    // }
+    let insertionSuccess = true;
 
-    const data = [name, JSON.stringify(specs), JSON.stringify(options), quantity, design, userId, productId];
+
+    const data = [name, JSON.stringify(specs), JSON.stringify(options),design, price, quantity, userId, productId];
     try {
-        await dbConnection.query("INSERT INTO cart SET printing_name = ? , spec_name = ?, option_name = ?, quantity = ?, design_file = ?, user_id = ?, product_id = ?", data, (error) => {
+        await dbConnection.query("INSERT INTO cart SET printing_name = ? , spec = ?, options = ?, design_file = ?, price = ?, quantity = ?, user_id = ?, product_id = ?", data, (error) => {
             if (error) throw error;
         });
-        return res.send('เพิ่มลงตระกร้าแล้ว');
     } catch (error) {
         console.log(error);
+        insertionSuccess = false;
+        return res.redirect(`/product/all`);
+    }
+
+
+    if (insertionSuccess) {
+        return res.send('เพิ่มลงตระกร้าแล้ว');
+    } else {
         return res.redirect(`/product/all`);
     }
 };
 
+const deleteCart = async (req, res) => {
+    const id = req.body.id
+    try {
+        await dbConnection.query("UPDATE cart SET deleted_at = CURRENT_TIMESTAMP WHERE cart_id = ?", [id]);
+        req.flash("success_msg", 'ลบสินค้าออกจากตระกร้าแล้ว');
+        return res.redirect("/cart");
+    } catch (error) {
+        req.flash("errors", error.message);
+        return res.redirect("/cart");
+    }
+}
+
 module.exports = {
     upload: upload,
     insertCart: insertCart,
+    deleteCart: deleteCart
 }

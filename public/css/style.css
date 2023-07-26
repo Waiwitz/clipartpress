@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Bai+Jamjuree&family=Kanit&display=swap');
+@import "/css/animation.css";
 
 * {
     font-family: 'Kanit', sans-serif;
@@ -44,6 +45,11 @@
     background-color: #588cb3;
     border-radius: 8px;
     box-shadow: inset 0px 10px 15px rgba(0, 0, 0, 0.341);
+}
+
+.nav-link:hover a {
+    color: white !important;
+
 }
 
 .btn-primary {
@@ -118,7 +124,7 @@
 }
 
 .card img {
-    height: 80%;
+    height: 100%;
     width: 100%;
 }
 
@@ -189,6 +195,7 @@
 /* Footer */
 
 footer {
+    margin-top: 350px;
     box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.389);
 }
 
@@ -200,6 +207,7 @@ footer {
 
 .itemlist {
     display: flex;
+    width: 100%;
     flex-wrap: wrap;
     flex: 1;
     justify-content: start;
@@ -209,10 +217,18 @@ footer {
 .itemlist .card {
     width: 270px;
     height: 450px;
+    transition: 0.2s ease-in ;
+}
+
+.itemlist .card:hover {
+    transition: 0.1s ease-out ;
+    border: 2px solid #37648678;
+    border-radius: 0;
 }
 
 
 .product_list_card {
+    overflow: hidden;
     height: 250px;
 }
 
@@ -221,8 +237,17 @@ footer {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    /* scale: 1;
+    transition: 0.4s ease-in-out; */
 }
 
+.cate-button {
+    cursor: pointer;
+}
+
+/* #cardSection, #flyerSection, #leafletSection, #stickerSection, #billSection, #letterSection {
+    display: none;
+} */
 
 /* ตั้งค่าบัญชี */
 /* .setting-button {
@@ -324,6 +349,24 @@ footer {
     position: absolute;
 }
 
+.des-question {
+    display: none;
+    background-color: white;
+    position: absolute;
+    width: 300px;
+    height: 100px;
+    box-shadow: 1px 5px 15px #0000003c;
+    transition: 0.2s;
+    transform: translateX(20px) translateY(-60px);
+    z-index: 3;
+    font-size: 16px;
+    padding: 10px;
+}
+
+.fa-circle-question:hover + .des-question {
+    display: inline;
+    transition: 0.2s;
+}
 
 /* Nav admin */
 
@@ -385,8 +428,16 @@ footer {
     object-fit: cover;
 }
 
+.product-preview-upload .option-img {
+    height: 160px;
+}
+
+.product-preview-upload .option-img .fa-plus{
+    margin: 1.5em 1em;
+}
+
 .option-img {
-    width: 100px;
+    width: 120px;
     height: 89px;
     overflow: hidden;
     border-radius: 5px;
@@ -396,7 +447,7 @@ footer {
 .option-img .fa-plus {
     position: absolute;
     font-size: 40px;
-    margin: 0.55em 0.80em;
+    margin: 0.55em 1em;
 }
 
 .option-img img {
@@ -407,12 +458,103 @@ footer {
 }
 
 .option-img input[type="file"] {
-    width: 100px;
+    width: 120px;
     height: 89px;
     opacity: 0;
     position: absolute;
     /* z-index: -1; */
+}
 
+.product-cate {
+    width: 200px !important;
+    height: 250px;
+    margin: 10px auto;
+    padding: 0 !important;
+    box-shadow: 0px 5px 22px rgba(0, 0, 0, 0.285);
+}
+
+
+.product-cate .type-name {
+    position: absolute;
+    width: 200px;
+    height: 50px;
+    backdrop-filter: blur(10px);
+    background-color: #37648648;
+    text-align: center;
+    top: 40%;
+    color: white;
+    transition: 0.2s ease-out;
+}
+
+.product-cate span {
+    position: absolute;
+    width: 200px;
+    top: 40%;
+    font-size: 22px;
+    color: white;
+    z-index: 2;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.product-cate:hover .type-name {
+    top: 5%;
+    height: 250px;
+    transition: 0.2s ease-in;
+}
+
+/* หน้าจัดการตัวเลือกวัสดุ */
+.option-admin-card {
+    width: 250px;
+}
+
+.option-admin-card .card-body {
+    height: 250px;
+}
+
+.option-action {
+    position: fixed;
+    display: none;
+    flex-wrap: wrap;
+    justify-content: center;
+    transition: 0.2s;
+}
+
+.option-action button {
+    width: 125px;
+}
+
+.option-admin-card :hover .option-action {
+    display: flex;
+    transition: 0.2s;
+}
+
+.option-action-img {
+    width: 100%;
+    height: 200px;
+}
+
+.ms-choice {
+    height: 35px !important;
+}
+
+
+.ms-choice .placeholder {
+    background-color: #00000000;
+}
+
+.ms-choice span {
+    height: 35px !important;
+    padding: 5px;
+}
+
+.remove-spec {
+    right: 0;
+    margin-right: 2em;
+}
+
+.sub-option-row {
+    height: 250px;
 }
 
 /* ตัวอย่างงาน */
@@ -434,4 +576,240 @@ footer {
     width: 300px;
     height: 400px;
     margin-right: 1em;
+}
+
+/* แชทฝั่งแอดมิน */
+.chat-list {
+    width: 40%;
+}
+
+.user-box {
+    width: 320px;
+    height: 120px;
+    background-color: white;
+    box-shadow: 0px 5px 15px #67676782;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    transition: 0.2s ease-out;
+    cursor: pointer;
+}
+
+.user-box:hover {
+    transition: 0.2s ease-in;
+    border-left: 5px solid #588cb3;
+    background-color: rgb(244, 244, 244);
+}
+
+.chat-pf {
+    width: 80px;
+    height: 80px;
+    margin: 1.25em;
+    border-radius: 100%;
+    overflow: hidden;
+}
+
+.chat-pf img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.chatbox {
+    display: none;
+    background-color: #ffffff;
+    width: 100%;
+    height: 100%;
+    box-shadow: 0px 5px 15px #67676782;
+}
+
+.message-wrap {
+    position: relative;
+    width: 100%;
+    height: 70px;
+    margin-bottom: 10px;
+}
+
+.message-box-left {
+    position: absolute;
+    background-color: white;
+    width: fit-content;
+    height: fit-content;
+    padding: 10px;
+    margin: 1em 1em 0;
+    left: 0;
+    border-radius: 20px;
+    box-shadow: 0px 5px 10px #6767671d;
+}
+
+.message-box-right {
+    position: absolute;
+    background-color: #588cb3;
+    color: white;
+    width: fit-content;
+    height: fit-content;
+    padding: 10px;
+    margin: 1em 1em 0;
+    right: 0;
+    border-radius: 20px;
+    box-shadow: 0px 5px 10px #6767671d;
+}
+
+.input-message-wrap {
+    position: relative;
+    width: 100%;
+    height: 50px;
+}
+
+.text-message {
+    width: 96%;
+    margin: 10px;
+    border: 0.5px solid #b3b3b3;
+    border-radius: 5px;
+    box-shadow: 0px 5px 10px #6767671d;
+
+}
+
+.input-message {
+    padding: 5px;
+    border-radius: 5px;
+    border: none;
+    width: 100%;
+}
+
+.message {
+    height: 79%;
+    overflow-x: auto;
+}
+
+.chat-action {
+    position: relative;
+    transform: translateX(-10px);
+}
+
+/* แชท user */
+.chat-button {
+    position: fixed;
+    width: 80px;
+    height: 80px;
+    margin: 1em;
+    background-color: #588cb3;
+    border-radius: 100%;
+    /* z-index: 10; */
+    bottom: 0;
+    right: 0;
+    color: white;
+    text-align: center;
+    box-shadow: 0px 5px 10px #35353568;
+    font-size: 30px;
+    cursor: pointer;
+    transition: 0.2s ease-out;
+}
+
+.chat-button:hover {
+    background-color: #376486;
+}
+
+.chat-windows {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    background-color: #ffffff;
+    width: 600px;
+    height: 600px;
+    margin-right: 20px;
+    box-shadow: 0px 5px 15px #67676782;
+    z-index: 10;
+}
+
+.slideTop {
+    -webkit-animation: slide-top 0.5s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
+    animation: slide-top 0.5s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
+}
+
+.slidedown {
+    -webkit-animation: slide-top 0.5s cubic-bezier(0.250, 0.460, 0.450, 0.940) reverse both;
+    animation: slide-top 0.5s cubic-bezier(0.250, 0.460, 0.450, 0.940) reverse both;
+}
+
+.upload-img {
+    width: 30px;
+    height: 30px;
+    overflow: hidden;
+    border-radius: 5px;
+    border: 2px solid rgb(214, 214, 214);
+    margin: auto;
+}
+
+.upload-img input[type="file"] {
+    width: 30px;
+    height: 30px;
+    opacity: 0;
+    position: absolute;
+    z-index: 4;
+    transform: translateX(-27px);
+
+}
+
+.chat-noti {
+    display: none;
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    top: 0;
+    right: 0;
+    background-color: rgb(237, 0, 0);
+    border-radius: 20px;
+}
+
+.close-chat {
+    background: white;
+    width: 35px;
+    height: 35px;
+    margin: 1em;
+    border-radius: 20px;
+    border: 1px solid #bababa;
+}
+
+.send-ms {
+    background: none;
+    border: none;
+}
+
+.send-ms:hover i {
+    color: #b6bccf;
+}
+
+.cart-box {
+    height: 300px !important;
+}
+
+.cart-product-picture {
+    width: 200px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    object-fit: cover;
+}
+
+.cart-product-picture+div {
+    margin-left: 200px;
+}
+
+/* datatable */
+.paginate_button {
+    /* margin: 10px; */
+}
+
+.dataTables_length, .dataTables_filter {
+    margin-bottom: 1em;
+}
+
+#table {
+    border-bottom: solid 1px #c1c1c1a7 !important;
+    margin: 2em 0 !important;
+}
+
+.dataTable tr {
+    border: solid 1px #c1c1c1a7;
 }

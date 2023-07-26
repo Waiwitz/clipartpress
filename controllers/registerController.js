@@ -95,7 +95,7 @@ const createNewUserController = async (req, res) => {
 
     try {
         createNewUser(newUser);
-        return res.redirect("/");
+        return res.redirect("/"); 
     } catch (err) {
         req.flash("errors", err);
         // console.log(err)
@@ -110,9 +110,11 @@ const createNewUser = (user) => {
                 username: user.username,
                 password: bcryptjs.hashSync(user.password, 10),
                 email: user.email,
+                picture: "/uploads/profile/icons-profile.png",
                 name: user.name,
                 telephone: user.telephone,
                 lineid: user.lineid,
+                user_role: 0,
                 token: randtoken.generate(20)
             };
             dbConnection.query("INSERT INTO users SET ?", [data]);

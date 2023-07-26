@@ -20,19 +20,63 @@
         <div class="w-100">
             <% if(cartlist.length > 0) { %>
             <% cartlist.forEach((cart) => { %>
-            <div class="card mx-0">
-                <div class="card-body">
-                    <div class="d-flex">
-                        <div class="" style="width: 200px;">
-                            <img src="<%= cart.picture %>" class="imageFitBox" alt="">
+            <div class="card mx-0 overflow-hidden cart-box">
+                <div class="card-body overflow-hidden">
+                    <div class="d-flex m-2 justify-content-between flex-wrap">
+                        <div class="d-inline-flex">
+                            <div class="cart-product-picture">
+                                <input type="checkbox">
+                                <img src="<%= cart.picture %>" alt="" class="imageFitBox" draggable="false">
+                            </div>
+                            <div class="d-inline-flex">
+                                <div class="m-2">
+                                    <% const specs = JSON.parse(cart.spec); %>
+                                    <% const options = JSON.parse(cart.options); %>
+                                    <h4><%= cart.productName %></h4>
+                                    <p>ชื่องาน : <%= cart.printing_name %></p>
+                                    <% for (let i = 0; i < specs.length; i++) { %>
+                                    <p> <%= specs[i] %> : <%= options[i] %></p>
+                                    <% } %>
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <% const specs = JSON.parse(cart.spec_name); %>
-                            <% const option = JSON.parse(cart.option_name); %>
-                            <p><%= cart.productName %></p>
-                    
-                            <p><%= cart.printing_name %></p>
-                            <p><%= cart.spce_name %></p>
+                        <div class="border-start p-5">
+                            <p><%= cart.price %></p>
+                        </div>
+                    </div>
+                    <div class="border-top d-flex justify-content-between p-3 my-4" style="margin-left: 200px;">
+                        <a href="" class="text-drak">
+                            <i class="fa-solid fa-pen-to-square"></i> แก้ไขรายการ
+                        </a>
+                        <button type="button" class="btn btn-danger delete rounded-0" data-mdb-toggle="modal"
+                            data-mdb-target="#deleteModal" data-cart-id="<%= cart.cart_id %>">
+                            ลบ
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editModalLabel">ลบรายการ</h5>
+                            <button type="button" class="btn-close" data-mdb-dismiss="modal"
+                                aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form action="/deleteCart" id="editForm" method="post">
+                                <div>
+                                    <p>ต้องการลบสินค้านี้ออกจากตระกร้าใช่หรือไม่ ?</p>
+                                </div>
+                                <input type="hidden" id="id" name="id" value="" />
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary "
+                                        data-mdb-dismiss="modal">ยกเลิก</button>
+                                    <button type="submit" class="btn btn-danger">ยืนยัน</button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -41,5 +85,13 @@
             <% } %>
         </div>
     </div>
+
+    <script>
+         $(document).on("click", ".delete", function () {
+            var id = $(this).data("cart-id");
+            $("#id").val(id);
+        });
+
+    </script>
 </body>
 <%- include('../partials/footer') %>
