@@ -1,0 +1,254 @@
+<%- include('../../partials/admin-nav') %>
+
+<body>
+    <div class="box-admin">
+        <h4>เพิ่มสินค้า</h4>
+        <% if(success_msg != "") { %>
+        <% success_msg.forEach((item) => { %>
+        <div class="alert alert-success">
+            <%- item %>
+        </div>
+        <% }); %>
+        <% }else if(errors != "") {%>
+        <% errors.forEach((item) => { %>
+        <div class="alert alert-danger">
+            <%- item %>
+        </div>
+        <% }); %>
+        <% } %>
+        <div class="mb-5"
+            style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='%236c757d'/%3E%3C/svg%3E&#34;);"
+            aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Library</li>
+            </ol>
+        </div>
+        <form action="/addproduct" method="post" enctype="multipart/form-data">
+            <div class="card">
+                <div class="mx-4 mt-4 border-bottom">
+                    <h4>รายละเอียดสินค้า</h4>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="product-preview-upload me-4">
+                            <div class="option-img ">
+                                <i class="fa-solid fa-plus"></i>
+                                <input type="file" name="imgproduct" id="imgproduct" onchange="previewImage(event, [0])"
+                                    accept="image/png, image/jpeg" multiple />
+                                <img src="https://www.solidbackgrounds.com/images/950x350/950x350-white-solid-color-background.jpg"
+                                    alt="" id="option_preview[0]" draggable="false" class="img_option">
+                            </div>
+                        </div>
+                        <div class="row w-100">
+                            <div class="col p-0">
+                                <div class="form-outline">
+                                    <input type="text" id="product-name" class="form-control" name="product_name"
+                                        required />
+                                    <label class="form-label" for="form6Example1">ชื่อสินค้า</label>
+                                </div>
+                            </div>
+
+                            <div class="col">
+                                <!-- <label class="form-label" for="inlineFormSelectPref">ประเภท</label> <br> -->
+                                <select class="form-select" style="height: 35px;" name="categories">
+                                    <option value="card">นามบัตร</option>
+                                    <option value="flyer">ใบปลิว</option>
+                                    <option value="">แผ่บพับ</option>
+                                    <option value="sticker">สติ๊กเกอร์</option>
+                                    <option value="bill">ใบบิล</option>
+                                    <option value="letter">ซองจดหมาย</option>
+                                </select>
+                            </div>
+
+                            <div class="col">
+                                <!-- <label class="form-label" for="inlineFormSelectPref">สถานะ</label> <br> -->
+                                <select class="form-select" style="height: 35px;" name="status">
+                                    <option value="1">เปิดรับทำ</option>
+                                    <option value="0">งดรับทำ</option>
+                                </select>
+                            </div>
+
+                            <!-- Message input -->
+                          
+                            <div class="w-100 ps-0 mt-2">
+                                <!-- Message input -->
+                                <div class="form-outline ">
+                                   <textarea class="form-control" id="description" rows="4" name="product_description"
+                                       required></textarea>
+                                   <label class="form-label" for="description">รายละเอียดสินค้า</label>
+                               </div>
+                              </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="mx-4 mt-4 border-bottom">
+                    <h4>กำหนดส่วนลด</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row row-cols-lg-auto mb-4">
+                        <div class="col">
+                            <label class="form-label" for="dc-num">ส่วนลด(%)</label> <br>
+                            <input type="number" id="discount" class="form-control" name="discount" value="0" />
+                        </div>
+                        <div class="col">
+                            <label class="form-label" for="dc-start">วันที่เริ่ม</label> <br>
+                            <input type="datetime-local" id="dc-start" class="form-control" name="dc_start" />
+                        </div>
+                        <div class="col">
+                            <label class="form-label" for="dc-end">วันที่สิ้นสุด</label> <br>
+                            <input type="datetime-local" id="dc-end" class="form-control" name="dc_end" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- <div class="card">
+                <div class="mx-4 mt-4 border-bottom">
+                    <h4>กำหนดราคาต่อหน่วย</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row row-cols-auto mb-4">
+                        <div class="col">
+                            <div class="form-outline">
+                                <input type="text" class="spec-name form-control" name="quantity[0][]" required>
+                                <label class="form-label">จำนวน</label>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-outline">
+                                <input type="text" class="spec-name form-control" name="price_per_unit[0][]" required>
+                                <label class="form-label">ราคาต่อหน่วย</label>
+                            </div>
+                        </div>
+                        <button type="button" id="add-price" class="btn btn-secondary">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
+                    </div>
+                    <div id="newPriceRow"></div>
+                </div>
+            </div> -->
+
+
+            <!-- <div class="card mb-4 spec" id="spec">
+                <div class="mx-4 mt-4 border-bottom">
+                    <h4>กำหนดสเปคสินค้า</h4>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="form-outline me-2" style="width: 200px;">
+                            <input type="text" class="spec-name form-control" name="spec_name[0][]" required>
+                            <label class="form-label">ชื่อสเปค</label>
+                        </div>
+                        <select multiple="multiple" class="option-checkbox w-100" name="option[0][]" multiple>
+             
+                        </select>
+                        <button type="button" id="add-spec" class="btn btn-secondary mx-2">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
+                    </div>
+                    <div id="newRow"></div>
+                </div>
+            </div> -->
+            <button type="submit" class="btn btn-primary btn-block mt-5 float-end" style="width: 150px;">ยืนยัน</button>
+        </form>
+    </div>
+
+    <script>
+        $('.option-checkbox').multipleSelect({
+            filter: true,
+            keepOpen: true,
+            placeholder: 'เลือกวัสดุที่ใช้กับสเปคนี้'
+        })
+
+        function previewImage(event, index) {
+            var input = event.target;
+            var imgPreview = document.getElementById('option_preview[' + index + ']');
+            console.log(imgPreview)
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    imgPreview.src = e.target.result;
+                }
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                imgPreview.src = "";
+            }
+        }
+        var quantityCount = 0;
+        var specCount = 0;
+        var img = 0
+
+        //         $('#add-price').on('click', function () {
+        //             quantityCount ++
+        //             var newPriceRow = `
+        //             <div class="row row-cols-auto mb-4 newPrice">
+        //                         <div class="col">
+        //                             <div class="form-outline">
+        //                                 <input type="text" class="spec-name form-control" name="quantity[${quantityCount}][]" required>
+        //                                 <label class="form-label">จำนวน</label>
+        //                             </div>
+        //                         </div>
+        //                         <div class="col">
+        //                             <div class="form-outline">
+        //                                 <input type="text" class="spec-name form-control" name="price_per_unit[${quantityCount}][]" required>
+        //                                 <label class="form-label">ราคาต่อหน่วย</label>
+        //                             </div>
+        //                         </div>
+        //                         <button type="button" class="btn btn-danger remove-price"><i class="fa-solid fa-trash" style="color: #ffffff;"></i></button>
+        //                     </div>
+        //   `;
+
+        //             $('#newPriceRow').append(newPriceRow);
+        //             document.querySelectorAll('.form-outline').forEach((formOutline) => {
+        //                 new mdb.Input(formOutline).init();
+        //             });
+        //         })
+
+        //         $('#add-spec').on('click', function () {
+        //             specCount++;
+        //             var newSpecCard = `
+        //         <div class="d-flex justify-content-between mb-2 newcard">
+        //           <div class="form-outline me-2" style="width: 200px;">
+        //             <input type="text" name="spec_name[${specCount}][]" class="spec-name form-control" required>
+        //             <label class="form-label">ชื่อสเปค</label>
+        //           </div>
+        //           <select multiple="multiple" class="option-checkbox w-100" name="option[${specCount}][]" multiple>
+        // 
+        //             </select>
+        //           <button type="button" class="btn btn-danger remove-spec mx-2"><i class="fa-solid fa-trash" style="color: #ffffff;"></i></button>
+        //         </div>
+        //   `;
+        //             $('#newRow').append(newSpecCard);
+        //             document.querySelectorAll('.form-outline').forEach((formOutline) => {
+        //                 new mdb.Input(formOutline).init();
+        //             });
+        //             $('.option-checkbox').multipleSelect('refreshOptions', {
+        //                 filter: true,
+        //                 keepOpen: true,
+        //                 placeholder: 'เลือกวัสดุที่ใช้กับสเปคนี้'
+        //             });
+        //         });
+
+        document.querySelectorAll('.form-outline').forEach((formOutline) => {
+            new mdb.Input(formOutline).init();
+        });
+
+        // $('#newPriceRow').on('click', '.remove-price', function () {
+        //     $(this).closest(`.newPrice`).remove();
+        // });
+
+        // $('#newRow').on('click', '.remove-spec', function () {
+        //     $(this).closest(`.newcard`).remove();
+        // });
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,164 @@
+<% if(login === true){ %>
+    <div class="chat-button" data-bs-toggle="collapse" data-bs-target=".chat-windows" aria-controls="chat-windows">
+        <i class="mt-4 fa-solid fa-comment"></i>
+        <div class="chat-noti">
+  
+        </div>
+    </div>
+  
+    <div class="collapse chat-windows">
+        <div class="d-flex justify-content-between shadow-6-soft border-bottom chat-title">
+            <div class="d-flex">
+                <div class="rounded-circle overflow-hidden border" style="width: 40px; height: 40px; margin: 10px;">
+                    <img class="" src="/assets/img/logo.png" alt="clipartpress" width="100%">
+                </div>
+                <span class="fs-5 align-self-center">Cilpart Press</span>
+            </div>
+            <button class="close-chat" title="close-chat" type="button" data-bs-toggle="collapse"
+                data-bs-target=".chat-windows" aria-expanded="true">
+                <i class="fa-solid fa-chevron-down"></i>
+            </button>
+        </div>
+  
+        <div class="message">
+            <!-- <div class="message-wrap">
+                <div class="message-box-left border">
+                    <span>asasdadasd</span>
+                </div>
+            </div>
+            <div class="message-wrap">
+                <div class="message-box-right border">
+                    <span>asasdadasd</span>
+                </div>
+            </div> -->
+        </div>
+  
+  
+        <form action="/send-message" onsubmit="event.preventDefault(); sendMessage();">
+            <div class="w-100" style="height: 100px;">
+                <div class="text-message d-flex">
+                    <input class="input-message shadow-6-strong" type="text" id="input-message-<%= session.user_id %>"
+                        placeholder="พิมพ์ข้อความ.." name="message-text" maxlength="300" autocomplete="off">
+                    <div class="d-flex chat-action">
+                        <div class="upload-img">
+                            <i class="fa-solid fa-image ms-1"></i>
+                            <input type="file" name="option_img[]" onchange="previewImage(event, [0])"
+                                accept="image/png, image/jpeg" multiple />
+                        </div>
+                        <button class="send-ms" type="submit">
+                            <i class="fa-sharp fa-solid fa-paper-plane" style="color: #425c8a;"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <% } %>
+  
+    <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"
+        integrity="sha384-c79GN5VsunZvi+Q/WObgk2in0CbZsHnjEqvFxC5DxHn9lTfNce2WW6h2pH6u/kF+" crossorigin="anonymous">
+    </script>
+    <!-- <script src="/socket.io/socket.io.js"></script> -->
+    <script>
+        const userId = '<%= session.user_id %>';
+    </script>
+    <script>
+        var socket = io('http://localhost:3000');
+        // Send a message to the admin
+        const messageContainer = document.querySelector('.message').scrollHeight;
+        socket.emit('joinRoom', userId);
+  
+        $(document).ready(function () {
+            $(document).on("click", ".chat-button", function () {
+                console.log(socket.on('newMessage'));
+                socket.emit('joinRoom', userId);
+                $('.chat-noti').hide();
+                var ms = document.getElementsByClassName(`message`);
+                ms.scrollTop = ms.scrollHeight;
+                $('.chat-windows').addClass('slideTop')
+            });
+  
+        });
+  
+        function sendMessage() {
+            const messageInput = document.querySelector(`#input-message-${userId}`);
+            const message = messageInput.value;
+            // Emit an event to send the message from the user to the admin
+            if (message !== "") {
+                socket.emit('sendMessage', {
+                    sender: userId,
+                    receiver: 'admin',
+                    message: message,
+                    room: userId
+                });
+                // Clear the message input
+                messageInput.value = '';
+                // Append the sent message to the chat box
+                const messageBox = document.createElement('div');
+                messageBox.classList.add('message-wrap');
+                messageBox.innerHTML = `
+          <div class="message-box-right border">
+            <span>${message}</span>
+          </div>
+      `;
+                document.querySelector('.message').appendChild(messageBox);
+                window.scrollTo(0, messageContainer);
+            } else {
+                return false;
+            }
+        }
+  
+  
+        socket.on('newMessage', (message) => {
+            console.log(`Received message: ${message.message}`);
+            getMessage(message.message, message.sender);
+        });
+  
+        let count;
+  
+        function getMessage(message, sender) {
+            $('.chat-noti').show();
+            count++
+            $(".chat-noti").append(`${count}`);
+  
+            const messageBox = document.createElement('div');
+            messageBox.classList.add('message-wrap');
+            const messageText = document.createElement('div');
+            if (sender === userId) {
+                messageText.classList.add('message-box-right');
+            } else {
+                messageText.classList.add('message-box-left');
+            }
+            messageText.innerHTML = `<span>${message}</span>`;
+            messageBox.appendChild(messageText);
+            document.querySelector('.message').appendChild(messageBox);
+        }
+  
+        // Fetch the chat history via AJAX
+        function fetchChatHistory() {
+            fetch(`/chat-history`)
+                .then(response => response.json())
+                .then(data => {
+                    // Append the chat history to the chat box
+                    data.forEach(message => {
+                        // div ครอบ
+                        const messageBox = document.createElement('div');
+                        messageBox.classList.add('message-wrap');
+                        // div ข้างใน
+                        const message_text = document.createElement('div');
+                        if (message.sender_id === userId) {
+                            message_text.classList.add('message-box-right');
+                        } else {
+                            message_text.classList.add('message-box-left');
+                        }
+                        message_text.innerHTML = `<span>${message.message}</span>`;
+                        document.querySelector('.message').appendChild(messageBox);
+                        messageBox.appendChild(message_text);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching chat history:', error);
+                });
+        }
+        fetchChatHistory()
+    </script>

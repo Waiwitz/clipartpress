@@ -1,0 +1,144 @@
+<%- include('../../partials/admin-nav') %>
+
+<body>
+    <div class="box-admin">
+        <h4>เพิ่มสินค้า</h4>
+        <% if(success_msg != "") { %>
+        <% success_msg.forEach((item) => { %>
+        <div class="alert alert-success">
+            <%- item %>
+        </div>
+        <% }); %>
+        <% }else if(errors != "") {%>
+        <% errors.forEach((item) => { %>
+        <div class="alert alert-danger">
+            <%- item %>
+        </div>
+        <% }); %>
+        <% } %>
+        <div class="mb-5"
+            style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='%236c757d'/%3E%3C/svg%3E&#34;);"
+            aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Library</li>
+            </ol>
+        </div>
+        <form action="/updateProduct/<%= product.product_id %>" method="post" enctype="multipart/form-data">
+            <div class="card">
+                <div class="mx-4 mt-4 border-bottom">
+                    <h4>รายละเอียดสินค้า</h4>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="product-preview-upload me-4">
+                            <div class="option-img ">
+                                <i class="fa-solid fa-plus"></i>
+                                <input type="file" name="imgproduct" id="imgproduct" onchange="previewImage(event, [0])"
+                                    accept="image/png, image/jpeg" multiple />
+                                <img src="<%= product.picture %>"
+                                    alt="" id="preview" draggable="false" class="img_option imageFitBox">
+                            </div>
+                        </div>
+                        <div class="row w-100">
+                            <div class="col p-0">
+                                <div class="form-outline">
+                                    <input type="text" id="product-name" class="form-control" name="product_name" value=" <%= product.productName %>"
+                                        required />
+                                    <label class="form-label" for="form6Example1">ชื่อสินค้า</label>
+                                </div>
+                            </div>
+
+                            <div class="col">
+                                <!-- <label class="form-label" for="inlineFormSelectPref">ประเภท</label> <br> -->
+                                <select class="form-select" style="height: 35px;" name="categories">
+                                    <% const values = ['card', 'flyer', 'leaflet', 'sticker', 'bill', 'letter']; %>
+                                    <% const thai = ['นามบัตร', 'ใบปลิว', 'แผ่บพับ', 'สติ๊กเกอร์', 'ใบบิล', 'ซองจดหมาย']; %>
+                                    <% for (let i = 0; i < values.length; i++) { %>
+                                        <option value="<%= values[i] %>" <%= product.categories === values[i] ? 'selected' : '' %>><%= thai[i] %></option>
+                                    <% } %>
+                                </select>
+                            </div>
+
+                            <div class="col">
+                                <!-- <label class="form-label" for="inlineFormSelectPref">สถานะ</label> <br> -->
+                                <select class="form-select" style="height: 35px;" name="status">
+                                    <option value="1" <%= product.status === 1 ? 'selected' : '' %>>เปิดรับทำ</option>
+                                    <option value="0" <%= product.status === 0 ? 'selected' : '' %>>งดรับทำ</option>
+                                </select>
+                            </div>
+
+                           <div class="w-100 ps-0 mt-2">
+                             <!-- Message input -->
+                             <div class="form-outline ">
+                                <textarea class="form-control" id="description" rows="4" name="product_description"
+                                    required> <%= product.description %></textarea>
+                                <label class="form-label" for="description">รายละเอียดสินค้า</label>
+                            </div>
+                           </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+           
+
+            <div class="card">
+                <div class="mx-4 mt-4 border-bottom">
+                    <h4>กำหนดส่วนลด</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row row-cols-lg-auto mb-4">
+                        <div class="col">
+                            <label class="form-label" for="dc-num">ส่วนลด(%)</label> <br>
+                            <input type="number" id="discount" class="form-control" name="discount" value="0" />
+                        </div>
+                        <div class="col">
+                            <label class="form-label" for="dc-start">วันที่เริ่ม</label> <br>
+                            <input type="datetime-local" id="dc-start" class="form-control" name="dc_start" />
+                        </div>
+                        <div class="col">
+                            <label class="form-label" for="dc-end">วันที่สิ้นสุด</label> <br>
+                            <input type="datetime-local" id="dc-end" class="form-control" name="dc_end" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block mt-5 float-end" style="width: 150px;">ยืนยัน</button>
+        </form>
+    </div>
+
+    <script>
+        // $('.option-checkbox').multipleSelect({
+        //     filter: true,
+        //     keepOpen: true,
+        //     placeholder: 'เลือกวัสดุที่ใช้กับสเปคนี้'
+        // })
+
+        document.querySelectorAll('.form-outline').forEach((formOutline) => {
+            new mdb.Input(formOutline).init();
+        });
+
+        function previewImage(event, index) {
+            var input = event.target;
+            var imgPreview = document.getElementById('option_preview[' + index + ']');
+            console.log(imgPreview)
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    imgPreview.src = e.target.result;
+                }
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                imgPreview.src = "";
+            }
+        }
+        var quantityCount = 0;
+        var specCount = 0;
+        var img = 0
+    </script>
+
+</body>
+
+</html>

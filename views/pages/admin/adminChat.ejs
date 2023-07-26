@@ -1,0 +1,201 @@
+<%- include('../../partials/admin-nav') %>
+
+<body style="background-color: #FCFCFC !important;">
+    <div class="d-flex justify-content-between" style="margin-left: 300px; padding-left: 5em;">
+        <div class="chat-list pt-5 mt-5">
+            <h1>แชท</h1>
+            <!-- รายชื่อ user -->
+            <div class="mt-5">
+                <% if (users.length > 0) { %>
+                <% users.forEach((user) => { %>
+                <div class="user-box" id="userbox" data-user="<%= user.user_id %>">
+                    <div class="card-body d-flex">
+                        <div class="chat-pf border">
+                            <img src="<%= user.picture %>" alt="user-profile" draggable="false">
+                        </div>
+                        <div class="mt-3 d-flex justify-content-between">
+                            <div class="col-1">
+                                <span class="fs-5"><%= user.username %></span>
+                                <span class="fs-6 text-secondary" id="current-ms-<%= user.user_id %>"></span>
+                            </div>
+                            <div class="m-1 pe-3">
+                                <span class="align-self-center text-secondary">5 นาที</span><br>
+                                <span class="badge rounded-circle bg-danger">
+                                    99+
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <% }) %>
+                <% } %>
+            </div>
+        </div>
+
+        <% users.forEach((user) => { %>
+        <div class="chatbox" id="chatbox-<%= user.user_id %>">
+            <!-- หัวแชท -->
+            <div class="d-flex shadow-6-soft border-bottom chat-title">
+                <input type="text" id="id" name="id" hidden>
+                <div class="rounded-circle overflow-hidden border" style="width: 60px; height: 60px; margin: 10px;">
+                    <img src="<%= user.picture %>" alt="user-profile" draggable="false">
+                </div>
+                <span class="fs-5 align-self-center"><%= user.username %></span>
+            </div>
+
+            <!-- กล่องข้อความ -->
+            <div class="message pb-2" id="message-<%= user.user_id %>" style="height: 85vh;">
+
+            </div>
+
+            <!-- input -->
+            <form action="" onsubmit="event.preventDefault(); sendMessage();">
+                <div class="input-message-wrap">
+                    <div class="text-message d-flex">
+                        <input class="input-message shadow-6-strong" id="input-message-<%= user.user_id %>" type="text"
+                            placeholder="พิมพ์ข้อความ.." name="message-text" maxlength="300">
+                        <div class="d-flex chat-action">
+                            <div class="upload-img">
+                                <i class="fa-solid fa-image ms-1"></i>
+                                <input type="file" name="option_img[]" onchange="previewImage(event, [0])"
+                                    accept="image/png, image/jpeg" multiple />
+                            </div>
+                            <button class="send-ms" type="submit">
+                                <i class="fa-sharp fa-solid fa-paper-plane" style="color: #425c8a;"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <% }) %>
+    </div>
+</body>
+
+<script src="https://cdn.socket.io/4.6.0/socket.io.min.js"
+    integrity="sha384-c79GN5VsunZvi+Q/WObgk2in0CbZsHnjEqvFxC5DxHn9lTfNce2WW6h2pH6u/kF+" crossorigin="anonymous">
+</script>
+<script>
+    const adminWhoLogind = '<%= session.user_id %>';
+</script>
+<!-- <script src="/socket.io/socket.io.js"></script> -->
+<script>
+    var socket = io('http://localhost:3000');
+
+    // var chatHistoryCache = {};
+
+    $(document).ready(function () {
+        $(document).on("click", ".user-box", function () {
+            var userId = $(this).data("user");
+            socket.emit('joinRoom', userId);
+            $("#id").val(userId);
+            $('.chatbox').hide();
+            $(`#chatbox-${userId}`).show();
+            // if (chatHistoryCache[userId]) {
+            //     displayChatHistory(chatHistoryCache[userId], userId);
+            // } else {
+            // getChatHistory(userId);
+            // }
+            getChatHistory(userId);
+            // socket.emit('joinRoom', userId);
+            history.pushState(null, null, `/admin/chat/${userId}`);
+            var ms = document.getElementsByClassName(`message-${userId}`);
+            ms.scrollTop = ms.scrollHeight;
+        });
+
+        socket.on('newMessage', (message) => {
+            console.log(`Admin Received message: ${message.message}`);
+            getMessage(message.message, message.sender);
+        });
+    });
+
+
+    function getChatHistory(userId) {
+        $.ajax({
+            url: "/admin/chat-history",
+            method: "GET",
+            data: {
+                userId: userId
+            },
+            success: function (response) {
+                // chatHistoryCache[userId] = response;
+                displayChatHistory(response, userId);
+                // console.log(response);
+                // var chatbox = $(`#chatbox-${userId}`).is(":hidden");
+                // if (chatbox == false) {
+                //     console.log('เปิดแชท');
+                //     socket.on('newMessage', (message) => {
+                //         console.log(`Admin Received message: ${message.message}`);
+                //         getMessage(message.message, message.sender);
+                //     });
+                // }
+            },
+            error: function (error) {
+                console.error("Error fetching chat history:", error);
+            }
+        });
+    }
+
+    function displayChatHistory(history, userId) {
+        var messageContainer = $(`.message`);
+        messageContainer.empty();
+
+        history.forEach(function (message) {
+            var messageBox = $("<div>").addClass("message-wrap");
+            var messageText = $("<div>").text(message.message);
+
+            if (message.sender_id === 'admin') {
+                messageText.addClass("message-box-right");
+            } else {
+                messageText.addClass("message-box-left");
+            }
+            messageBox.append(messageText);
+            messageContainer.append(messageBox);
+        });
+    }
+
+    // Send a message to the admin
+    function sendMessage() {
+        var userId = $('#id').val();
+        const messageInput = document.querySelector(`#input-message-${userId}`);
+        const message = messageInput.value;
+        // Emit an event to send the message to the admin
+        socket.emit('sendMessage', {
+            sender: 'admin',
+            receiver: userId,
+            message: message,
+            room: userId
+        });
+        // Clear the message input
+        messageInput.value = '';
+        // Append the sent message to the chat box
+        const messageBox = document.createElement('div');
+        messageBox.classList.add('message-wrap');
+        messageBox.innerHTML = `
+        <div class="message-box-right border">
+          <span>${message}</span>
+        </div>
+      `;
+        document.querySelector(`#message-${userId}`).appendChild(messageBox);
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function getMessage(message, sender) {
+        var userId = $('#id').val();
+        const messageBox = document.createElement('div');
+        messageBox.classList.add('message-wrap');
+        const messageText = document.createElement('div');
+        if (sender === 'admin') {
+            messageText.classList.add('message-box-right');
+        } else {
+            messageText.classList.add('message-box-left');
+        }
+        messageText.innerHTML = `<span>${message}</span>`;
+        messageBox.appendChild(messageText);
+        document.querySelector(`#message-${userId}`).appendChild(messageBox);
+    }
+
+    function updateChat(message, room) {
+        const current_ms = $('#current-ms')
+    }
+</script>

@@ -1,0 +1,215 @@
+<%- include('../../partials/admin-nav') %>
+
+<body>
+    <div class="box-admin">
+        <h4>เพิ่มสินค้า</h4>
+        <% if(success_msg != "") { %>
+        <% success_msg.forEach((item) => { %>
+        <div class="alert alert-success">
+            <%- item %>
+        </div>
+        <% }); %>
+        <% }else if(errors != "") {%>
+        <% errors.forEach((item) => { %>
+        <div class="alert alert-danger">
+            <%- item %>
+        </div>
+        <% }); %>
+        <% } %>
+        <div class="mb-5"
+            style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='%236c757d'/%3E%3C/svg%3E&#34;);"
+            aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Library</li>
+            </ol>
+        </div>
+        <form action="/addoption" method="post" enctype="multipart/form-data">
+            <div class="card mb-4 spec" id="spec">
+                <div class="card-body">
+                    <div class="sub-options mb-4">
+                        <div class="sub-option-row">
+                            <div class="row row-cols-lg-auto mb-4">
+                                <div class="col" style="width: 15%;">
+                                    <div class="option-img ">
+                                        <i class="fa-solid fa-plus"></i>
+                                        <input type="file" name="option_img[]" onchange="previewImage(event, [0])"
+                                            accept="image/png, image/jpeg" multiple />
+                                        <img src="https://www.solidbackgrounds.com/images/950x350/950x350-white-solid-color-background.jpg"
+                                            alt="" id="option_preview[0]" draggable="false" class="img_option">
+                                    </div>
+                                </div>
+                                <div class="col" style="width: 42.5%;">
+                                    <div class="form-outline mb-3">
+                                        <input type="text" name="option[]" class="sub-option-name form-control"
+                                            id="optionName" required>
+                                        <label class="form-label" for="optionName">ชื่อตัวเลือก</label>
+                                    </div>
+                                    <div class="form-outline">
+                                        <input type="number" name="option_price[]" class="sub-option-price form-control"
+                                            required>
+                                        <label class="form-label">ราคาต่อหน่วย</label>
+                                    </div>
+                                </div>
+                                <div class="col" style="width: 42.5%;">
+                                    <select class="form-select mb-3" id="parcel" aria-label="Default select example"
+                                        name="option_parcel[]">
+                                        <option selected disabled>หมวดหมู่</option>
+                                        <option value="foramt">ขนาดของชิ้นงาน</option>
+                                        <option value="papertype">ประเภทกระดาษ</option>
+                                        <option value="oil">การเคลือบเงา</option>
+                                        <option value="pumping">การปั้ม</option>
+                                        <option value="die-cut">การไดคัท</option>
+                                        <option value="folding">การพับ</option>
+                                    </select>
+
+                                    <select multiple="multiple" class="option-checkbox w-100" name="product[0]"
+                                        multiple>
+                                        <% if( products.length > 0 ){ %>
+                                        <% products.forEach((product) => { %>
+                                        <option value="<%= product.product_id %>"><%= product.productName %></option>
+                                        <% })%>
+                                        <% } %>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <!-- Message input -->
+                                <div class="form-outline mb-4">
+                                    <textarea class="form-control" id="description" rows="4"
+                                        name="option_des[0]"></textarea>
+                                    <label class="form-label" for="description">คำอธิบายตัวเลือก</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="newRow"></div>
+
+            <button type="button" id="add-spec" class="btn btn-secondary w-100">เพิ่มสเปค</button>
+            <button type="submit" class="btn btn-primary btn-block mt-5 float-end" style="width: 150px;">ยืนยัน</button>
+        </form>
+    </div>
+
+
+    <script>
+        $('.option-checkbox').multipleSelect({
+            filter: true,
+            keepOpen: true,
+            placeholder: 'เลือกสินค้าที่ใช้ตัวเลือกนี้'
+        })
+
+        document.querySelectorAll('.form-outline').forEach((formOutline) => {
+            new mdb.Input(formOutline).init();
+        });
+
+        function previewImage(event, index) {
+            var input = event.target;
+            var imgPreview = document.getElementById('option_preview[' + index + ']');
+            console.log(imgPreview)
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    imgPreview.src = e.target.result;
+                }
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                imgPreview.src = "";
+            }
+        }
+
+        var specCount = 0;
+        var img = 0
+        $('#add-spec').on('click', function () {
+            specCount++;
+            img++
+            var newSpecCard = `
+            <div class="card mb-4 spec newcard" id="spec${specCount}">
+                <div class="card-body">
+                    <div class="sub-options mb-4">
+                        <div class="sub-option-row">
+                            <div class="row row-cols-lg-auto mb-4">
+                                <div class="col" style="width: 15%;">
+                                    <div class="option-img ">
+                                        <i class="fa-solid fa-plus"></i>
+                                        <input type="file" name="option_img[]" onchange="previewImage(event, [${ img }])"
+                                            accept="image/png, image/jpeg" multiple />
+                                        <img src="https://www.solidbackgrounds.com/images/950x350/950x350-white-solid-color-background.jpg"
+                                            alt="" id="option_preview[${specCount}]" draggable="false" class="img_option">
+                                    </div>
+                                </div>
+                                <div class="col" style="width: 42.5%;">
+                                    <div class="form-outline mb-3">
+                                        <input type="text" name="option[${specCount}]" class="sub-option-name form-control"
+                                            id="optionName" required>
+                                        <label class="form-label" for="optionName">ชื่อตัวเลือก</label>
+                                    </div>
+                                    <div class="form-outline">
+                                        <input type="number" name="option_price[${specCount}]"
+                                            class="sub-option-price form-control" required>
+                                        <label class="form-label">ราคาต่อหน่วย</label>
+                                    </div>
+                                </div>
+                                <div class="col" style="width: 42.5%;">
+                                    <select class="form-select mb-3" id="parcel" aria-label="Default select example"
+                                        name="option_parcel[${specCount}]">
+                                        <option selected disabled>หมวดหมู่</option>
+                                        <option value="foramt">ขนาดของชิ้นงาน</option>
+                                        <option value="papertype">ประเภทกระดาษ</option>
+                                        <option value="oil">การเคลือบเงา</option>
+                                        <option value="pumping">การปั้ม</option>
+                                        <option value="die-cut">การไดคัท</option>
+                                        <option value="folding">การพับ</option>
+                                    </select>
+
+                                    <select multiple="multiple" class="option-checkbox w-100" name="product[${specCount}]"
+                                        multiple>
+                                        <% if( products.length > 0 ){ %>
+                                        <% products.forEach((product) => { %>
+                                        <option value="<%= product.product_id %>"><%= product.productName %></option>
+                                        <% })%>
+                                        <% } %>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <!-- Message input -->
+                                <div class="form-outline mb-4">
+                                    <textarea class="form-control" id="description" rows="4"
+                                        name="option_des[${specCount}]"></textarea>
+                                    <label class="form-label" for="description">คำอธิบายตัวเลือก</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="remove-spec btn btn-danger">ลบ</button>
+
+                </div>
+            </div>
+  `;
+
+            $('#newRow').append(newSpecCard);
+            document.querySelectorAll('.form-outline').forEach((formOutline) => {
+                new mdb.Input(formOutline).init();
+            });
+
+            $('.option-checkbox').multipleSelect('refreshOptions', {
+                filter: true,
+                keepOpen: true,
+                placeholder: 'เลือกสินค้าที่ใช้ตัวเลือกนี้'
+            });
+        });
+
+        // ลบแถวหลัก
+        $('#newRow').on('click', '.remove-spec', function () {
+            $(this).closest(`.newcard`).remove();
+        });
+
+
+        if ($("#parcel option:selected").val() == 'format') {
+            $('.option-img ').hide();
+        }
+    </script>
+
+</body>
