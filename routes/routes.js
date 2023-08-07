@@ -147,41 +147,50 @@ let Routes = (app) => {
     // });
 
     // หน้ารายละเอียดสินค้าและเลือกสเปค
-    router.get('/product/item/:id', (req, res) => {
+    // `SELECT p.*, o.*, op.* FROM options_product op JOIN options o ON o.option_id = op.option_id JOIN product p ON p.product_id = op.product_id WHERE o.deleted_at IS null AND p.product_id = ?`
+    // `SELECT p.*, o.* FROM product p JOIN options o ON JSON_CONTAINS(o.product_id, JSON_ARRAY(?)) WHERE p.product_id = ?`
+    router.get('/product/item/:id', async (req, res) => {
         const productId = req.params.id;
-        dbConnection.query(`SELECT p.*, o.* FROM product p JOIN options o ON JSON_CONTAINS(o.product_id, JSON_ARRAY(?)) WHERE p.product_id = ?`,
-                [productId, productId])
-            .then(([rows]) => {
-                console.log(rows);
-                const product = {
-                    product_id: rows[0].product_id,
-                    productName: rows[0].productName,
-                    discount: rows[0].status,
-                    picture: rows[0].picture,
-                    categories: rows[0].categories,
-                    description: rows[0].description
-                };
-
-                const options = rows.map(row => {
-                    return {
-                        option_id: row.option_id,
-                        option_name: row.option_name,
-                        option_img: row.option_img,
-                        price_per_unit: row.price_per_unit,
-                        parcel_type: row.parcel_type,
-                        description: row.description,
-                        product_id: row.product_id
-                        // Add other option properties as needed
-                    };
-                });
-                res.render('pages/product_detail', {
-                    currentMenu: "",
-                    product: product,
-                    options: options,
-                    currentLink: ""
-                })
+        await dbConnection.query(`SELECT * FROM product WHERE product_id = ${productId}`)
+            .then(async ([row]) => {
+                await dbConnection.query(`SELECT o.*, op.* FROM options o JOIN options_product op ON op.option_id = o.option_id WHERE JSON_CONTAINS(op.product_id, JSON_ARRAY(?)) AND o.deleted_at IS NULL`, [productId])
+                    .then(([rows]) => {
+                        // const product = {
+                        //     product_id: rows.product_id,
+                        //     productName: rows[0].productName,
+                        //     discount: rows[0].status,
+                        //     picture: rows[0].picture,
+                        //     categories: rows[0].categories,
+                        //     description: rows[0].description
+                        // };
+                        const flattenedRows = rows.flat(); // Flatten the rows array
+                        const options = flattenedRows.map(row => {
+                            return {
+                                option_id: row.option_id,
+                                option_name: row.option_name,
+                                option_img: row.option_img,
+                                price_per_unit: row.price_per_unit,
+                                parcel_type: row.parcel_type,
+                                description: row.description,
+                                // Add other option properties as needed
+                            };
+                        });
+                        dbConnection.query('SELECT * FROM pricingQt_tier WHERE product_id = ?', [productId])
+                            .then(([tiers]) => {
+                                dbConnection.query('SELECT * FROM pricingSize_tier WHERE product_id = ?', [productId])
+                                    .then(([sizes]) => {
+                                        res.render('pages/product_detail', {
+                                            currentMenu: "",
+                                            product: row[0],
+                                            options: options,
+                                            tiers: tiers,
+                                            sizes: sizes,
+                                            currentLink: ""
+                                        })
+                                    })
+                            })
+                    })
             })
-
     });
 
     router.post('/addtocart', cart.upload.single('designfile'), cart.insertCart)
@@ -215,12 +224,8 @@ let Routes = (app) => {
         });
     });
 
-    router.get('/konva', (req, res) => {
-        res.render('editor/konva', {});
-    });
-
-    router.get('/test', (req, res) => {
-        res.render('editor/test', {});
+    router.get('/template', (req, res) => {
+        res.render('pages/editor/template', {});
     });
 
     // ---------------------------------------------------------------------------------------------------
@@ -244,89 +249,35 @@ let Routes = (app) => {
     router.post("/addproduct", adminController.upload_product.single('imgproduct'), adminController.addProduct);
     router.post("/updateProduct/:id", adminController.upload_product.single('imgproduct'), adminController.updateProduct); //แก้ไขสินค้า
 
-
     router.get('/admin/product/edit/:id', async (req, res) => {
         const productId = req.params.id;
-        await dbConnection.query('SELECT * FROM product WHERE product_id = ?', productId).then(([rows]) => {
-            res.render('pages/admin/editproduct', {
-                product: rows[0],
-                currentLink: "addproduct"
+        await dbConnection.query('SELECT p.*, qp.* FROM product p JOIN pricingQt_tier qp ON qp.product_id = p.product_id WHERE p.product_id = ? ORDER BY qp.minqt ASC', productId).then(([rows]) => {
+            dbConnection.query('SELECT * FROM pricingSize_tier WHERE product_id = ? ORDER BY minsize ASC', productId).then(([size]) => {
+                res.render('pages/admin/editproduct', {
+                    product: rows[0],
+                    priceTiers: rows,
+                    sizeTiers: size,
+                    currentLink: "addproduct"
+                })
             })
         })
     });
-    // router.get('/admin/product/edit/:id', (req, res) => {
-    //     dbConnection.query('SELECT * FROM categories WHERE deleted_at is NULL').then(([categories]) => { // ดึงประเภท
-    //         const productId = req.params.id;
-    //         dbConnection.query('SELECT * FROM product WHERE product_id = ?', [productId]) // ข้อมูลสินค้า
-    //             .then(([resultProduct]) => {
-    //                 let product = resultProduct[0];
-    //                 dbConnection.query('SELECT * FROM quantity_per_price WHERE product_id = ?', [productId])
-    //                     .then(([resultQuantity]) => {
-    //                         dbConnection.query('SELECT * FROM specification WHERE product_id = ?', [productId]) // ชื่อสเปค
-    //                             .then(([specResults]) => {
-    //                                 let specs = [];
-    //                                 for (let i = 0; i < specResults.length; i++) {
-    //                                     let spec = {
-    //                                         spec_id: specResults[i].spec_id,
-    //                                         spec_name: specResults[i].spec_name,
-    //                                         options: []
-    //                                     };
-    //                                     const specid = specResults[i].spec_id;
-    //                                     dbConnection.query('SELECT * FROM options WHERE deleted_at is NULL').then(([options]) => {
-    //                                         dbConnection.query('SELECT so.*, o.* FROM specification_options so JOIN options o ON so.option_id = o.option_id WHERE spec_id = ?', [specid]) // ออฟชั่น
-    //                                             .then(([optionSelectResults]) => {
-    //                                                 for (let j = 0; j < optionSelectResults.length; j++) {
-    //                                                     let option = {
-    //                                                         option_id: optionSelectResults[j].option_id,
-    //                                                         option_name: optionSelectResults[j].option_name,
-    //                                                         price_per_unit: optionSelectResults[j].price_per_unit
-    //                                                     };
-    //                                                     spec.options.push(option);
-    //                                                 }
-    //                                                 specs.push(spec);
 
-    //                                                 if (i === specResults.length - 1) {
-    //                                                     // console.log(specid)
-    //                                                     res.render('pages/admin/editproduct', {
-    //                                                         types: categories,
-    //                                                         product: product,
-    //                                                         quantity: resultQuantity,
-    //                                                         specs: specs,
-    //                                                         options: options,
-    //                                                         optionsSelected: optionSelectResults,
-    //                                                         currentLink: "editproduct"
-    //                                                     });
-    //                                                 }
-    //                                                 // res.render('pages/editproduct', {
-    //                                                 //     types: type,
-    //                                                 //     product: product[0],
-    //                                                 //     specs: specs,
-    //                                                 //     options: options,
-    //                                                 //     currentLink: "editproduct"
-    //                                                 // })
-    //                                             })
-    //                                     });
-    //                                 }
-    //                             })
-    //                     })
-    //             })
-    //     })
-    // });
     router.post("/deleteProduct", adminController.deleteProduct);
 
     // หน้าประเภท
-    router.get('/admin/typeproduct', (req, res) => {
-        dbConnection.query('SELECT * FROM categories WHERE deleted_at is NULL').then(([data]) => {
-            // console.log(data)
-            res.render('pages/admin/typeproduct', {
-                types: data,
-                currentLink: "typeproduct"
-            })
-        })
-        // res.render('pages/typeproduct',{
-        //     currentLink: "typeproduct",
-        // })
-    });
+    // router.get('/admin/typeproduct', (req, res) => {
+    //     dbConnection.query('SELECT * FROM categories WHERE deleted_at is NULL').then(([data]) => {
+    //         // console.log(data)
+    //         res.render('pages/admin/typeproduct', {
+    //             types: data,
+    //             currentLink: "typeproduct"
+    //         })
+    //     })
+    //     // res.render('pages/typeproduct',{
+    //     //     currentLink: "typeproduct",
+    //     // })
+    // });
 
     // router.post("/addtype", categoriesController.addType) //เพิ่มประเภท
     // router.post("/updateType", categoriesController.editType) //แก้ไขประเภท
@@ -340,7 +291,7 @@ let Routes = (app) => {
 
     //หน้าจัดการตัวเลือกวัสดุ 
     router.get('/admin/options', (req, res) => {
-        dbConnection.query('SELECT o.*, p.* FROM options o LEFT JOIN product p ON o.product_id = p.product_id WHERE o.deleted_at IS NULL').then(([option]) => {
+        dbConnection.query('SELECT * FROM options WHERE deleted_at IS NULL').then(([option]) => {
             dbConnection.query('SELECT * FROM product WHERE deleted_at is NULL').then(([product]) => {
                 res.render('pages/admin/optionValue', {
                     products: product,

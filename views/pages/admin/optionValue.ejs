@@ -1,16 +1,17 @@
 <%- include('../../partials/admin-nav') %>
 
-<body>
-    <div class="box-admin">
-        <p>สินค้า</p>
-        <div class="mb-5"
-            style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='%236c757d'/%3E%3C/svg%3E&#34;);"
-            aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="#">Home</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Library</li>
+<body class="h-100" style="background-color: rgb(248, 248, 248);">
+    <div class="mb-5 secondHead-admin">
+        <div class="secondHead-content">
+            <h1>ตัวเลือกสินค้า</h1>
+            <ol class="list-unstyled d-flex ">
+                <li class="breadcrumb-item"><a class="link-light" href="#">หน้าแรก</a></li>
+                <li class="active text-light ms-2">/ ตัวเลือกสินค้า</li>
             </ol>
         </div>
+    </div>
+    <div style="padding-bottom: 150px;"></div>
+    <div class="box-admin">
         <% if(success_msg != "") { %>
         <% success_msg.forEach((item) => { %>
         <div class="alert alert-success">
@@ -30,7 +31,6 @@
                 เพิ่มตัวเลือกวัสดุ
             </button>
         </a>
-
         <div class="card" style="width: 100%; margin: auto;">
             <div class="card-body">
                 <table class="table align-middle mb-0 bg-white table-striped" id="table">
@@ -76,18 +76,20 @@
                             <% parcel = "การไดคัท" %>
                             <% }else if(option.parcel_type === "folding"){ %>
                             <% parcel = "การพับ" %>
-                            <% }%>
+                            <% }else if(option.parcel_type === "side"){%>
+                            <% parcel = "ด้านพิมพ์" %>
+                            <% } %>
                             <td><%= parcel %></td>
                             <td><%= option.product_id%></td>
                             <td>
-                                <button type="button" class="btn btn-link btn-sm btn-rounded btn-edit update"
+                                <button type="button" class="btn btn-warning btn-edit btn-sm update"
                                     data-mdb-toggle="modal" data-mdb-target="#updateModal"
                                     data-id="<%= option.option_id %>" data-name="<%= option.option_name %>"
                                     data-img="<%= option.option_img %>" data-price="<%= option.price_per_unit %>"
                                     data-product="<%= option.product_id %>" data-parcel="<%= option.parcel_type %>">
                                     แก้ไข
                                 </button>
-                                <button type="button" class="btn btn-link btn-sm btn-rounded btn-edit delete"
+                                <button type="button" class="btn btn-danger btn-sm btn-edit delete"
                                     data-mdb-toggle="modal" data-mdb-target="#deleteModal"
                                     data-id="<%= option.option_id %>">
                                     ลบ
@@ -104,7 +106,7 @@
                                             aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
-                                        <form action="/deleteType" id="editForm" method="post">
+                                        <form action="/deleteOption" id="editForm" method="post">
                                             <div>
                                                 <p>ต้องการลบประเภทใช่หรือไม่ ?</p>
                                             </div>
@@ -131,64 +133,78 @@
                                     </div>
                                     <div class="modal-body">
                                         <form action="/updateOption" id="editForm" method="post">
-                                            <input type="text" id="id1" name="option_id" value="" />
+                                            <input type="hidden" id="id1" name="option_id" value="" />
                                             <div class="sub-option-row">
                                                 <div class="row row-cols-lg-auto mb-4">
                                                     <div class="col" style="width: 15%;">
                                                         <div class="option-img ">
                                                             <i class="fa-solid fa-plus"></i>
-                                                            <input type="file" name="option_img[]"
+                                                            <input type="file" name="option_img"
                                                                 onchange="previewImage(event, [0])"
                                                                 accept="image/png, image/jpeg" multiple />
                                                             <img src="https://www.solidbackgrounds.com/images/950x350/950x350-white-solid-color-background.jpg"
                                                                 alt="" id="option_preview[<%= index  %>]"
                                                                 draggable="false" class="img_option">
                                                         </div>
-                                                    </div> 
+                                                    </div>
                                                     <div class="col" style="width: 42.5%;">
                                                         <div class="form-outline mb-3">
-                                                            <input type="text" name="option[]"
+                                                            <input type="text" name="option"
                                                                 class="sub-option-name form-control" id="optionName"
                                                                 required>
                                                             <label class="form-label"
                                                                 for="optionName">ชื่อตัวเลือก</label>
                                                         </div>
                                                         <div class="form-outline">
-                                                            <input type="number" name="option_price[]" id="price"
+                                                            <input type="number" name="option_price" id="price"
                                                                 class="sub-option-price form-control" required>
                                                             <label class="form-label">ราคาต่อหน่วย</label>
                                                         </div>
                                                     </div>
                                                     <div class="col" style="width: 42.5%;">
                                                         <select class="form-select mb-3" id="parcel"
-                                                            aria-label="Default select example" name="option_parcel[]">
-                                                            <option selected disabled>หมวดหมู่</option>
-                                                            <option value="foramt">ขนาดของชิ้นงาน</option>
-                                                            <option value="papertype">ประเภทกระดาษ</option>
-                                                            <option value="oil">การเคลือบเงา</option>
-                                                            <option value="pumping">การปั้ม</option>
-                                                            <option value="die-cut">การไดคัท</option>
-                                                            <option value="folding">การพับ</option>
+                                                            <% const values = ['papertype', 'oil', 'pumping', 'die-cut', 'folding']; %>
+                                                            <% const thai = ['ประเภทกระดาษ', 'การเคลือบเงา', 'การปั้ม', 'การไดคัท', 'การพับ']; %>
+                                                            aria-label="Default select example" name="option_parcel">
+                                                            <% for (let i = 0; i < values.length; i++) { %>
+                                                            <option value="<%= values[i] %>"
+                                                                <%= option.parcel_type === values[i] ? 'selected' : '' %>>
+                                                                <%= thai[i] %></option>
+                                                            <% } %>
                                                         </select>
-
-                                                        <select multiple="multiple" class="option-checkbox w-100"
-                                                            name="categories[]" multiple>
+                                                        <select multiple="multiple" id="product-cb"
+                                                            class="option-checkbox w-100" name="product[][]" multiple>
                                                             <% if( products.length > 0 ){ %>
                                                             <% products.forEach((product) => { %>
-                                                            <option value="<%= product.product_id %>">
-                                                                <%= product.productName %></option>
+                                                            <% if(product.categories === 'card'){ %>
+                                                            <optgroup label="นามบัตร">
+                                                                <option value="<%= product.product_id %>">
+                                                                    <%= product.productName %></option>
+                                                            </optgroup>
+                                                            <% }else if(product.categories === 'flyer'){ %>
+                                                            <optgroup label="ใบปลิว/แผ่นพับ">
+                                                                <option value="<%= product.product_id %>">
+                                                                    <%= product.productName %></option>
+                                                            </optgroup>
+                                                            <% }else if(product.categories === 'sticker'){ %>
+                                                            <optgroup label="สติ๊กเกอร์">
+                                                                <option value="<%= product.product_id %>">
+                                                                    <%= product.productName %></option>
+                                                            </optgroup>
+                                                            <% }else if(product.categories === 'bill'){ %>
+                                                            <optgroup label="ใบบิล">
+                                                                <option value="<%= product.product_id %>">
+                                                                    <%= product.productName %></option>
+                                                            </optgroup>
+                                                            <% }else if(product.categories === 'letter'){ %>
+                                                            <optgroup label="ซองจดหมาย">
+                                                                <option value="<%= product.product_id %>">
+                                                                    <%= product.productName %></option>
+                                                            </optgroup>
+                                                            <% } %>
                                                             <% })%>
                                                             <% } %>
                                                         </select>
-                                                    </div>
-                                                </div>
-                                                <div class="col">
-                                                    <!-- Message input -->
-                                                    <div class="form-outline mb-4">
-                                                        <textarea class="form-control" id="description" rows="4"
-                                                            name="option_des[0]"></textarea>
-                                                        <label class="form-label"
-                                                            for="description">คำอธิบายตัวเลือก</label>
                                                     </div>
                                                 </div>
                                             </div>
@@ -223,7 +239,10 @@
         $('.option-checkbox').multipleSelect({
             filter: true,
             keepOpen: true,
-            placeholder: 'เลือกสินค้าที่ใช้ตัวเลือกนี้'
+            placeholder: 'เลือกสินค้าที่ใช้ตัวเลือกนี้',
+            type: 'optgroup',
+            hideOptgroupCheckboxes: true
+
         })
 
         document.querySelectorAll('.form-outline').forEach((formOutline) => {
@@ -246,7 +265,7 @@
         }
 
         $(document).on("click", ".delete", function () {
-            var id = $(this).data("option-id");
+            var id = $(this).data("id");
             $("#id").val(id);
         });
 
@@ -261,8 +280,9 @@
             $("#id1").val(id);
             $("#optionName").val(optionName);
             $("#price").val(price);
-            $("#option_preview").attr("src", img)
-
+            $(".img_option").attr("src", img)
+            $("#parcel").val(parcel)
+            $("#product-cb").attr("option", product)
         });
     </script>
 </body>

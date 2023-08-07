@@ -1,6 +1,6 @@
 <%- include('../partials/header') %>
 
-<body>
+<body class="h-100" style="background-color: rgb(248, 248, 248);">
     <div class="container-lg mt-5">
         <div class="d-flex justify-content-between">
             <div class="left-box-product">
@@ -17,15 +17,53 @@
                         <h3>สรุปสิ่งที่เลือก</h3>
                     </div>
                     <div class="card-body">
-                        <% let i = 0; %>
-                        <% for (var optionName in options) { %>
-                        <% i++ %>
-                        <% if (options.hasOwnProperty(optionName)) { %>
-                        <div class="col">
-                            <h4><%= optionName %></h4>
-                            <p class="select-option" id="select-option-<%= i %>"></p>
+                        <% let i = 1; %>
+                        <% if(product.categories === 'sticker'){ %>
+                        <div class="d-flex justify-content-between fs-4">
+                            <p>ขนาดของชิ้นงาน</p>
+                            <p class="select-option" id="select-option-<%= i++ %>">-</p>
                         </div>
-                        <% } %>
+                        <div class="d-flex justify-content-between fs-4">
+                            <p>ประเภทกระดาษ</p>
+                            <p class="select-option" id="select-option-<%= i++ %>">-</p>
+                        </div>
+                        <div class="d-flex justify-content-between fs-4">
+                            <p>กระเคลือบเงา</p>
+                            <p class="select-option" id="select-option-<%= i++ %>">-</p>
+                        </div>
+                        <div class="d-flex justify-content-between fs-4">
+                            <p>การไดคัท</p>
+                            <p class="select-option" id="select-option-<%= i++ %>">-</p>
+                        </div>
+                        <div class="d-flex justify-content-between fs-4">
+                            <p>จำนวน</p>
+                            <p class="select-option" id="select-option-<%= i++ %>">-</p>
+                        </div>
+                        <% }else if(product.categories === 'card'){ %>
+                        <div class="d-flex justify-content-between fs-4">
+                            <p>ขนาดของชิ้นงาน</p>
+                            <p class="select-option" id="select-option-<%= i++ %>">-</p>
+                        </div>
+                        <div class="d-flex justify-content-between fs-4">
+                            <p>ประเภทกระดาษ</p>
+                            <p class="select-option" id="select-option-<%= i++ %>">-</p>
+                        </div>
+                        <div class="d-flex justify-content-between fs-4">
+                            <p>ด้านพิมพ์</p>
+                            <p class="select-option" id="select-option-<%= i++ %>">-</p>
+                        </div>
+                        <div class="d-flex justify-content-between fs-4">
+                            <p>การปั้ม</p>
+                            <p class="select-option" id="select-option-<%= i++ %>">-</p>
+                        </div>
+                        <div class="d-flex justify-content-between fs-4">
+                            <p>การเคลือบเงา</p>
+                            <p class="select-option" id="select-option-<%= i++ %>">-</p>
+                        </div>
+                        <div class="d-flex justify-content-between fs-4">
+                            <p>จำนวน</p>
+                            <p class="select-option" id="select-option-<%= i++ %>">-</p>
+                        </div>
                         <% } %>
                     </div>
                 </div>
@@ -36,18 +74,18 @@
                     <div class="w-75 m-auto">
                         <div class="spec-picking">
                             <input type="text" name="productid" value="<%= product.product_id %>" hidden>
-                            <% let count = 0; %>
+                            <% let count = 1; %>
                             <% if(product.categories === 'sticker'){ %>
-                            <% count++ %>
-                            <%- include('./product_select/sticker', { count: count, options: options }) %> 
+                            <%- include('./product_select/sticker', { count: count, options: options }) %>
+                            <% } else if(product.categories === 'card') { %>
+                            <%- include('./product_select/card', { count: count, options: options }) %>
                             <% } %>
-                          
                             <div class="my-4">
                                 <h4>การออกแบบ</h4>
                                 <hr>
                                 <input type="file" class="btn d-block" id="customFile" name="designfile" />
-                                <a href="/konva">
-                                    <div class="btn btn-secondary d-block mt-3">ออกแบบด้วยเครื่องมือในเว็บ</div>
+                                <a href="/template">
+                                    <div class="btn btn-secondary d-block mt-3 fs-6">เลือกเทมเพลต</div>
                                 </a>
                             </div>
                             <div class="float-end mt-5">
@@ -85,22 +123,49 @@
     // }
 
     $(document).ready(() => {
-        $('.radio-choice, #floatingSelect').change(calculatePrice);
+        $('.form-select').change(calculatePrice);
     });
 
+    // `<% for (let j = 0; j < sizes.length; j++) { %>`
+    //     if (width >= `<%- sizes[j].minSize %>`) {
+    //         widthprice = `<%- sizes[j].pricesize %>`;
+    //     }
+    //     if (height >= `<%- sizes[j].minSize %>`) {
+    //         heightprice = `<%- sizes[j].pricesize %>`;
+    //     }
+    //     `<%  }; %>`
+
     function calculatePrice() {
-        const quantity = parseInt($('#floatingSelect').val());
-        const quantityPerUnit = parseInt($('#floatingSelect option:selected').data('perunit'));
         const optionPrice = parseFloat($('#option option:selected').data('price'));
+        const sizeTier = $('#size').find('option:selected').val();
+        const qtTier = $('#qt').find('option:selected').val();
+        console.log(qtTier);
+        const [width, height] = sizeTier.split('x');
+        // const qtSelected = sizeTier.val();
+        // const qts = parseFloat(qtSelected);
 
-        if (isNaN(quantity) || isNaN(quantityPerUnit) || isNaN(optionPrice)) {
-            $('#total-price').val('Invalid selection');
-            return;
+        let widthprice;
+        let heightprice;
+        let qtprice;
+
+
+        `<% for (let i = 0; i < tiers.length; i++) { %>`
+        if (qtTier >= `<%- tiers[i].minqt %>` && qtTier <= `<%- tiers[i].maxqt %>`) {
+            qtprice = `<%- tiers[i].priceqt %>`;
         }
+        `<%  }; %>`
 
-        const totalPricePerUnit = optionPrice * quantityPerUnit;
-        const totalPrice = totalPricePerUnit * quantity;
 
+        // if (isNaN(quantity) || isNaN(quantityPerUnit) || isNaN(optionPrice)) {
+        //     $('#total-price').val('Invalid selection');
+        //     return;
+        // }
+        console.log(`กว้าง : ${widthprice} บาท, ยาว : ${heightprice}`);
+        console.log(`ราคาปริมาณต่อหน่วย : ${qtprice}`);
+        const totalSize = widthprice + heightprice;
+        const totalPricePerUnit = optionPrice + totalSize + qtprice;
+        const totalPrice = totalPricePerUnit * qtTier;
+        console.log(optionPrice);
         $('#total-price').val(totalPrice.toFixed(2));
     }
 
@@ -115,25 +180,43 @@
         });
     });
 
-
-
     $(document).ready(() => {
-        $('.radio-choice').change(function () {
+        $('.form-select').change(function () {
             const selectedOption = $(this).find('option:selected');
-            const imagePath = selectedOption.data('img');
-            const index = $('.radio-choice').index(this);
-            const selectedImage = $('.selectedimg').eq(index);
-
-            selectedImage.attr('src', imagePath);
+            const selectedText = selectedOption.val();
+            const index = $(this).closest('.mb-5').attr('id');
+            // console.log('#select-option-'+index+selectedText);
+            $('#select-option-' + index).text(selectedText);
         });
     });
 
     $(document).ready(() => {
-        $('.radio-choice').change(function () {
-            const selectedOption = $(this).find('option:selected');
-            const selectedText = selectedOption.val();
-            const index = $(this).closest('.mb-2').attr('id');
-            $('#select-option-' + index).text(selectedText);
+        function updateFirstOptionImage() {
+            $('.form-select').each(function () {
+                const firstOption = $(this).find('option:selected');
+                const optionImg = firstOption.data('img'); // Corrected access to data attribute
+                const imgId = $(this).data('img-id'); // Corrected access to data attribute
+                const imgElement = $('#selectedimg' + imgId);
+                imgElement.attr('src', optionImg);
+            });
+        }
+
+        // Call the function on page load to set the images for the first options
+        updateFirstOptionImage();
+
+        // Add an event listener to each select element with class "radio-choice"
+        $('.form-select').on('change', function () {
+            // Get the selected option
+            const selectedOption = $(this).find(':selected');
+            const optionName = selectedOption.val();
+            const optionImg = selectedOption.data('img');
+
+            // Get the corresponding image element based on the ID
+            const imgId = $(this).data('img-id');
+            const imgElement = $('#selectedimg' + imgId);
+            // console.log('optionImg:', optionImg);
+            // Update the image source with the selected option's image
+            imgElement.attr('src', optionImg);
         });
     });
 </script>

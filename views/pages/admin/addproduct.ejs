@@ -1,8 +1,19 @@
 <%- include('../../partials/admin-nav') %>
 
 <body>
+    <div class="mb-5 secondHead-admin">
+        <div class="secondHead-content">
+            <h1>เพิ่มสินค้า</h1>
+            <ol class="list-unstyled d-flex ">
+                <li class="breadcrumb-item"><a class="link-light" href="#">หน้าแรก</a></li>
+                <li class="active text-light ms-2">/ สินค้า</li>
+                <li class="active text-light ms-2">/ เพิ่มสินค้า</li>
+
+            </ol>
+        </div>
+    </div>
+    <div style="padding-bottom: 150px;"></div>
     <div class="box-admin">
-        <h4>เพิ่มสินค้า</h4>
         <% if(success_msg != "") { %>
         <% success_msg.forEach((item) => { %>
         <div class="alert alert-success">
@@ -16,14 +27,6 @@
         </div>
         <% }); %>
         <% } %>
-        <div class="mb-5"
-            style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='%236c757d'/%3E%3C/svg%3E&#34;);"
-            aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="#">Home</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Library</li>
-            </ol>
-        </div>
         <form action="/addproduct" method="post" enctype="multipart/form-data">
             <div class="card">
                 <div class="mx-4 mt-4 border-bottom">
@@ -54,7 +57,7 @@
                                 <select class="form-select" style="height: 35px;" name="categories">
                                     <option value="card">นามบัตร</option>
                                     <option value="flyer">ใบปลิว</option>
-                                    <option value="">แผ่บพับ</option>
+                                    <option value="flyer">แผ่บพับ</option>
                                     <option value="sticker">สติ๊กเกอร์</option>
                                     <option value="bill">ใบบิล</option>
                                     <option value="letter">ซองจดหมาย</option>
@@ -70,15 +73,15 @@
                             </div>
 
                             <!-- Message input -->
-                          
+
                             <div class="w-100 ps-0 mt-2">
                                 <!-- Message input -->
                                 <div class="form-outline ">
-                                   <textarea class="form-control" id="description" rows="4" name="product_description"
-                                       required></textarea>
-                                   <label class="form-label" for="description">รายละเอียดสินค้า</label>
-                               </div>
-                              </div>
+                                    <textarea class="form-control" id="description" rows="4" name="description"
+                                        required></textarea>
+                                    <label class="form-label" for="description">รายละเอียดสินค้า</label>
+                                </div>
+                            </div>
                         </div>
 
                     </div>
@@ -109,22 +112,24 @@
             </div>
 
 
-            <!-- <div class="card">
+            <div class="card">
                 <div class="mx-4 mt-4 border-bottom">
-                    <h4>กำหนดราคาต่อหน่วย</h4>
+                    <h4>กำหนดราคาเหมาตามปริมาณ</h4>
                 </div>
                 <div class="card-body">
                     <div class="row row-cols-auto mb-4">
-                        <div class="col">
-                            <div class="form-outline">
-                                <input type="text" class="spec-name form-control" name="quantity[0][]" required>
-                                <label class="form-label">จำนวน</label>
+                        <div class="col d-flex">
+                            <div class="form-outline w-50 me-2">
+                                <input type="text" class="spec-name form-control" name="minqt[0][]" required>
+                                <label class="form-label">จาก</label>
                             </div>
-                        </div>
-                        <div class="col">
-                            <div class="form-outline">
-                                <input type="text" class="spec-name form-control" name="price_per_unit[0][]" required>
-                                <label class="form-label">ราคาต่อหน่วย</label>
+                            <div class="form-outline w-50 me-2">
+                                <input type="text" class="spec-name form-control" name="maxqt[0][]" required>
+                                <label class="form-label">ถึง</label>
+                            </div>
+                            <div class="form-outline w-50">
+                                <input type="text" class="spec-name form-control" name="priceTier[0][]" required>
+                                <label class="form-label">ราคา</label>
                             </div>
                         </div>
                         <button type="button" id="add-price" class="btn btn-secondary">
@@ -133,8 +138,31 @@
                     </div>
                     <div id="newPriceRow"></div>
                 </div>
-            </div> -->
+            </div>
 
+            <div class="card">
+                <div class="mx-4 mt-4 border-bottom">
+                    <h4>กำหนดราคาเหมาตามขนาด</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row row-cols-auto mb-4">
+                        <div class="col d-flex">
+                            <div class="form-outline w-50 me-2">
+                                <input type="text" class="form-control" name="minsize[0][]" required>
+                                <label class="form-label">หน่วยขนาด</label>
+                            </div>
+                            <div class="form-outline w-50">
+                                <input type="text" class="form-control" name="priceSize[0][]" required>
+                                <label class="form-label">ราคา</label>
+                            </div>
+                        </div>
+                        <button type="button" id="add-size" class="btn btn-secondary">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
+                    </div>
+                    <div id="newSizeRow"></div>
+                </div>
+            </div>
 
             <!-- <div class="card mb-4 spec" id="spec">
                 <div class="mx-4 mt-4 border-bottom">
@@ -156,7 +184,7 @@
                     <div id="newRow"></div>
                 </div>
             </div> -->
-            <button type="submit" class="btn btn-primary btn-block mt-5 float-end" style="width: 150px;">ยืนยัน</button>
+            <button type="submit" class="btn btn-primary btn-block my-5 float-end" style="width: 150px;">ยืนยัน</button>
         </form>
     </div>
 
@@ -182,71 +210,102 @@
             }
         }
         var quantityCount = 0;
-        var specCount = 0;
+        var sizeCount = 0;
         var img = 0
 
-        //         $('#add-price').on('click', function () {
-        //             quantityCount ++
-        //             var newPriceRow = `
-        //             <div class="row row-cols-auto mb-4 newPrice">
-        //                         <div class="col">
-        //                             <div class="form-outline">
-        //                                 <input type="text" class="spec-name form-control" name="quantity[${quantityCount}][]" required>
-        //                                 <label class="form-label">จำนวน</label>
-        //                             </div>
-        //                         </div>
-        //                         <div class="col">
-        //                             <div class="form-outline">
-        //                                 <input type="text" class="spec-name form-control" name="price_per_unit[${quantityCount}][]" required>
-        //                                 <label class="form-label">ราคาต่อหน่วย</label>
-        //                             </div>
-        //                         </div>
-        //                         <button type="button" class="btn btn-danger remove-price"><i class="fa-solid fa-trash" style="color: #ffffff;"></i></button>
-        //                     </div>
-        //   `;
+        $('#add-price').on('click', function () {
+            quantityCount++
+            var newPriceRow = `
+            <div class="row row-cols-auto mb-4 newPrice">
+                        <div class="col d-flex">
+                            <div class="form-outline w-50 me-2">
+                                <input type="text" class="spec-name form-control" name="minqt[${quantityCount}][]" required>
+                                <label class="form-label">จาก</label>
+                            </div>
+                            <div class="form-outline w-50 me-2">
+                                <input type="text" class="spec-name form-control" name="maxqt[${quantityCount}][]" required>
+                                <label class="form-label">ถึง</label>
+                            </div>
+                            <div class="form-outline w-50">
+                                <input type="text" class="spec-name form-control" name="priceTier[${quantityCount}][]" required>
+                                <label class="form-label">ราคา</label>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-danger remove-price"><i class="fa-solid fa-trash" style="color: #ffffff;"></i></button>
+                    </div>
+          `;
 
-        //             $('#newPriceRow').append(newPriceRow);
-        //             document.querySelectorAll('.form-outline').forEach((formOutline) => {
-        //                 new mdb.Input(formOutline).init();
-        //             });
-        //         })
+            $('#newPriceRow').append(newPriceRow);
+            document.querySelectorAll('.form-outline').forEach((formOutline) => {
+                new mdb.Input(formOutline).init();
+            });
+        })
 
-        //         $('#add-spec').on('click', function () {
-        //             specCount++;
-        //             var newSpecCard = `
-        //         <div class="d-flex justify-content-between mb-2 newcard">
+
+        $('#add-size').on('click', function () {
+            sizeCount++
+            var newrow = `
+            <div class="row row-cols-auto mb-4 newSize">
+                        <div class="col d-flex">
+                            <div class="form-outline w-50 me-2">
+                                <input type="text" class="form-control" name="minsize[${sizeCount}][]" required>
+                                <label class="form-label">หน่วยขนาด</label>
+                            </div>
+                            <div class="form-outline w-50">
+                                <input type="text" class="form-control" name="priceSize[${sizeCount}][]" required>
+                                <label class="form-label">ราคา</label>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-danger remove-size"><i class="fa-solid fa-trash" style="color: #ffffff;"></i></button>
+                    </div>
+          `;
+
+            $('#newSizeRow').append(newrow);
+            document.querySelectorAll('.form-outline').forEach((formOutline) => {
+                new mdb.Input(formOutline).init();
+            });
+        })
+
+        // $('#add-spec').on('click', function () {
+        //     specCount++;
+        //     var newSpecCard = `
+        //         <div class="d-flex justify-content-between mb-2 newcard ">
         //           <div class="form-outline me-2" style="width: 200px;">
         //             <input type="text" name="spec_name[${specCount}][]" class="spec-name form-control" required>
         //             <label class="form-label">ชื่อสเปค</label>
         //           </div>
         //           <select multiple="multiple" class="option-checkbox w-100" name="option[${specCount}][]" multiple>
-        // 
+        
         //             </select>
         //           <button type="button" class="btn btn-danger remove-spec mx-2"><i class="fa-solid fa-trash" style="color: #ffffff;"></i></button>
         //         </div>
         //   `;
-        //             $('#newRow').append(newSpecCard);
-        //             document.querySelectorAll('.form-outline').forEach((formOutline) => {
-        //                 new mdb.Input(formOutline).init();
-        //             });
-        //             $('.option-checkbox').multipleSelect('refreshOptions', {
-        //                 filter: true,
-        //                 keepOpen: true,
-        //                 placeholder: 'เลือกวัสดุที่ใช้กับสเปคนี้'
-        //             });
-        //         });
+        //     $('#newRow').append(newSpecCard);
+        //     document.querySelectorAll('.form-outline').forEach((formOutline) => {
+        //         new mdb.Input(formOutline).init();
+        //     });
+        //     $('.option-checkbox').multipleSelect('refreshOptions', {
+        //         filter: true,
+        //         keepOpen: true,
+        //         placeholder: 'เลือกวัสดุที่ใช้กับสเปคนี้'
+        //     });
+        // });
 
         document.querySelectorAll('.form-outline').forEach((formOutline) => {
             new mdb.Input(formOutline).init();
         });
 
-        // $('#newPriceRow').on('click', '.remove-price', function () {
-        //     $(this).closest(`.newPrice`).remove();
-        // });
+        $('#newPriceRow').on('click', '.remove-price', function () {
+            $(this).closest(`.newPrice`).remove();
+        });
 
         // $('#newRow').on('click', '.remove-spec', function () {
         //     $(this).closest(`.newcard`).remove();
         // });
+
+        $('#newSizeRow').on('click', '.remove-size', function () {
+            $(this).closest(`.newSize`).remove();
+        });
     </script>
 
 </body>

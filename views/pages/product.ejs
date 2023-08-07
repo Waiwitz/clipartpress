@@ -1,6 +1,6 @@
 <%- include('../partials/header') %>
 
-<body style="background-color: #FCFCFC;">
+<body class="h-100" style="background-color: rgb(248, 248, 248);">
   <script>
     $(document).ready(function () {
       $('#cardSection').hide();
@@ -11,29 +11,32 @@
       $('#letterSection').hide();
     });
   </script>
-  <div class="container-lg mt-5">
-    <div style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
-      <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="#">หน้าแรก</a></li>
+  <div class="banner shadow-5-strong">
+    <img class="imageFitBox" src="/assets/img/Flyers-Brochure-Test-mage.jpg" alt="">
+    <div class="banner-content overlay">
+      <div>
+        <h1>สินค้างานพิมพ์</h1>
+      <ol class="breadcrumb justify-content-center bg-light shadow-5-strong">
+        <li class="breadcrumb-item"><a href="/">หน้าแรก</a></li>
         <li class="breadcrumb-item active" aria-current="page"><%= currentMenu %></li>
       </ol>
     </div>
-
+      </div>
+  </div>
+  <div class="container-lg mt-5">
     <div class="mt-3">
-      <h3>งานพิมพ์</h3>
       <div class="d-flex mb-5">
         <!-- ประเภท -->
-        <div class="list-group" style="width: 230px;">
-          <div href="/product/all"
-            class="list-group-item list-group-item-action cate-button"
-            data-target="allSection">สินค้าทั้งหมด</div>
-          <div class="list-group-item list-group-item-action cate-button" data-target="cardSection">นามบัตร</div>
-          <div class="list-group-item list-group-item-action cate-button" data-target="flyerSection">ใบปลิว</div>
-          <div class="list-group-item list-group-item-action cate-button" data-target="leafletSection">แผ่บพับ</div>
-          <div class="list-group-item list-group-item-action cate-button" data-target="stickerSection">สติ๊กเกอร์</div>
-          <div class="list-group-item list-group-item-action cate-button" data-target="billSection">ใบบิล</div>
-          <div class="list-group-item list-group-item-action cate-button" data-target="letterSection">ซองจดหมาย</div>
-        </div>
+        <ul class="cate-select-group card">
+          <li href="/product/all" class="cate-button cate-active" data-target="allSection">
+            สินค้าทั้งหมด</li>
+          <li class="cate-button" data-target="cardSection">นามบัตร</li>
+          <li class="cate-button" data-target="flyerSection">ใบปลิว</li>
+          <li class="cate-button" data-target="leafletSection">แผ่บพับ</li>
+          <li class="cate-button" data-target="stickerSection">สติ๊กเกอร์</li>
+          <li class="cate-button" data-target="billSection">ใบบิล</li>
+          <li class="cate-button" data-target="letterSection">ซองจดหมาย</li>
+        </ul>
 
 
         <div>
@@ -80,6 +83,8 @@
             </div>
             <% } %>
             <% }); %>
+            <% } else { %>
+              <b>ไม่มีสินค้าประเภทนี้</b>
             <% } %>
           </div>
 
@@ -103,6 +108,8 @@
             </div>
             <% } %>
             <% }); %>
+            <% } else { %>
+              <b>ไม่มีสินค้าประเภทนี้</b>
             <% } %>
           </div>
 
@@ -126,6 +133,8 @@
             </div>
             <% } %>
             <% }); %>
+            <% } else { %>
+                <b>ไม่มีสินค้าประเภทนี้</b>
             <% } %>
           </div>
 
@@ -203,15 +212,15 @@
     </div>
   </div>
   <script>
-   $(document).ready(function () {
-    $(".cate-button").on("click", function () {
-      const targetSection = $(this).data("target");
-      $(".cate-button").removeClass("active");
-      $(this).addClass("active");
-      $(".itemlist").hide();
-      $("#" + targetSection).show();
+    $(document).ready(function () {
+      $(".cate-button").on("click", function () {
+        const targetSection = $(this).data("target");
+        $(".cate-button").removeClass("cate-active");
+        $(this).addClass("cate-active");
+        $(".itemlist").hide();
+        $("#" + targetSection).show();
+      });
     });
-  });
   </script>
 </body>
 

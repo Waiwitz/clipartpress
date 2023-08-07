@@ -1,27 +1,29 @@
 <%- include('../partials/head') %>
 <nav class="nav-admin navbar-light" style="z-index: 10 !important;">
-  <div class="text-center mt-3 ">
-    <img src="/assets/img/logo.png" alt="clipartpress" width="150" class="center">
+  <div class="mt-3 text-center">
+    <img src="/assets/img/logo.png" alt="clipartpress" width="120" class="ms-3">
+    <!-- <div class="align-self-center me-4" id="mini-nav-btn">
+      <i class="fas fa-bars fs-4"></i>
+    </div> -->
   </div>
   <hr class="ms-3 me-3">
-  <div class="  " id="navbarSupportedContent">
+  <div class="" id="navbarSupportedContent">
     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-      <li class="nav-item">
+      <li class="nav-item ripple" data-mdb-ripple-color="light">
         <a class="admin-navlink  " aria-current="page" href="/admin/dashborad">
           <i class="fa fa-chart-line"></i>
           <p>แดชบอร์ด</p>
         </a>
       </li>
 
-      <li class="nav-item">
-        <div class="admin-navlink d-flex justify-content-between" data-mdb-toggle="collapse" data-mdb-target="#product"
-          aria-expanded="false" aria-controls="product">
-
+      <li class="nav-item ripple" data-mdb-ripple-color="light">
+        <div class="admin-navlink d-flex justify-content-between" id="product-btn" data-mdb-toggle="collapse"
+          data-mdb-target="#product" aria-expanded="false" aria-controls="product">
           <div class="d-flex">
             <i class="fas fa-list"></i>
             <p>สินค้า</p>
           </div>
-          <i class="fa-solid fa-caret-down" style="padding-left: 50px;"></i>
+          <i class="fa-solid fa-caret-down"></i>
         </div>
         <div>
           <div
@@ -35,42 +37,42 @@
               href="/admin/options">
               <p class="ms-5">จัดการตัวเลือกสินค้า</p>
             </a>
-            <a class="<%= currentLink == "typeproduct" ? 'admin-navlink admin-nav-active' : 'admin-navlink' %>"
+            <!-- <a class="<%= currentLink == "typeproduct" ? 'admin-navlink admin-nav-active' : 'admin-navlink' %>"
               href="/admin/typeproduct">
               <p class="ms-5">จัดการขนาดของชิ้นงาน</p>
-            </a>
+            </a> -->
           </div>
         </div>
       </li>
 
-      <li class="nav-item">
+      <li class="nav-item ripple" data-mdb-ripple-color="light">
         <a class="admin-navlink" href="#">
           <i class="fas fa-clipboard-list"></i>
           <p>รายการสั่งทำ</p>
         </a>
       </li>
 
-      <li class="nav-item">
+      <li class="nav-item ripple" data-mdb-ripple-color="light">
         <a class="<%= currentLink == "chat" ? 'admin-navlink admin-nav-active' : 'admin-navlink' %>" aria-current="page"
           href="/admin/chat/*">
           <i class="fa-solid fa-comment"></i>
           <p>แชท</p>
         </a>
       </li>
-      <li class="nav-item">
+      <li class="nav-item ripple" data-mdb-ripple-color="light">
         <a class="admin-navlink" href="#">
           <i class="fas fa-ban"></i>
           <p>คำขอยกเลิกรายการ</p>
         </a>
       </li>
-      <li class="nav-item">
+      <li class="nav-item ripple" data-mdb-ripple-color="light">
         <a class="<%= currentLink == "member" ? 'admin-navlink admin-nav-active' : 'admin-navlink' %>"
           href="/admin/member">
           <i class="fas fa-user-friends"></i>
           <p>สมาชิก</p>
         </a>
       </li>
-      <li class="nav-item">
+      <li class="nav-item ripple" data-mdb-ripple-color="light">
         <a class="admin-navlink" href="#">
           <i class="fas fa-sign-out-alt"></i>
           <p>ออกจากระบบ</p>
@@ -79,3 +81,18 @@
     </ul>
   </div>
 </nav>
+
+<script>
+  $(function () {
+    $("#product-btn").click(function (e) {
+      e.preventDefault();
+      $(".fa-caret-down").toggleClass("rotate");
+    });
+  });
+
+  $("#mini-nav-btn").click(function () {
+    $(".nav-admin").toggleClass("mini-nav");
+    $(".nav-item p").toggleClass("d-none");
+  });
+
+</script>

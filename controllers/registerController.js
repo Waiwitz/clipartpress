@@ -125,7 +125,7 @@ const createNewUser = (user) => {
                 text: `คลิกที่ลิ้งค์เพื่อยืนยันอีเมล: http://localhost:3000/verify?email=${data.email}&token=${data.token}`
             };
             transporter.sendMail(mailOptions);
-
+  
         } catch (e) {
             reject(e);
         }

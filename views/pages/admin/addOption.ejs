@@ -1,8 +1,18 @@
 <%- include('../../partials/admin-nav') %>
 
 <body>
+    <div class="mb-5 secondHead-admin">
+        <div class="secondHead-content">
+            <h1>เพิ่มตัวเลือกสินค้า</h1>
+            <ol class="list-unstyled d-flex ">
+                <li class="breadcrumb-item"><a class="link-light" href="#">หน้าแรก</a></li>
+                <li class="active text-light ms-2">/ ตัวเลือกสินค้า</li>
+                <li class="active text-light ms-2">/ เพิ่มตัวเลือกสินค้า</li>
+            </ol>
+        </div>
+    </div>
+    <div style="padding-bottom: 150px;"></div>
     <div class="box-admin">
-        <h4>เพิ่มสินค้า</h4>
         <% if(success_msg != "") { %>
         <% success_msg.forEach((item) => { %>
         <div class="alert alert-success">
@@ -16,14 +26,6 @@
         </div>
         <% }); %>
         <% } %>
-        <div class="mb-5"
-            style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='%236c757d'/%3E%3C/svg%3E&#34;);"
-            aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="#">Home</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Library</li>
-            </ol>
-        </div>
         <form action="/addoption" method="post" enctype="multipart/form-data">
             <div class="card mb-4 spec" id="spec">
                 <div class="card-body">
@@ -54,8 +56,6 @@
                                 <div class="col" style="width: 42.5%;">
                                     <select class="form-select mb-3" id="parcel" aria-label="Default select example"
                                         name="option_parcel[]">
-                                        <option selected disabled>หมวดหมู่</option>
-                                        <option value="foramt">ขนาดของชิ้นงาน</option>
                                         <option value="papertype">ประเภทกระดาษ</option>
                                         <option value="oil">การเคลือบเงา</option>
                                         <option value="pumping">การปั้ม</option>
@@ -63,22 +63,39 @@
                                         <option value="folding">การพับ</option>
                                     </select>
 
-                                    <select multiple="multiple" class="option-checkbox w-100" name="product[0]"
-                                        multiple>
+                                    <select multiple="multiple" id="product-cb" class="option-checkbox w-100"
+                                        name="product[0][]" multiple>
                                         <% if( products.length > 0 ){ %>
                                         <% products.forEach((product) => { %>
-                                        <option value="<%= product.product_id %>"><%= product.productName %></option>
+                                        <% if(product.categories === 'card'){ %>
+                                        <optgroup label="นามบัตร">
+                                            <option value="<%= product.product_id %>">
+                                                <%= product.productName %></option>
+                                        </optgroup>
+                                        <% }else if(product.categories === 'flyer'){ %>
+                                        <optgroup label="ใบปลิว/แผ่นพับ">
+                                            <option value="<%= product.product_id %>">
+                                                <%= product.productName %></option>
+                                        </optgroup>
+                                        <% }else if(product.categories === 'sticker'){ %>
+                                        <optgroup label="สติ๊กเกอร์">
+                                            <option value="<%= product.product_id %>">
+                                                <%= product.productName %></option>
+                                        </optgroup>
+                                        <% }else if(product.categories === 'bill'){ %>
+                                        <optgroup label="ใบบิล">
+                                            <option value="<%= product.product_id %>">
+                                                <%= product.productName %></option>
+                                        </optgroup>
+                                        <% }else if(product.categories === 'letter'){ %>
+                                        <optgroup label="ซองจดหมาย">
+                                            <option value="<%= product.product_id %>">
+                                                <%= product.productName %></option>
+                                        </optgroup>
+                                        <% } %>
                                         <% })%>
                                         <% } %>
                                     </select>
-                                </div>
-                            </div>
-                            <div class="col">
-                                <!-- Message input -->
-                                <div class="form-outline mb-4">
-                                    <textarea class="form-control" id="description" rows="4"
-                                        name="option_des[0]"></textarea>
-                                    <label class="form-label" for="description">คำอธิบายตัวเลือก</label>
                                 </div>
                             </div>
                         </div>
@@ -97,7 +114,10 @@
         $('.option-checkbox').multipleSelect({
             filter: true,
             keepOpen: true,
-            placeholder: 'เลือกสินค้าที่ใช้ตัวเลือกนี้'
+            placeholder: 'เลือกสินค้าที่ใช้ตัวเลือกนี้',
+            type: 'optgroup',
+            hideOptgroupCheckboxes: true
+
         })
 
         document.querySelectorAll('.form-outline').forEach((formOutline) => {
@@ -163,22 +183,39 @@
                                         <option value="folding">การพับ</option>
                                     </select>
 
-                                    <select multiple="multiple" class="option-checkbox w-100" name="product[${specCount}]"
-                                        multiple>
+                                    <select multiple="multiple" id="product-cb" class="option-checkbox w-100"
+                                        name="product[${specCount}][]" multiple>
                                         <% if( products.length > 0 ){ %>
                                         <% products.forEach((product) => { %>
-                                        <option value="<%= product.product_id %>"><%= product.productName %></option>
+                                        <% if(product.categories === 'card'){ %>
+                                        <optgroup label="นามบัตร">
+                                            <option value="<%= product.product_id %>">
+                                                <%= product.productName %></option>
+                                        </optgroup>
+                                        <% }else if(product.categories === 'flyer'){ %>
+                                        <optgroup label="ใบปลิว/แผ่นพับ">
+                                            <option value="<%= product.product_id %>">
+                                                <%= product.productName %></option>
+                                        </optgroup>
+                                        <% }else if(product.categories === 'sticker'){ %>
+                                        <optgroup label="สติ๊กเกอร์">
+                                            <option value="<%= product.product_id %>">
+                                                <%= product.productName %></option>
+                                        </optgroup>
+                                        <% }else if(product.categories === 'bill'){ %>
+                                        <optgroup label="ใบบิล">
+                                            <option value="<%= product.product_id %>">
+                                                <%= product.productName %></option>
+                                        </optgroup>
+                                        <% }else if(product.categories === 'letter'){ %>
+                                        <optgroup label="ซองจดหมาย">
+                                            <option value="<%= product.product_id %>">
+                                                <%= product.productName %></option>
+                                        </optgroup>
+                                        <% } %>
                                         <% })%>
                                         <% } %>
                                     </select>
-                                </div>
-                            </div>
-                            <div class="col">
-                                <!-- Message input -->
-                                <div class="form-outline mb-4">
-                                    <textarea class="form-control" id="description" rows="4"
-                                        name="option_des[${specCount}]"></textarea>
-                                    <label class="form-label" for="description">คำอธิบายตัวเลือก</label>
                                 </div>
                             </div>
                         </div>
@@ -197,7 +234,9 @@
             $('.option-checkbox').multipleSelect('refreshOptions', {
                 filter: true,
                 keepOpen: true,
-                placeholder: 'เลือกสินค้าที่ใช้ตัวเลือกนี้'
+                placeholder: 'เลือกสินค้าที่ใช้ตัวเลือกนี้',
+                type: 'optgroup',
+                hideOptgroupCheckboxes: true
             });
         });
 
