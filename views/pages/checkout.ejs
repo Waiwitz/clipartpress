@@ -1,0 +1,757 @@
+<%- include('../partials/header') %>
+
+<style>
+    .dd-selected-image,
+    .dd-option-image {
+        margin: 0.85em 0.5em;
+        width: 35px !important;
+        height: 35px !important;
+    }
+
+    .dd-selected,
+    .dd-option {
+        padding: 0;
+        height: 60px;
+    }
+
+    .dd-option-text {
+        line-height: 0;
+    }
+
+    label.dd-selected-text {
+        line-height: 62px !important;
+    }
+</style>
+<body style="background-color: #f8f8f8;">
+
+    <!-- <div class="banner shadow-5-strong">
+        <img class="imageFitBox" src="/assets/img/Flyers-Brochure-Test-mage.jpg" alt="">
+        <div class="banner-content overlay">
+            <div>
+                <h1><%= currentMenu %></h1>
+                <ol class="breadcrumb justify-content-center bg-light shadow-5-strong px-5">
+                    <li class="breadcrumb-item"><a href="/">หน้าแรก</a></li>
+                    <li class="breadcrumb-item active" aria-current="page"><%= currentMenu %></li>
+                </ol>
+            </div>
+        </div>
+    </div> -->
+    <% let sumTotal = 0 %>
+
+    <form action="/placeOrder/<%= session.user_id %>" method="post">
+        <input type="hidden" name="product_id" value="<%= JSON.stringify(cartsItem.product_id) %>">
+        <div class="container-lg mt-5 mb-5 p-auto">
+            <% if(success_msg != "") { %>
+            <% success_msg.forEach((item) => { %>
+            <div class="alert alert-success">
+                <%- item %>
+            </div>
+            <% }); %>
+            <% }else if(errors != "") {%>
+            <% errors.forEach((item) => { %>
+            <div class="alert alert-danger">
+                <%- item %>
+            </div>
+            <% }); %>
+            <% } %>
+            <% let qty; %>
+            <% let price; %>
+            <% let SumPrice = 0; %>
+            <% if(cartsItem.length > 0) { %>
+            <div class="d-flex flex-wrap">
+                <div class="col-8 overflow-y-scroll" style="height: 700px;">
+                    <% cartsItem.forEach((item) => { %>
+                    <% qty = item.quantity %>
+                    <% price = item.price %>
+                    <% const findPromo = promotions.some(row => row.product_id == item.product_id) %>
+                    <% let textPrice = money.format(item.price); %>
+                    <% let textQty = item.quantity; %>
+                    <div class="card mx-0 overflow-hidden p-2">
+                        <div class="card-body p-2 overflow-hidden">
+                            <div class="row">
+                                <div class="col-2">
+                                    <div class="cart-product-picture">
+                                        <img src="<%= item.picture %>" alt="" class="imageFitBox" draggable="false">
+                                    </div>
+                                </div>
+                                <div class="col-5">
+                                    <h4><%= item.productName %></h4>
+                                    <div class="collapse-horizontal">
+                                        <p class="mb-2"> ขนาดของชิ้นงาน : <%= item.size %></p>
+                                        <% item.options.forEach((option) => {  %>
+                                        <p class="mb-2"> <%= option.option_type %> : <%= option.option_name %></p>
+                                        <% }) %>
+                                    </div>
+                                </div>
+                                <div class="col-2">
+                                    <% if (findPromo) { %>
+                                    <%  promotions.forEach((promo) => { %>
+                                    <%  let min_reach = promo.min_reach;%>
+                                    <% if (promo.promo_type == 'giveaway' && promo.promo_condition == 'value') { %>
+                                    <% if (item.price >= promo.min_reach) {%>
+                                    <% qty = item.quantity + promo.type_value%>
+                                    <% textQty = `<b>${qty}</b><br><s>${item.quantity}</s>` %>
+                                    <% } %>
+                                    <% } else if (promo.promo_type == 'giveaway' && promo.promo_condition == 'qty') { %>
+                                    <% if (item.quantity >= promo.min_reach) {%>
+                                    <% qty = item.quantity + promo.type_value%>
+                                    <% textQty = `<b>${qty}</b><br><s>${item.quantity}</s>` %>
+                                    <% } %>
+                                    <%  }else if (promo.promo_type == 'discount' && promo.promo_condition == 'value') { %>
+                                    <% if (item.price >= promo.min_reach) {%>
+                                    <% price = item.price - (item.price * promo.type_value / 100)%>
+                                    <% textPrice = `<b>${money.format(price)}</b><br><s>${money.format(item.price)}</s>` %>
+                                    <% } %>
+                                    <% } else if (promo.promo_type == 'discount' && promo.promo_condition == 'qty') { %>
+                                    <% if (item.quantity >= promo.min_reach) {%>
+                                    <% price = item.price - (item.price * promo.type_value / 100) %>
+                                    <% textPrice = `<b>${money.format(price)}</b><br><s>${money.format(item.price)}</s>` %>
+                                    <% } %>
+                                    <% } %>
+                                    <% }) %>
+                                    <% }  %>
+                                    <% SumPrice += price %>
+                                    <h5>จำนวน</h5>
+                                    <%- textQty %>
+                                </div>
+                                <div class="col-3">
+                                    <h5>ราคา</h5>
+                                    <%- textPrice %>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <% }) %>
+                </div>
+                <div class="col-4">
+                    <div class="card mt-0 overflow-y-scroll position-sticky" style="height: 700px;">
+                        <div class="p-2">
+                            <div class="px-4 pt-3 d-flex justify-content-between">
+                                <b class="fs-5">ที่อยู่จัดส่ง</b>
+                                <button type="button" class="btn btn-link btn-sm " data-bs-toggle="modal"
+                                    data-bs-target="#selectAddress">เปลี่ยนที่อยู่</button>
+                            </div>
+                            <div class="card-body py-2 mb-0" id="show-address">
+                                <% if (address.length > 0) {%>
+                                <% address.forEach((data,index) => { %>
+                                <% if (data.default_address == '1') { %>
+                                <b id="ad-name"><%= data.name %></b> <br>
+                                <span class="card-text" id="ad-info">
+                                    <%= data.address %> <%= data.province %> <%= data.postcode %>
+                                </span> <br>
+                                <span id="ad-tel"><%= data.telephone%></span>
+                                <% } %>
+                                <% }) %>
+                                <% } else { %>
+                                <b>ยังไม่มีที่อยู่</b>
+                                <% } %>
+                            </div>
+                        </div>
+                        <div class="p-2 py-0">
+                            <div class="px-4 pt-3 mb-0">
+                                <b class="fs-5">การชำระเงิน</b>
+                            </div>
+                     
+                            <div class="card-body py-2">
+                                <select id="paymentMethod">
+                                    <% promptpay.forEach((promptpay) => { %>
+                                    <option value="<%= promptpay.promptpay_id %>" data-imagesrc="/assets/img/logoBank/promptpay.png">Qr Code promptpay</option>
+                                    <% }) %>
+                                    <% for( let i = 0; i < banks.length; i++ ) { %>
+                                        <option value="<%= banks[i].bank_id %>" data-imagesrc="/assets/img/logoBank/<%= banks[i].bank %>.png"><%= banks[i].bank == banklist[i].en ? `${banklist[i].th}` : '' %></option>
+                                    <% } %>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="p-2 py-0">
+                            <div class="px-4 pt-3 mb-0">
+                                <b class="fs-5">การจัดส่ง</b>
+                            </div>
+                     
+                            <div class="card-body py-2">
+                                <select class="form-select" id="shipment">
+                                    <% shipments.forEach((shipments) => { %>
+                                    <option value="<%= shipments.shipment_id %>" data-imagesrc="/assets/img/logoBank/promptpay.png"><%= shipments.shipment_name %></option>
+                                    <% }) %>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="p-2" style="height: fit-content;">
+                            <div class="px-4 pt-3 mb-0">
+                                <b class="fs-5">สรุปรายการ</b>
+                            </div>
+                            <div class="card-body py-1">
+                                <div class="border-bottom mb-2">
+                                    <div class="my-2 d-flex justify-content-between">
+                                        <span>ยอดรวมสินค้า (<%= cartsItem.length %> รายการ)</span>
+                                        <span>
+                                            <%= money.format(SumPrice) %>
+                                        </span>
+                                    </div>
+                                    <div class="my-2 d-flex justify-content-between">
+                                        <span>ค่าส่ง</span>
+                                        <span>
+                                            <% let ship = shipments[0].start_price; %>
+                                            <%= ship %>
+                                        </span>
+                                    </div>
+                                    <div class="my-2 d-flex justify-content-between">
+                                        <span>VAT 7%</span>
+                                        <span>
+                                            <% let vat = SumPrice * 7 / 100;%>
+                                            <%= money.format(vat) %>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="border-bottom mb-2">
+                                    <div class="d-flex mb-2">
+                                        <div class="form-outline me-1 " id="coupon-outline">
+                                            <input type="text" id="coupon" name="coupon_code" class="form-control" />
+                                            <label class="form-label" for="coupon">คูปอง</label>
+                                        </div>
+                                        <button class="btn btn-primary" id="applyCode"
+                                            style="padding: 10px;">apply</button>
+                                    </div>
+                                    <div id="coupon-detail" class="my-3">
+                                    </div>
+                                </div>
+                                <div class="my-2 d-flex justify-content-between">
+                                    <b>ยอดที่ต้องชำระ</b>
+                                    <div class="d-flex">
+                                        <input type="hidden" id="sumPrice" value="<%= SumPrice + ship + vat %>" hidden>
+                                        <span class="fw-bold me-2" id="totalPrice">
+                                            <% sumTotal = SumPrice + ship + vat %>
+                                            <%=money.format(SumPrice + ship + vat) %>
+                                        </span>
+                                        <span class="fw-bold" id="newPrice">
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer sticky-bottom bg-white">
+                            <!-- <button type="submit" class="btn btn-primary w-100 fs-5">สั่งซื้อและชำระเงิน</button> -->
+                            <a href="/invoices">
+                                <button type="button" class="btn btn-primary w-100 fs-5">สั่งซื้อและชำระเงิน</button>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <% } else { %>
+            <div class="text-center">
+                <img src="assets/img/empty.png" alt="cart-empty" width="150"> <br>
+                <h3 class="mt-5">คุณยังไม่มีสินค้าในตระกร้า</h3>
+            </div>
+            <% } %>
+        </div>
+        <div class="modal fade" id="selectAddress" aria-hidden="true" aria-labelledby="selectAddessLable" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="selectAddessLable">เลือกที่อยู่</h1>
+                        <button class="btn btn-secondary" type="button" id="openAddAddress" data-bs-toggle="modal"
+                            data-bs-target="#addAddress">
+                            <i class="fa fa-plus-circle"></i>
+                            เพิ่มที่อยู่
+                        </button>
+                    </div>
+                    <div class="modal-body px-1 overflow-y-scroll" style="height: 600px;" id="addressList">
+                        <% if(address.length > 0) {%>
+                        <% address.forEach((data,index) => { %>
+                        <div class="card border">
+                            <div class="card-header d-flex justify-content-between">
+                                <% if (data.default_address == "1") {%>
+                                <div>
+                                    <input class="form-check-input" type="radio" name="selectAddress"
+                                        <%= data.default_address == "1" ? 'checked' : '' %> data-name="<%= data.name %>"
+                                        data-address="<%= data.address %>" data-province="<%= data.province %>"
+                                        data-postcode="<%= data.postcode %>" data-telephone="<%= data.telephone%>" />
+                                    <b class="card-title d-inline me-2 mt-2"><%= data.name %></b>
+                                    <span class="p-1 alert-info rounded border">ที่อยู่หลัก</span>
+                                </div>
+                                <% } else {%>
+                                <div>
+                                    <input class="form-check-input" type="radio" name="selectAddress"
+                                        data-name="<%= data.name %>" data-address="<%= data.address %>"
+                                        data-province="<%= data.province %>" data-postcode="<%= data.postcode %>"
+                                        data-telephone="<%= data.telephone%>" />
+                                    <b class="card-title d-inline me-2 mt-2"><%= data.name %></b>
+                                    <span></span>
+                                </div>
+                                <% } %>
+                                <button class="btn btn-link btn-sm updateBtn" type="button" data-bs-toggle="modal"
+                                    data-bs-target="#updateAddress" data-id="<%= data.address_id %>"
+                                    data-name="<%= data.name %>" data-address="<%= data.address %>"
+                                    data-province="<%= data.province %>" data-postcode="<%= data.postcode %>"
+                                    data-telephone="<%= data.telephone%>" data-df="<%= data.default_address %>">
+                                    แก้ไข
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text">
+                                    <%= data.address %> <%= data.province %> <%= data.postcode %>
+                                </p>
+                                <p class="card-text">
+                                    <%= data.telephone%>
+                                </p>
+                            </div>
+                        </div>
+                        <% }); %>
+                        <% } else {%>
+                        <div class="w-100 h-100 d-flex justify-content-center">
+                            <b class="fs-5 align-self-center">ยังไม่มีที่อยู่</b>
+                        </div>
+                        <% } %>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn-secondary btn" data-bs-dismiss="modal"
+                            aria-label="Close">ยกเลิก</button>
+                        <button class="btn btn-primary" id="selectAddress-btn" type="button"
+                            data-bs-dismiss="modal">ยืนยัน</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="modal" id="addAddress" aria-labelledby="selectAddress" role="dialog" aria-hidden="true" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button class="btn btn-secondary" id="i_backToSelect" data-bs-toggle="modal"
+                        data-bs-target="#selectAddress">
+                        <i class="fas fa-angle-left"></i> ย้อนกลับ</button>
+                </div>
+                <form action="/address" method="post" class="needs-validation" id="saveAddressForm" novalidate>
+                    <div class="modal-body">
+                        <h1 class="modal-title fs-5 mb-4" id="addAddressLable">เพิ่มที่อยู่</h1>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <div class="form-outline mb-4">
+                                    <input type="text" id="name" class="form-control" name="name" required />
+                                    <label class="form-label" for="form1Example1">ชื่อ-นามสกุล</label>
+                                    <div class="invalid-feedback">
+                                        กรุณากรอกชื่อ-นามสกุล
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-outline mb-4">
+                                    <input type="tel" id="tel" class="form-control" name="telephone" required
+                                        maxlength="10" pattern="[0-9]{10}">
+                                    <label class="form-label" for="form1Example1">เบอร์โทรศัพท์</label>
+                                    <div class="invalid-feedback">
+                                        เบอร์โทรศัพท์ต้องเป็นตัวเลขและไม่เกิน 10 ตัว
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <div class="form-outline mb-4">
+                                    <input type="text" id="province" class="form-control" name="province" required />
+                                    <label class="form-label" for="form1Example1">จังหวัด</label>
+                                    <div class="invalid-feedback">
+                                        กรุณากรอกจังหวัด
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-outline mb-4">
+                                    <input type="text" id="zipcode" class="form-control" name="zipcode" required />
+                                    <label class="form-label" for="form1Example1">รหัสไปรษณีย์</label>
+                                    <div class="invalid-feedback">
+                                        กรุณากรอกรหัสไปรษณีย์
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-outline mb-5">
+                            <textarea class="form-control" id="address" rows="4" name="address" required></textarea>
+                            <label class="form-label" for="textAreaExample">ที่อยู่ บ้านเลขที่, หมู่ที่,
+                                ตำบล, อำเภอ</label>
+                            <div class="invalid-feedback">
+                                กรุณากรอกที่อยู่ที่จะใช้ในการจัดส่ง
+                            </div>
+                        </div>
+                        <div class="mb-3 form-check mt-3">
+                            <input type="checkbox" class="form-check-input" id="df_address" value="1" name="df_address">
+                            <label class="form-check-label" for="df_address">เลือกเป็นที่อยู่หลัก</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn" id="closeInsert" data-bs-dismiss="modal"
+                            aria-label="Close">ยกเลิก</button>
+                        <button type="submit" id="saveAddress" class="btn btn-primary">บันทึก</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="updateAddress" aria-hidden="true" role="dialog" aria-labelledby="addAddressLable"
+        tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button class="btn btn-secondary" id="u_backToSelect" data-bs-target="#selectAddress"
+                        data-bs-toggle="modal">
+                        <i class="fas fa-angle-left"></i> ย้อนกลับ</button>
+                    <h1 class="modal-title fs-5" id="addAddressLable"></h1>
+                </div>
+                <form action="/updateAddress" method="post" class="needs-validation" id="UpdateAddressForm" novalidate>
+                    <div class="modal-body">
+                        <h1 class="modal-title fs-5 mb-4" id="addAddressLable">แก้ไขที่อยู่</h1>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <div class="form-outline mb-4">
+                                    <input type="text" id="new_name" class="form-control" name="new_name" required />
+                                    <label class="form-label" for="new_name">ชื่อ-นามสกุล</label>
+                                    <div class="invalid-feedback">
+                                        กรุณากรอกชื่อ-นามสกุล
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-outline mb-4">
+                                    <input type="tel" id="new_tel" class="form-control" name="new_tel" required
+                                        maxlength="10" pattern="[0-9]{10}">
+                                    <label class="form-label" for="new_tel">เบอร์โทรศัพท์</label>
+                                    <div class="invalid-feedback">
+                                        เบอร์โทรศัพท์ต้องเป็นตัวเลขและไม่เกิน 10 ตัว
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <div class="form-outline mb-4">
+                                    <input type="text" id="new_province" class="form-control" name="new_province"
+                                        required />
+                                    <label class="form-label" for="new_province">จังหวัด</label>
+                                    <div class="invalid-feedback">
+                                        กรุณากรอกจังหวัด
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-outline mb-4">
+                                    <input type="text" id="new_zipcode" class="form-control" name="new_zipcode"
+                                        required />
+                                    <label class="form-label" for="new_zipcode">รหัสไปรษณีย์</label>
+                                    <div class="invalid-feedback">
+                                        กรุณากรอกรหัสไปรษณีย์
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-outline mb-5">
+                            <textarea class="form-control" id="new_address" rows="4" name="new_address"
+                                required></textarea>
+                            <label class="form-label" for="textAreaExample">ที่อยู่ บ้านเลขที่, หมู่ที่,
+                                ตำบล, อำเภอ</label>
+                            <div class="invalid-feedback">
+                                กรุณากรอกที่อยู่ที่จะใช้ในการจัดส่ง
+                            </div>
+                        </div>
+                        <div class="mb-3 form-check mt-3">
+                            <input type="checkbox" class="form-check-input" id="ndf_address" value="1"
+                                name="df_address">
+                            <label class="form-check-label" for="ndf_address">เลือกเป็นที่อยู่หลัก</label>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn" id="closeUpdate" data-bs-dismiss="modal"
+                            aria-label="Close">ยกเลิก</button>
+                        <button type="submit" id="saveUpdate" class="btn btn-primary">บันทึก</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.querySelectorAll('.form-outline').forEach((formOutline) => {
+            new mdb.Input(formOutline).init();
+        });
+        $(document).ready(function () {
+            const couponReq = () => {
+                const code_input = $('#coupon').val();
+                $('#applyCode').prop('disabled', true)
+                $('#coupon').prop('disabled', true)
+                let spiner = ` <div class="text-center" id='loading'>
+                                        <div class="spinner-border" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </div>`;
+                $('#coupon-detail').empty().append(spiner);
+                $.ajax({
+                    url: '/getCoupon',
+                    method: 'GET',
+                    success: (data) => {
+                        const coupons = data.coupons;
+                        const used = data.coupons_used;
+                        const findCode = coupons.find(row => code_input === row.coupon_code);
+                        let coupon_amount;
+                        const user_limit = used.filter(row => row.user_id === session.user_id);;
+                        coupons.forEach((coupon) => {
+                            coupon_amount = used.filter(row => row.coupon_id === coupon
+                                .coupon_id);
+                        });
+                        console.log(findCode);
+                        setTimeout(function () {
+                            $('#applyCode').prop('disabled', false)
+                            $('#coupon').prop('disabled', false)
+
+                            if (findCode) {
+                                console.log('เจอ');
+                                var totalPrice = $('#sumPrice').val();
+                                let detail = ``;
+                                let newPrice = 0;
+                                console.log(totalPrice);
+                                if (findCode.coupon_type == 'percent') {
+                                    detail = `ส่วนลด ${findCode.discount_value} %`
+                                    newPrice = totalPrice - (totalPrice * findCode
+                                        .discount_value /
+                                        100);
+                                } else if (findCode.coupon_type == 'value') {
+                                    detail = `ส่วนลด ${findCode.discount_value} บาท`
+                                    newPrice = totalPrice - findCode.discount_value
+                                }
+                                let updateOldPrice =
+                                    `<s class="fw-bold me-2" id="totalPrice">${THmoney.format(totalPrice)}</s>`
+
+                                if (totalPrice >= findCode.min_amount) {
+                                    $('#coupon-detail').empty().append(detail);
+                                    $('#totalPrice').empty().replaceWith(
+                                        updateOldPrice);
+                                    $('#newPrice').empty().append(THmoney.format(
+                                        newPrice));
+                                    // $('.form-outline').addClass('border-success')
+                                } else if (coupon_amount.lenght >= findCode
+                                    .coupon_amount) {
+                                    $('#coupon-detail').empty().append(detail +
+                                        '|| คูปองนี้ไม่เหลือแล้ว');
+                                    $('#totalPrice').empty().replaceWith(
+                                        `<b class="fw-bold me-2" id="totalPrice">${THmoney.format(totalPrice)}</b>`
+                                    );
+                                    $('#newPrice').empty()
+                                } else if (user_limit.lenght >= findCode
+                                    .user_limitUse) {
+                                    $('#coupon-detail').empty().append(detail +
+                                        '|| คุณได้ใช้คูปองนี้ครบจำนวนครั้งแล้ว');
+                                    $('#totalPrice').empty().replaceWith(
+                                        `<b class="fw-bold me-2" id="totalPrice">${THmoney.format(totalPrice)}</b>`
+                                    );
+                                    $('#newPrice').empty()
+                                } else {
+                                    $('#coupon-detail').empty().append(detail +
+                                        '|| ไม่ผ่านไม่เงื่อนไข');
+                                    $('#totalPrice').empty().replaceWith(
+                                        `<b class="fw-bold me-2" id="totalPrice">${THmoney.format(totalPrice)}</b>`
+                                    );
+                                    $('#newPrice').empty()
+                                }
+                            } else {
+                                $('#coupon-detail').empty().append('ไม่พบคูปองนี้');
+                            }
+                        }, 400);
+
+                        // $('#applyCode').prop('disabled', false)
+                        // $('#coupon').prop('disabled', false)
+                        // data.forEach((item) => {
+
+                        // });
+                    },
+                    error: (error) => {
+                        console.error('Error:', error);
+                    },
+                });
+            }
+
+            if ($('#coupon').val() === '') {
+                $('#applyCode').prop('disabled', true);
+            }
+
+            $('#coupon').on('input', function () {
+                if ($(this).val() === '') {
+                    $('#applyCode').prop('disabled', true);
+                } else {
+                    $('#applyCode').prop('disabled', false);
+                }
+            });
+
+            $('#applyCode').click(() => {
+                couponReq();
+            });
+
+            $('#coupon').keypress((e) => {
+                if (e.which === 13) {
+                    if ($('#coupon').val() !== '') {
+                        couponReq();
+                    }
+                }
+            });
+
+            // ที่อยู่
+            $('#selectAddress-btn').click(() => {
+                console.log($('#sumPrice').val());
+                var checked = $("input[name='selectAddress']:checked");
+                var name = checked.data("name");
+                var address = checked.data("address");
+                var province = checked.data("province");
+                var postcode = checked.data("postcode");
+                var telephone = checked.data("telephone");
+
+                $('.modal').modal('hide');
+                let loading = `    <div class="backdrop">
+        <div class="d-flex justify-content-center align-self-center">
+            <div class="spinner-border text-light fs-1" role="status">
+              <span class="visually-hidden"></span>
+            </div>
+          </div>
+    </div>`
+                $('body').append(loading)
+                setTimeout(() => {
+                    $('#ad-name').text(name);
+                    $('#ad-info').text(address + ' ' + province + ' ' + postcode);
+                    $('#ad-tel').text(telephone);
+                    $('.backdrop').remove();
+                }, 800);
+            });
+
+
+            $('#openAddAddress').click(() => {
+                $('#selectAddress').modal('hide');
+                $('#addAddress').modal('show');
+            });
+            $('#i_backToSelect').click(() => {
+                $('#addAddress').modal('toggle');
+            });
+            $('#closeInsert').click(() => {
+                $('#addAddress').modal('hide');
+            });
+
+            $(document).on('click', 'button.updateBtn', function () {
+                // $('#updateAddress').modal('toggle');
+                var Id = $(this).data("id");
+                var name = $(this).data("name");
+                var address = $(this).data("address");
+                var province = $(this).data("province");
+                var postcode = $(this).data("postcode");
+                var telephone = $(this).data("telephone");
+                var df = $(this).data("df");
+                console.log(Id, name);
+                $("#new_name").val(name);
+                $("#new_address").val(address);
+                $("#new_province").val(province);
+                $("#new_zipcode").val(postcode);
+                $("#new_tel").val(telephone);
+                if (df == "1") {
+                    $('#ndf_address').prop('checked', true);
+                } else {
+                    $('#ndf_address').prop('checked', false);
+                }
+
+                $('#UpdateAddressForm').submit(function (event) {
+                    const formData = $(this).serialize();
+                    event.preventDefault();
+                    if (!this[0].checkValidity()) {
+                        event.stopPropagation();
+                    } else {
+                        $(this).removeClass('was-validated')
+                        $.ajax({
+                            url: `/updateAddress/${Id}`,
+                            type: 'POST',
+                            data: formData,
+                            success: function () {
+                                // $('#selectAddress').modal('hide');
+                                $('#updateAddress').removeClass('show')
+                                $('.modal-backdrop').remove();
+
+                                $('#addressList').load(location.href +
+                                    " #addressList");
+                                $('#show-address').load(location.href +
+                                    " #show-address");
+
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'สำเร็จ',
+                                    text: 'แก้ไขที่อยู่สำเร็จ',
+                                })
+                            },
+                            error: function (xhr, status, error) {
+                                console.error('Error deleting item:',
+                                    error);
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'มีบางอย่างผิดพลาด...',
+                                    text: 'กรุณาลองเพิ่มที่อยู่ใหม่อีกครั้ง',
+                                })
+                            }
+                        });
+                    }
+                })
+            });
+            // $('#u_backToSelect').click(() => {
+            //     $('#updateAddress').modal('hide');
+            // });
+            // $('#closeUpdate').click(() => {
+            //     $('#updateAddress').modal('hide');
+            // });
+
+            $('#saveAddressForm').submit(function (event) {
+                const formData = $(this).serialize();
+                // setTimeout(function () {
+                //     $(this).attr('disabled', false);
+                //     $(this).val('Submit');
+                // }, 2000);
+                event.preventDefault();
+                if (!this[0].checkValidity()) {
+                    event.stopPropagation();
+                } else {
+                    $(this).removeClass('was-validated')
+                    $.ajax({
+                        url: '/address',
+                        type: 'POST',
+                        data: formData,
+                        success: function () {
+                            // $('#selectAddress').modal('hide');
+                            $('#addAddress').modal('hide', {
+                                clickClose: true,
+                            });
+                            $('.modal-backdrop').remove();
+                            $('#addressList').load(location.href + " #addressList");
+                            $('#show-address').load(location.href + " #show-address");
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'สำเร็จ',
+                                text: 'เพิ่มที่อยู่ใหม่สำเร็จแล้ว',
+                            })
+                            $('#saveAddressForm')[0].reset()
+                        },
+                        error: function (xhr, status, error) {
+                            console.error('Error deleting item:', error);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'มีบางอย่างผิดพลาด...',
+                                text: 'กรุณาลองเพิ่มที่อยู่ใหม่อีกครั้ง',
+                            })
+                        }
+                    });
+                }
+            })
+
+            $('#paymentMethod').ddslick({
+                width: '100%',
+                height: 150,
+                imagePosition: "left",
+            });
+            $('#paymentMethod .dd-selected-value').attr('name', 'paymentMethod')
+
+        });
+    </script>
+</body>
+<%- include('../partials/footer') %>

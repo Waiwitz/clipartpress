@@ -31,7 +31,7 @@ let validateReg = [
         return dbConnection.query("SELECT * FROM users WHERE username = ?", [value])
             .then(([rows]) => {
                 if (rows.length > 0) {
-                    return Promise.reject('ชื่อนี้ถูกใช้งานแล้ว')
+                    return Promise.reject('ชื่อผู้ใช้นี้ถูกใช้งานแล้ว')
                 }
                 return true;
             });
@@ -49,14 +49,30 @@ let validateReg = [
     check("password", "รหัสผ่านต้องมีอย่างน้อย 6 ตัว").isLength({
         min: 6
     }),
-    check("confirmpassword", "Password not match")
+    check("confirmpassword", "รหัสผ่านไม่ตรงกัน")
     .custom((value, {
         req
     }) => {
         return value === req.body.password
     }),
-    check("name", "กรุณากรอกชื่อ").not().isEmpty(),
-    check("telephone", "กรุณากรอกหมายเลขโทรศัพท์").not().isEmpty()
+    check("name", "กรุณากรอกชื่อ").not().isEmpty().custom((value) => {
+        return dbConnection.query("SELECT * FROM users WHERE name = ?", [value])
+            .then(([rows]) => {
+                if (rows.length > 0) {
+                    return Promise.reject('มีชื่อบุลคลนี้ในระบบแล้ว')
+                }
+                return true;
+            });
+    }),
+    check("telephone", "กรุณากรอกหมายเลขโทรศัพท์").not().isEmpty().custom((value) => {
+        return dbConnection.query("SELECT * FROM users WHERE telephone = ?", [value])
+            .then(([rows]) => {
+                if (rows.length > 0) {
+                    return Promise.reject('มีคนใช้เบอร์โทรศัพท์นี้แล้ว')
+                }
+                return true;
+            });
+    }),
 ];
 
 
@@ -90,12 +106,11 @@ const createNewUserController = async (req, res) => {
         email: req.body.email,
         name: req.body.name,
         telephone: req.body.telephone,
-        lineid: req.body.lineid,
     };
 
     try {
         createNewUser(newUser);
-        return res.redirect("/"); 
+        return res.redirect("/sucessfulRegister"); 
     } catch (err) {
         req.flash("errors", err);
         // console.log(err)
@@ -113,7 +128,6 @@ const createNewUser = (user) => {
                 picture: "/uploads/profile/icons-profile.png",
                 name: user.name,
                 telephone: user.telephone,
-                lineid: user.lineid,
                 user_role: 0,
                 token: randtoken.generate(20)
             };

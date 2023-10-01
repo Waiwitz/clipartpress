@@ -10,10 +10,41 @@ const session = require('express-session');
 const router = require('./routes/routes');
 const morgan = require('morgan')
 const path = require('path');
+const fs = require('fs');
+const banklist = require('./public/js/banklist.js')
 
 // socket.io
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
+
+// const server = require('http').createServer(app, (req, res) => {
+//     const canvas = new fabric.Canvas(null, { width: 300, height: 300 });
+//     const rect = new fabric.Rect({ width: 20, height: 50, fill: '#ff0000' });
+//     const text = new fabric.Text('fabric.js', { fill: 'blue', fontSize: 24 });
+//     canvas.add(rect, text);
+//     canvas.renderAll();
+//     if (req.url === '/template') {
+//       res.setHeader('Content-Type', 'image/png');
+//       res.setHeader('Content-Disposition', 'attachment; filename="fabric.png"');
+//       canvas.createPNGStream().pipe(res);
+//     } else if (req.url === '/view') {
+//       canvas.createPNGStream().pipe(res);
+//     } else {
+//       const imageData = canvas.toDataURL();
+//       res.writeHead(200, '', { 'Content-Type': 'text/html' });
+//       res.write(`<img src="${imageData}" />`);
+//       res.end();
+//     }
+//   })
+// fabric
+// fs.readFile('public/templates/templates.json', 'utf8', (err, data) => {
+//     if (err) {
+//       console.error('Error reading JSON file:', err);
+//       return;
+//     }
+//     const templates = JSON.parse(data);
+//     console.log('Loaded templates:', templates);
+//   });
 
 app.use(express.json());
 app.use(express.urlencoded({
@@ -39,28 +70,47 @@ const sessionExpress = session({
 });
 app.use(sessionExpress)
 
-const message = (req, res) => {
-    dbConnection.query('SELECT * FROM chats WHERE ')
-}
-
 // flash 
 app.use(connectFlash());
 
+let money = Intl.NumberFormat("th-TH", {
+    style: "currency",
+    currency: "THB",
+});
+
+
 app.use(function (req, res, next) {
+    res.locals.login = req.session.isLoggedIn;
+    res.locals.session = req.session;
     res.locals.success_msg = req.flash('success_msg');
     res.locals.error_msg = req.flash('error_msg');
+    res.locals.warnings = req.flash('warnings');
     res.locals.errors = req.flash('errors');
     res.locals.currentMenu = ''
     res.locals.Title = 'Clipart Press'
     res.locals.message = ''
+    res.locals.money = money;
+    res.locals.banklist = banklist;
     next();
 });
 
-app.use((req, res, next) => {
-    res.locals.login = req.session.isLoggedIn;
-    res.locals.session = req.session;
-    next();
+app.use(function (req, res, next) {
+    if (req.session.user_id !== null) {
+        dbConnection.query(`SELECT COUNT(*) as cartCount, p.* FROM cart c JOIN product p ON p.product_id = c.product_id WHERE c.user_id = ${req.session.user_id} AND c.deleted_at IS NULL AND p.deleted_at IS NULL`)
+            .then(([result]) => {
+                res.locals.cartCount = result[0].cartCount;
+                next();
+            })
+            .catch(err => {
+                // console.log(err);
+                next();
+            });
+    } else {
+        return;
+    }
 });
+
+
 
 app.use(function (err, req, res, next) {
     console.log(err);
@@ -83,23 +133,27 @@ io.on('connection', (socket) => {
     console.log(socket.request.session.username + ' connected');
 
     socket.on('sendMessage', (data) => {
-        const { sender, receiver, message } = data;
+        const {
+            sender,
+            receiver,
+            message
+        } = data;
         console.log(`${socket.request.session.username} posted a message to room ${data.room}: ${data.message}`);
         dbConnection.query('INSERT INTO chats (message, sender_id, recipient_id) VALUES (?, ?, ?)', [message, sender, receiver], (err, result) => {
-          if (err) {
-            console.error('Error saving message to the database:', err);
-            return;
-          }
+            if (err) {
+                console.error('Error saving message to the database:', err);
+                return;
+            }
         });
         const newMessage = {
-          sender: sender,
-          message: data.message,
-          room: data.room
+            sender: sender,
+            message: data.message,
+            room: data.room
         };
-        
+
         socket.to(data.room).emit('newMessage', newMessage); // Emit the message to the admin in the room
-      });
-      
+    });
+
     //   socket.on('adminMessage', (data) => {
     //     const { sender, receiver, message } = data;
     //     console.log(`Admin posted a message to room ${data.room}: ${data.message}`);
@@ -114,10 +168,10 @@ io.on('connection', (socket) => {
     //       message: data.message,
     //       room: data.room
     //     };
-      
+
     //     io.to(data.room).emit('adminMessage', newMessage); // Emit the message to all users in the room
     //   });
-      
+
 
 
     // socket.on("chatMessage", (message) => {
@@ -147,7 +201,7 @@ io.on('connection', (socket) => {
 
 io.of("/admin/chat/*").on("connection", (socket) => {
     // admin users
-  });
+});
 //   app.post('/send-message', (req, res) => {
 //     // Extract the user ID and message from the request body
 //     const message_text = req.body;
@@ -167,7 +221,6 @@ io.of("/admin/chat/*").on("connection", (socket) => {
 //     })
 
 // });
-
 
 router(app)
 // app.use("/", require("./routes"));

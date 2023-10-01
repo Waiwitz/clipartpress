@@ -1,0 +1,140 @@
+<%- include('../../partials/admin-nav') %>
+
+<body style="background-color: #f8f8f8;">
+    <div class="mb-5 secondHead-admin">
+        <div class="secondHead-content">
+            <h1>โปรโมชั่น</h1>
+        </div>
+    </div>
+    <div style="padding-bottom: 150px;"></div>
+
+    <div class="box-admin">
+        <% if(success_msg != "") { %>
+        <% success_msg.forEach((item) => { %>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <strong><%- item %></strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <% }); %>
+        <% }else if(errors != "") {%>
+        <% errors.forEach((item) => { %>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong><%- item %></strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <% }); %>
+        <% } %>
+        <a href="/admin/promotion/addpromotion">
+            <button type="button" class="btn btn-secondary mb-3 fs-6" data-mdb-toggle="modal"
+                data-mdb-target="#addcoupon">
+                <i class="fa-solid fa-plus"></i>
+                เพิ่มโปรโมชั่น
+            </button>
+        </a>
+        <div class="card shadow-5-strong" id="all-tb" style="width: 100%; margin: auto;">
+            <div class="card-body">
+                <table class="table align-middle mb-0 bg-white tb" id="table">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>#</th>
+                            <th>ชื่อโปรโมชั่น</th>
+                            <th>สินค้าที่ร่วมรายการ</th>
+                            <th>วันที่เริ่ม</th>
+                            <th>วันที่สิ้นสุด</th>
+                            <th>สถานะ</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <%     function datetimeLocal(datetime) { %>
+                    <%   const dt = new Date(datetime); %>
+                    <%    dt.setMinutes(dt.getMinutes() - dt.getTimezoneOffset()); %>
+                    <%   return dt.toISOString().slice(0, 10) + ' ' + dt.toISOString().slice(11, 16); %>
+                    <%  } %>
+
+                    <tbody>
+                        <% promotions.forEach((promotion, index) => { %>
+                        <tr>
+                            <td>
+                                <%= index %>
+                            </td>
+                            <td>
+                                <%= promotion.promo_name %>
+                            </td>
+                            <td>
+                                <% product.forEach((p) => {%>
+                                <% if(p.promo_id === promotion.promo_id) { %>
+                                <%= p.productName%>
+                                <% } %>
+                                <% })  %>
+                            </td>
+                            <td>
+                                <%= datetimeLocal(promotion.start_date) %>
+                            </td>
+                            <td>
+                                <%= datetimeLocal(promotion.end_date) %>
+                            </td>
+                            <td>
+                            </td>
+                            <td>
+                                <a href="/admin/promotion/edit/<%= promotion.promo_id %>">
+                                    <div class="btn btn-warning btn-sm btn-edit">
+                                        แก้ไข
+                                    </div>
+                                </a>
+                                <button type="button" class="btn btn-danger btn-sm delete" data-mdb-toggle="modal"
+                                    data-mdb-target="#deleteModal" data-id="<%= promotion.promo_id %>" data-name="<%= promotion.promo_name %>">
+                                    ลบ
+                                </button>
+                            </td>
+                        </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">ลบประเภท</h5>
+                    <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="/deletePromotion" method="post">
+                        <div>
+                            <p class="">ต้องการลบโปรโมชั่น <b id="NameWarning"></b> ใช่หรือไม่ ?</p>
+                        </div>
+                        <input type="hidden" id="id" name="promotion_id" value="" readonly/>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary " data-mdb-dismiss="modal">ยกเลิก</button>
+                            <button type="submit" class="btn btn-danger">ยืนยัน</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script>
+    $(document).ready(function () {
+        $('.tb').DataTable({
+            order: [
+                [0, 'desc']
+            ],
+        });
+
+        document.querySelectorAll('.form-outline').forEach((formOutline) => {
+            new mdb.Input(formOutline).init();
+        });
+
+        $('.delete').click(function () {
+            const id = $(this).data('id')
+            const name = $(this).data('name')
+            $('#id').val(id)
+            $('#NameWarning').text(name)
+        })
+    });
+</script>

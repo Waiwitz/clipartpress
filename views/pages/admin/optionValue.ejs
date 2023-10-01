@@ -3,45 +3,76 @@
 <body class="h-100" style="background-color: rgb(248, 248, 248);">
     <div class="mb-5 secondHead-admin">
         <div class="secondHead-content">
-            <h1>ตัวเลือกสินค้า</h1>
-            <ol class="list-unstyled d-flex ">
+            <h1>ออฟชั่นสินค้า</h1>
+            <!-- <ol class="list-unstyled d-flex ">
                 <li class="breadcrumb-item"><a class="link-light" href="#">หน้าแรก</a></li>
                 <li class="active text-light ms-2">/ ตัวเลือกสินค้า</li>
-            </ol>
+            </ol> -->
         </div>
     </div>
     <div style="padding-bottom: 150px;"></div>
     <div class="box-admin">
         <% if(success_msg != "") { %>
         <% success_msg.forEach((item) => { %>
-        <div class="alert alert-success">
-            <%- item %>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <strong><%- item %></strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
         <% }); %>
         <% }else if(errors != "") {%>
         <% errors.forEach((item) => { %>
-        <div class="alert alert-danger">
-            <%- item %>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong><%- item %></strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
         <% }); %>
         <% } %>
-        <!-- Button trigger modal -->
+        <!-- <div class="dropdown">
+            <button class="btn btn-secondary mb-3 fs-6 dropdown-toggle" type="button" id="dropdownMenuButton"
+                data-mdb-toggle="dropdown" aria-expanded="false">
+                เพิ่มตัวเลือกวัสดุ
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <li><a class="dropdown-item fs-6" href="#"><i class="fa-solid fa-plus"></i> นามบัตร</a></li>
+                <li><a class="dropdown-item fs-6" href="#"><i class="fa-solid fa-plus"></i> ใบปลิว</a></li>
+                <li><a class="dropdown-item fs-6" href="#"><i class="fa-solid fa-plus"></i> แผ่นพับ</a></li>
+                <li><a class="dropdown-item fs-6" href="#"><i class="fa-solid fa-plus"></i> สติ๊กเกอร์</a></li>
+                <li><a class="dropdown-item fs-6" href="#"><i class="fa-solid fa-plus"></i> บิล</a></li>
+                <li><a class="dropdown-item fs-6" href="#"><i class="fa-solid fa-plus"></i> ซองจดหมาย</a></li>
+
+            </ul>
+        </div> -->
+
         <a href="/admin/options/addoption">
-            <button type="button" class="btn btn-secondary mb-3">
+            <button type="button" class="btn btn-secondary mb-3 fs-6">
+                <i class="fa-solid fa-plus"></i>
                 เพิ่มตัวเลือกวัสดุ
             </button>
         </a>
-        <div class="card" style="width: 100%; margin: auto;">
-            <div class="card-body">
-                <table class="table align-middle mb-0 bg-white table-striped" id="table">
+        <div class="table-cate-tab">
+            <div class="d-flex">
+                <button class="tab btn active" data-target="all-tb">ทั้งหมด</button>
+                <button class="tab btn" data-target="papertype-tb">ประเภทกระดาษ</button>
+                <button class="tab btn" data-target="oil-tb">การเคลือบเงา</button>
+                <button class="tab btn" data-target="diecut-tb">การไดคัท</button>
+                <button class="tab btn" data-target="printside-tb">ด้านพิมพ์</button>
+                <button class="tab btn" data-target="fold-tb">การพับ</button>
+                <button class="tab btn" data-target="color-tb">สี</button>
+                <button class="tab btn" data-target="number-tb">รันเลข</button>
+                <button class="tab btn" data-target="layer-tb">จำนวนชั้น</button>
+
+            </div>
+        </div>
+        <div class="card" style="width: 100%; margin: auto; border-top-left-radius: 0; border-top-right-radius: 0;">
+            <div class="card-body" id="all-tb">
+                <table class="table align-middle mb-0 bg-white table-striped">
                     <thead class="bg-light">
                         <tr>
-                            <th>No.</th>
+                            <th>#</th>
                             <th>รูปภาพ</th>
                             <th>ชื่อตัวเลือก</th>
                             <th>ราคาต่อหน่วย</th>
                             <th>หมวดหมู่</th>
-                            <th>สินค้า</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -53,40 +84,43 @@
                         <tr>
                             <td>
                                 <div class="d-flex align-items-center">
-                                    <p class="fw-normal mb-1"><%= option.option_id %></p>
+                                    <p class="fw-normal mb-1"><%= index %></p>
                                 </div>
                             </td>
                             <td class="product-picture">
+                                <% if(option.option_img === null) {  %>
+                                <img src="/assets/img/crossed-image-icon.jpg" alt="" draggable="false">
+                                <% } else { %>
                                 <img src="<%= option.option_img %>" alt="" draggable="false">
+                                <% } %>
                             </td>
                             <td>
                                 <p class="fw-normal mb-1"><%= option.option_name %></p>
                             </td>
                             <td><%= option.price_per_unit %></td>
                             <% let parcel; %>
-                            <% if(option.parcel_type === "format"){ %>
+                            <% if(option.option_type === "format"){ %>
                             <% parcel = "ขนาดของชิ้นงาน" %>
-                            <% }else if(option.parcel_type === "papertype"){ %>
+                            <% }else if(option.option_type === "papertype"){ %>
                             <% parcel = "ประเภทกระดาษ" %>
-                            <% }else if(option.parcel_type === "oil"){ %>
+                            <% }else if(option.option_type === "oil"){ %>
                             <% parcel = "การเคลือบเงา" %>
-                            <% }else if(option.parcel_type === "pumping"){ %>
+                            <% }else if(option.option_type === "pumping"){ %>
                             <% parcel = "การปั้ม" %>
-                            <% }else if(option.parcel_type === "die-cut"){ %>
+                            <% }else if(option.option_type === "die-cut"){ %>
                             <% parcel = "การไดคัท" %>
-                            <% }else if(option.parcel_type === "folding"){ %>
+                            <% }else if(option.option_type === "folding"){ %>
                             <% parcel = "การพับ" %>
-                            <% }else if(option.parcel_type === "side"){%>
+                            <% }else if(option.option_type === "side"){%>
                             <% parcel = "ด้านพิมพ์" %>
                             <% } %>
                             <td><%= parcel %></td>
-                            <td><%= option.product_id%></td>
                             <td>
                                 <button type="button" class="btn btn-warning btn-edit btn-sm update"
                                     data-mdb-toggle="modal" data-mdb-target="#updateModal"
                                     data-id="<%= option.option_id %>" data-name="<%= option.option_name %>"
                                     data-img="<%= option.option_img %>" data-price="<%= option.price_per_unit %>"
-                                    data-product="<%= option.product_id %>" data-parcel="<%= option.parcel_type %>">
+                                    data-product="<%= option.product_id %>" data-parcel="<%= option.option_type %>">
                                     แก้ไข
                                 </button>
                                 <button type="button" class="btn btn-danger btn-sm btn-edit delete"
@@ -96,142 +130,528 @@
                                 </button>
                             </td>
                         </tr>
-                        <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel"
-                            aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="editModalLabel">ลบประเภท</h5>
-                                        <button type="button" class="btn-close" data-mdb-dismiss="modal"
-                                            aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <form action="/deleteOption" id="editForm" method="post">
-                                            <div>
-                                                <p>ต้องการลบประเภทใช่หรือไม่ ?</p>
-                                            </div>
-                                            <input type="hidden" id="id" name="option_id" value="" />
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary "
-                                                    data-mdb-dismiss="modal">ยกเลิก</button>
-                                                <button type="submit" class="btn btn-danger">ยืนยัน</button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
 
-                        <div class="modal fade slidedown" id="updateModal" tabindex="-1"
-                            aria-labelledby="updateModalLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-xl">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="editModalLabel">แก้ไขตัวเลือกวัสดุ</h5>
-                                        <button type="button" class="btn-close" data-mdb-dismiss="modal"
-                                            aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <form action="/updateOption" id="editForm" method="post">
-                                            <input type="hidden" id="id1" name="option_id" value="" />
-                                            <div class="sub-option-row">
-                                                <div class="row row-cols-lg-auto mb-4">
-                                                    <div class="col" style="width: 15%;">
-                                                        <div class="option-img ">
-                                                            <i class="fa-solid fa-plus"></i>
-                                                            <input type="file" name="option_img"
-                                                                onchange="previewImage(event, [0])"
-                                                                accept="image/png, image/jpeg" multiple />
-                                                            <img src="https://www.solidbackgrounds.com/images/950x350/950x350-white-solid-color-background.jpg"
-                                                                alt="" id="option_preview[<%= index  %>]"
-                                                                draggable="false" class="img_option">
-                                                        </div>
-                                                    </div>
-                                                    <div class="col" style="width: 42.5%;">
-                                                        <div class="form-outline mb-3">
-                                                            <input type="text" name="option"
-                                                                class="sub-option-name form-control" id="optionName"
-                                                                required>
-                                                            <label class="form-label"
-                                                                for="optionName">ชื่อตัวเลือก</label>
-                                                        </div>
-                                                        <div class="form-outline">
-                                                            <input type="number" name="option_price" id="price"
-                                                                class="sub-option-price form-control" required>
-                                                            <label class="form-label">ราคาต่อหน่วย</label>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col" style="width: 42.5%;">
-                                                        <select class="form-select mb-3" id="parcel"
-                                                            <% const values = ['papertype', 'oil', 'pumping', 'die-cut', 'folding']; %>
-                                                            <% const thai = ['ประเภทกระดาษ', 'การเคลือบเงา', 'การปั้ม', 'การไดคัท', 'การพับ']; %>
-                                                            aria-label="Default select example" name="option_parcel">
-                                                            <% for (let i = 0; i < values.length; i++) { %>
-                                                            <option value="<%= values[i] %>"
-                                                                <%= option.parcel_type === values[i] ? 'selected' : '' %>>
-                                                                <%= thai[i] %></option>
-                                                            <% } %>
-                                                        </select>
-                                                        <select multiple="multiple" id="product-cb"
-                                                            class="option-checkbox w-100" name="product[][]" multiple>
-                                                            <% if( products.length > 0 ){ %>
-                                                            <% products.forEach((product) => { %>
-                                                            <% if(product.categories === 'card'){ %>
-                                                            <optgroup label="นามบัตร">
-                                                                <option value="<%= product.product_id %>">
-                                                                    <%= product.productName %></option>
-                                                            </optgroup>
-                                                            <% }else if(product.categories === 'flyer'){ %>
-                                                            <optgroup label="ใบปลิว/แผ่นพับ">
-                                                                <option value="<%= product.product_id %>">
-                                                                    <%= product.productName %></option>
-                                                            </optgroup>
-                                                            <% }else if(product.categories === 'sticker'){ %>
-                                                            <optgroup label="สติ๊กเกอร์">
-                                                                <option value="<%= product.product_id %>">
-                                                                    <%= product.productName %></option>
-                                                            </optgroup>
-                                                            <% }else if(product.categories === 'bill'){ %>
-                                                            <optgroup label="ใบบิล">
-                                                                <option value="<%= product.product_id %>">
-                                                                    <%= product.productName %></option>
-                                                            </optgroup>
-                                                            <% }else if(product.categories === 'letter'){ %>
-                                                            <optgroup label="ซองจดหมาย">
-                                                                <option value="<%= product.product_id %>">
-                                                                    <%= product.productName %></option>
-                                                            </optgroup>
-                                                            <% } %>
-                                                            <% })%>
-                                                            <% } %>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary "
-                                                    data-mdb-dismiss="modal">ยกเลิก</button>
-                                                <button type="submit" class="btn btn-primary">ยืนยัน</button>
-                                            </div>
-                                        </form>
-                                    </div>
+                        <% }); %>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card-body" id="papertype-tb">
+                <table class="table align-middle mb-0 bg-white table-striped">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>#</th>
+                            <th>รูปภาพ</th>
+                            <th>ชื่อตัวเลือก</th>
+                            <th>ราคาต่อหน่วย</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if(options.length > 0) {%>
+                        <% options.forEach((option, index) => { %>
+                        <% if(option.option_type === 'papertype') {%>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <p class="fw-normal mb-1"><%= index %></p>
                                 </div>
-                            </div>
-                        </div>
+                            </td>
+                            <td class="product-picture">
+                                <% if(option.option_img === null) {  %>
+                                <img src="/assets/img/crossed-image-icon.jpg" alt="" draggable="false" width="30">
+                                <% } else { %>
+                                <img src="<%= option.option_img %>" alt="" draggable="false" width="30">
+                                <% } %>
+                            </td>
+                            <td>
+                                <p class="fw-normal mb-1"><%= option.option_name %></p>
+                            </td>
+                            <td><%= option.price_per_unit %></td>
+                            <td>
+                                <button type="button" class="btn btn-warning btn-edit btn-sm update"
+                                    data-mdb-toggle="modal" data-mdb-target="#updateModal"
+                                    data-id="<%= option.option_id %>" data-name="<%= option.option_name %>"
+                                    data-img="<%= option.option_img %>" data-price="<%= option.price_per_unit %>"
+                                    data-product="<%= option.product_id %>" data-parcel="<%= option.option_type %>">
+                                    แก้ไข
+                                </button>
+                                <button type="button" class="btn btn-danger btn-sm btn-edit delete"
+                                    data-mdb-toggle="modal" data-mdb-target="#deleteModal"
+                                    data-id="<%= option.option_id %>">
+                                    ลบ
+                                </button>
+                            </td>
+                        </tr>
+                        <% } %>
+                        <% }); %>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card-body" id="oil-tb">
+                <table class="table align-middle mb-0 bg-white table-striped">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>#</th>
+                            <th>รูปภาพ</th>
+                            <th>ชื่อตัวเลือก</th>
+                            <th>ราคาต่อหน่วย</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if(options.length > 0) {%>
+                        <% options.forEach((option, index) => { %>
+                        <% if(option.option_type === 'oil') {%>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <p class="fw-normal mb-1"><%= index %></p>
+                                </div>
+                            </td>
+                            <td class="product-picture">
+                                <% if(option.option_img === null) {  %>
+                                <img src="/assets/img/crossed-image-icon.jpg" alt="" draggable="false" width="30">
+                                <% } else { %>
+                                <img src="<%= option.option_img %>" alt="" draggable="false" width="30">
+                                <% } %>
+                            </td>
+                            <td>
+                                <p class="fw-normal mb-1"><%= option.option_name %></p>
+                            </td>
+                            <td><%= option.price_per_unit %></td>
+                            <td>
+                                <button type="button" class="btn btn-warning btn-edit btn-sm update"
+                                    data-mdb-toggle="modal" data-mdb-target="#updateModal"
+                                    data-id="<%= option.option_id %>" data-name="<%= option.option_name %>"
+                                    data-img="<%= option.option_img %>" data-price="<%= option.price_per_unit %>"
+                                    data-product="<%= option.product_id %>" data-parcel="<%= option.option_type %>">
+                                    แก้ไข
+                                </button>
+                                <button type="button" class="btn btn-danger btn-sm btn-edit delete"
+                                    data-mdb-toggle="modal" data-mdb-target="#deleteModal"
+                                    data-id="<%= option.option_id %>">
+                                    ลบ
+                                </button>
+                            </td>
+                        </tr>
+                        <% } %>
+                        <% }); %>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card-body" id="diecut-tb">
+                <table class="table align-middle mb-0 bg-white table-striped">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>#</th>
+                            <th>รูปภาพ</th>
+                            <th>ชื่อตัวเลือก</th>
+                            <th>ราคาต่อหน่วย</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if(options.length > 0) {%>
+                        <% options.forEach((option, index) => { %>
+                        <% if(option.option_type === 'die-cut') { %>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <p class="fw-normal mb-1"><%= index %></p>
+                                </div>
+                            </td>
+                            <td class="product-picture">
+                                <% if(option.option_img === null) {  %>
+                                <img src="/assets/img/crossed-image-icon.jpg" alt="" draggable="false" width="30">
+                                <% } else { %>
+                                <img src="<%= option.option_img %>" alt="" draggable="false" width="30">
+                                <% } %>
+                            </td>
+                            <td>
+                                <p class="fw-normal mb-1"><%= option.option_name %></p>
+                            </td>
+                            <td><%= option.price_per_unit %></td>
+                            <td>
+                                <button type="button" class="btn btn-warning btn-edit btn-sm update"
+                                    data-mdb-toggle="modal" data-mdb-target="#updateModal"
+                                    data-id="<%= option.option_id %>" data-name="<%= option.option_name %>"
+                                    data-img="<%= option.option_img %>" data-price="<%= option.price_per_unit %>"
+                                    data-product="<%= option.product_id %>" data-parcel="<%= option.option_type %>">
+                                    แก้ไข
+                                </button>
+                                <button type="button" class="btn btn-danger btn-sm btn-edit delete"
+                                    data-mdb-toggle="modal" data-mdb-target="#deleteModal"
+                                    data-id="<%= option.option_id %>">
+                                    ลบ
+                                </button>
+                            </td>
+                        </tr>
+                        <% } %>
+                        <% }); %>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card-body" id="printside-tb">
+                <table class="table align-middle mb-0 bg-white table-striped">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>#</th>
+                            <th>รูปภาพ</th>
+                            <th>ชื่อตัวเลือก</th>
+                            <th>ราคาต่อหน่วย</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if(options.length > 0) {%>
+                        <% options.forEach((option, index) => { %>
+                        <% if(option.option_type === 'printside') {%>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <p class="fw-normal mb-1"><%= index %></p>
+                                </div>
+                            </td>
+                            <td class="product-picture">
+                                <% if(option.option_img === null) {  %>
+                                <img src="/assets/img/crossed-image-icon.jpg" alt="" draggable="false" width="30">
+                                <% } else { %>
+                                <img src="<%= option.option_img %>" alt="" draggable="false" width="30">
+                                <% } %>
+                            </td>
+                            <td>
+                                <p class="fw-normal mb-1"><%= option.option_name %></p>
+                            </td>
+                            <td><%= option.price_per_unit %></td>
+                            <td>
+                                <button type="button" class="btn btn-warning btn-edit btn-sm update"
+                                    data-mdb-toggle="modal" data-mdb-target="#updateModal"
+                                    data-id="<%= option.option_id %>" data-name="<%= option.option_name %>"
+                                    data-img="<%= option.option_img %>" data-price="<%= option.price_per_unit %>"
+                                    data-product="<%= option.product_id %>" data-parcel="<%= option.option_type %>">
+                                    แก้ไข
+                                </button>
+                                <button type="button" class="btn btn-danger btn-sm btn-edit delete"
+                                    data-mdb-toggle="modal" data-mdb-target="#deleteModal"
+                                    data-id="<%= option.option_id %>">
+                                    ลบ
+                                </button>
+                            </td>
+                        </tr>
+                        <% } %>
+                        <% }); %>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card-body" id="fold-tb">
+                <table class="table align-middle mb-0 bg-white table-striped">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>#</th>
+                            <th>รูปภาพ</th>
+                            <th>ชื่อตัวเลือก</th>
+                            <th>ราคาต่อหน่วย</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if(options.length > 0) {%>
+                        <% options.forEach((option, index) => { %>
+                        <% if(option.option_type === 'fold') {%>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <p class="fw-normal mb-1"><%= index %></p>
+                                </div>
+                            </td>
+                            <td class="product-picture">
+                                <% if(option.option_img === null) {  %>
+                                <img src="/assets/img/crossed-image-icon.jpg" alt="" draggable="false" width="30">
+                                <% } else { %>
+                                <img src="<%= option.option_img %>" alt="" draggable="false" width="30">
+                                <% } %>
+                            </td>
+                            <td>
+                                <p class="fw-normal mb-1"><%= option.option_name %></p>
+                            </td>
+                            <td><%= option.price_per_unit %></td>
+                            <td>
+                                <button type="button" class="btn btn-warning btn-edit btn-sm update"
+                                    data-mdb-toggle="modal" data-mdb-target="#updateModal"
+                                    data-id="<%= option.option_id %>" data-name="<%= option.option_name %>"
+                                    data-img="<%= option.option_img %>" data-price="<%= option.price_per_unit %>"
+                                    data-product="<%= option.product_id %>" data-parcel="<%= option.option_type %>">
+                                    แก้ไข
+                                </button>
+                                <button type="button" class="btn btn-danger btn-sm btn-edit delete"
+                                    data-mdb-toggle="modal" data-mdb-target="#deleteModal"
+                                    data-id="<%= option.option_id %>">
+                                    ลบ
+                                </button>
+                            </td>
+                        </tr>
+                        <% } %>
+                        <% }); %>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card-body" id="color-tb">
+                <table class="table align-middle mb-0 bg-white table-striped">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>#</th>
+                            <th>รูปภาพ</th>
+                            <th>ชื่อตัวเลือก</th>
+                            <th>ราคาต่อหน่วย</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if(options.length > 0) {%>
+                        <% options.forEach((option, index) => { %>
+                        <% if(option.option_type === 'color') {%>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <p class="fw-normal mb-1"><%= index %></p>
+                                </div>
+                            </td>
+                            <td class="product-picture">
+                                <% if(option.option_img === null) {  %>
+                                <img src="/assets/img/crossed-image-icon.jpg" alt="" draggable="false" width="30">
+                                <% } else { %>
+                                <img src="<%= option.option_img %>" alt="" draggable="false" width="30">
+                                <% } %>
+                            </td>
+                            <td>
+                                <p class="fw-normal mb-1"><%= option.option_name %></p>
+                            </td>
+                            <td><%= option.price_per_unit %></td>
+                            <td>
+                                <button type="button" class="btn btn-warning btn-edit btn-sm update"
+                                    data-mdb-toggle="modal" data-mdb-target="#updateModal"
+                                    data-id="<%= option.option_id %>" data-name="<%= option.option_name %>"
+                                    data-img="<%= option.option_img %>" data-price="<%= option.price_per_unit %>"
+                                    data-product="<%= option.product_id %>" data-parcel="<%= option.option_type %>">
+                                    แก้ไข
+                                </button>
+                                <button type="button" class="btn btn-danger btn-sm btn-edit delete"
+                                    data-mdb-toggle="modal" data-mdb-target="#deleteModal"
+                                    data-id="<%= option.option_id %>">
+                                    ลบ
+                                </button>
+                            </td>
+                        </tr>
+                        <% } %>
+                        <% }); %>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-body" id="number-tb">
+                <table class="table align-middle mb-0 bg-white table-striped">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>#</th>
+                            <th>รูปภาพ</th>
+                            <th>ชื่อตัวเลือก</th>
+                            <th>ราคาต่อหน่วย</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if(options.length > 0) {%>
+                        <% options.forEach((option, index) => { %>
+                        <% if(option.option_type === 'number') {%>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <p class="fw-normal mb-1"><%= index %></p>
+                                </div>
+                            </td>
+                            <td class="product-picture">
+                                <% if(option.option_img === null) {  %>
+                                <img src="/assets/img/crossed-image-icon.jpg" alt="" draggable="false" width="30">
+                                <% } else { %>
+                                <img src="<%= option.option_img %>" alt="" draggable="false" width="30">
+                                <% } %>
+                            </td>
+                            <td>
+                                <p class="fw-normal mb-1"><%= option.option_name %></p>
+                            </td>
+                            <td><%= option.price_per_unit %></td>
+                            <td>
+                                <button type="button" class="btn btn-warning btn-edit btn-sm update"
+                                    data-mdb-toggle="modal" data-mdb-target="#updateModal"
+                                    data-id="<%= option.option_id %>" data-name="<%= option.option_name %>"
+                                    data-img="<%= option.option_img %>" data-price="<%= option.price_per_unit %>"
+                                    data-product="<%= option.product_id %>" data-parcel="<%= option.option_type %>">
+                                    แก้ไข
+                                </button>
+                                <button type="button" class="btn btn-danger btn-sm btn-edit delete"
+                                    data-mdb-toggle="modal" data-mdb-target="#deleteModal"
+                                    data-id="<%= option.option_id %>">
+                                    ลบ
+                                </button>
+                            </td>
+                        </tr>
+                        <% } %>
+                        <% }); %>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card-body" id="layer-tb">
+                <table class="table align-middle mb-0 bg-white table-striped">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>#</th>
+                            <th>รูปภาพ</th>
+                            <th>ชื่อตัวเลือก</th>
+                            <th>ราคาต่อหน่วย</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if(options.length > 0) {%>
+                        <% options.forEach((option, index) => { %>
+                        <% if(option.option_type === 'layer') {%>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <p class="fw-normal mb-1"><%= index %></p>
+                                </div>
+                            </td>
+                            <td class="product-picture">
+                                <% if(option.option_img === null) {  %>
+                                <img src="/assets/img/crossed-image-icon.jpg" alt="" draggable="false" width="30">
+                                <% } else { %>
+                                <img src="<%= option.option_img %>" alt="" draggable="false" width="30">
+                                <% } %>
+                            </td>
+                            <td>
+                                <p class="fw-normal mb-1"><%= option.option_name %></p>
+                            </td>
+                            <td><%= option.price_per_unit %></td>
+                            <td>
+                                <button type="button" class="btn btn-warning btn-edit btn-sm update"
+                                    data-mdb-toggle="modal" data-mdb-target="#updateModal"
+                                    data-id="<%= option.option_id %>" data-name="<%= option.option_name %>"
+                                    data-img="<%= option.option_img %>" data-price="<%= option.price_per_unit %>"
+                                    data-product="<%= option.product_id %>" data-parcel="<%= option.option_type %>">
+                                    แก้ไข
+                                </button>
+                                <button type="button" class="btn btn-danger btn-sm btn-edit delete"
+                                    data-mdb-toggle="modal" data-mdb-target="#deleteModal"
+                                    data-id="<%= option.option_id %>">
+                                    ลบ
+                                </button>
+                            </td>
+                        </tr>
+                        <% } %>
                         <% }); %>
                         <% } %>
                     </tbody>
                 </table>
             </div>
         </div>
-
-
+    </div>
+    <div class="modal fade slidedown" id="updateModal" tabindex="-1" aria-labelledby="updateModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">แก้ไขตัวเลือกวัสดุ</h5>
+                    <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="/updateOption" id="editForm" method="post">
+                        <input type="hidden" id="id1" name="option_id" value="" />
+                        <div class="sub-option-row">
+                            <div class="row row-cols-lg-auto mb-4">
+                                <div class="col" style="width: 15%;">
+                                    <div class="option-img ">
+                                        <i class="fa-solid fa-plus"></i>
+                                        <input type="file" name="option_img" onchange="previewImage(event, [0])"
+                                            accept="image/png, image/jpeg" multiple />
+                                        <img src="https://www.solidbackgrounds.com/images/950x350/950x350-white-solid-color-background.jpg"
+                                            alt="" id="option_preview" draggable="false" class="img_option">
+                                    </div>
+                                </div>
+                                <div class="col" style="width: 42.5%;">
+                                    <div class="form-outline mb-3">
+                                        <input type="text" name="option" class="sub-option-name form-control"
+                                            id="optionName" required>
+                                        <label class="form-label" for="optionName">ชื่อตัวเลือก</label>
+                                    </div>
+                                    <div class="form-outline">
+                                        <input type="number" name="option_price" id="price"
+                                            class="sub-option-price form-control" required>
+                                        <label class="form-label">ราคาต่อหน่วย</label>
+                                    </div>
+                                </div>
+                                <div class="col" style="width: 42.5%;">
+                                    <select class="form-select mb-3" id="parcel"
+                                        <% const values = ['papertype', 'laminating', 'pumping', 'die-cut', 'folding']; %>
+                                        <% const thai = ['ประเภทกระดาษ', 'การเคลือบเงา', 'การปั้ม', 'การไดคัท', 'การพับ']; %>
+                                        aria-label="Default select example" name="option_parcel">
+                                        <% for (let i = 0; i < values.length; i++) { %>
+                                        <option value="<%= values[i] %>">
+                                            <%= thai[i] %></option>
+                                        <% } %>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary " data-mdb-dismiss="modal">ยกเลิก</button>
+                            <button type="submit" class="btn btn-primary">ยืนยัน</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">ลบประเภท</h5>
+                    <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="/deleteOption" id="editForm" method="post">
+                        <div>
+                            <p>ต้องการลบประเภทใช่หรือไม่ ?</p>
+                        </div>
+                        <input type="hidden" id="id" name="option_id" value="" />
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary " data-mdb-dismiss="modal">ยกเลิก</button>
+                            <button type="submit" class="btn btn-danger">ยืนยัน</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
     <script>
         $(document).ready(function () {
-            $('#table').DataTable({
+            $('.table').DataTable({
                 order: [
-                    [3, 'desc']
+                    [0, 'desc']
                 ],
             });
         });
@@ -241,7 +661,7 @@
             keepOpen: true,
             placeholder: 'เลือกสินค้าที่ใช้ตัวเลือกนี้',
             type: 'optgroup',
-            hideOptgroupCheckboxes: true
+            hideOptgroupCheckboxes: false
 
         })
 
@@ -251,7 +671,7 @@
 
         function previewImage(event, index) {
             var input = event.target;
-            var imgPreview = document.getElementById('option_preview[' + index + ']');
+            var imgPreview = document.getElementById('option_preview');
             console.log(imgPreview)
             if (input.files && input.files[0]) {
                 var reader = new FileReader();
@@ -283,6 +703,28 @@
             $(".img_option").attr("src", img)
             $("#parcel").val(parcel)
             $("#product-cb").attr("option", product)
+        });
+
+        $(document).ready(function () {
+            // event.preventDefault();
+            $('#papertype-tb').hide();
+            $('#oil-tb').hide();
+            $('#diecut-tb').hide();
+            $('#printside-tb').hide();
+            $('#fold-tb').hide();
+            $('#color-tb').hide();
+            $('#number-tb').hide();
+            $('#layer-tb').hide();
+        });
+
+        $(document).ready(function () {
+            $(".tab").on("click", function () {
+                const targetSection = $(this).data("target");
+                $(".tab").removeClass("active");
+                $(this).addClass("active");
+                $(".box-admin .card-body").hide();
+                $("#" + targetSection).show();
+            });
         });
     </script>
 </body>

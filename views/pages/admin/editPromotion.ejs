@@ -1,0 +1,368 @@
+<%- include('../../partials/admin-nav') %>
+
+<style>
+    .ms-drop li:not(.group) {
+        margin-left: 10px;
+    }
+
+    .ms-select-all {
+        margin-left: 0 !important;
+    }
+</style>
+
+<body style="background-color: #f8f8f8;">
+    <div class="mb-5 secondHead-admin">
+        <div class="secondHead-content">
+            <h1>แก้ไขโปรโมชั่น</h1>
+            <h5><%= promotions.promo_name %></h5>
+            <!-- <ol class="list-unstyled d-flex ">
+                <li class="breadcrumb-item"><a class="link-light" href="#">หน้าแรก</a></li>
+                <li class="active text-light ms-2">/ สินค้า</li>
+            </ol> -->
+        </div>
+    </div>
+    <div style="padding-bottom: 150px;"></div>
+    <div class="box-admin">
+        <form action="/updatePromotion/<%= promotions.promo_id %>" method="post" class="needs-validation" novalidate>
+            <div class="card">
+                <div class="mx-4 mt-4 border-bottom">
+                    <h4>ข้อมูลโปรโมชั่น</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col">
+                            <label class="form-label" for="couponName">ชื่อโปรโมชั่น<span
+                                    class="text-danger ms-1">*</span></label>
+                            <input type="text" id="promoName" class="form-control" name="promoName"
+                                value="<%= promotions.promo_name %>" required />
+                        </div>
+                        <div class="col">
+                            <label class="form-label" for="inlineFormSelectPref">สถานะ</label>
+                            <select class="form-select" style="height: 35px;" id="status" name="status" required>
+                                <option value="1">เปิดใช้งาน</option>
+                                <option value="0">ปิด</option>
+                            </select>
+                        </div>
+                    </div>
+                    <%     function datetimeLocal(datetime) { %>
+                    <%          const dt = new Date(datetime); %>
+                    <%          dt.setMinutes(dt.getMinutes() - dt.getTimezoneOffset()); %>
+                    <%          return dt.toISOString().slice(0, 16); %>
+                    <%  } %>
+                    <%  let start = datetimeLocal(promotions.start_date)%>
+                    <%  let end = datetimeLocal(promotions.end_date)%>
+                    <div class="row mb-4">
+                        <div class="col">
+                            <label class="form-label" for="start">วันที่เริ่ม <span
+                                    class="text-danger ms-2">*</span></label> <br>
+
+                            <input type="datetime-local" id="start" class="form-control" name="start"
+                                value="<%= start %>" required />
+                        </div>
+                        <div class="col">
+                            <label class="form-label" for="start">วันที่สิ้นสุด <span
+                                    class="text-danger ms-2">*</span></label> <br>
+                            <input type="datetime-local" id="end" class="form-control" name="end" value="<%= end %>"
+                                required />
+                        </div>
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col">
+                            <label class="form-label me-2">ประเภทโปรโมชั่น :</label>
+                            <div class="form-check me-3 form-check-inline">
+                                <input class="form-check-input" type="radio" name="promoType" id="type1"
+                                    value="discount" required
+                                    <%= promotions.promo_type == 'discount' ? 'checked' : '' %> />
+                                <label class="form-check-label" for="type1">ส่วนลด %</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="promoType" id="type2"
+                                    value="giveaway" required
+                                    <%= promotions.promo_type == 'giveaway' ? 'checked' : '' %> />
+                                <label class="form-check-label" for="type2">แถมฟรี</label>
+                            </div>
+                            <div class="input-group">
+                                <input type="number" id="minAmount" class="form-control" name="typeValue" min="0"
+                                    required value="<%= promotions.type_value %>" />
+                                <span class="input-group-text" id="unittype">
+                                    <% if(promotions.promo_type == 'discount'){ %>
+                                    %
+                                    <% }else if (promotions.promo_type == 'giveaway') { %>
+                                    ชิ้น
+                                    <% } %>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <label class="form-label me-2">เงื่อนไขโปรโมชั่น :</label>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="condition" id="condition1"
+                                    value="value" required
+                                    <%= promotions.promo_condition == 'value' ? 'checked' : '' %> />
+                                <label class="form-check-label" for="condition1">เมื่อยอดสั่งซื้อถึง</label>
+                            </div>
+                            <div class="form-check me-3 form-check-inline">
+                                <input class="form-check-input" type="radio" name="condition" id="condition2"
+                                    value="qty" required <%= promotions.promo_condition == 'qty' ? 'checked' : '' %> />
+                                <label class="form-check-label" for="condition2">เมื่อจำนวนสินค้าถึง</label>
+                            </div>
+                            <div class="input-group">
+                                <input type="number" id="minAmount" class="form-control" name="conditionValue" required
+                                    value="<%= promotions.min_reach %>" />
+                                <span class="input-group-text" id="unitCondition">
+                                    <% if(promotions.promo_condition == 'value'){ %>
+                                    ฿
+                                    <% }else if (promotions.promo_condition == 'qty') { %>
+                                    ชิ้น
+                                    <% } %></span>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col-6">
+                            <h6 class="">สินค้าที่ร่วมรายการ <span class="text-danger ms-2">*</span></h6>
+                            <select multiple="multiple" id="product-check" name="product[]" class="w-100" required>
+                                <optgroup label="นามบัตร">
+                                    <% if (products.some(product => product.categories === 'card')) { %>
+                                    <% products.forEach((product) => { %>
+                                    <% if(product.categories === 'card') { %>
+                                    <option value="<%= product.product_id %>"><%= product.productName %></option>
+                                    <% } %>
+                                    <% }); %>
+                                    <% } else { %>
+                                    <option disabled>ยังไม่มีสินค้าประเภทนี้</option>
+                                    <% } %>
+                                </optgroup>
+                                <optgroup label="ใบปลิว">
+                                    <% if (products.some(product => product.categories === 'flyer')) { %>
+                                    <% products.forEach((product) => { %>
+                                    <% if(product.categories === 'flyer') { %>
+                                    <option value="<%= product.product_id %>"><%= product.productName %></option>
+                                    <% } %>
+                                    <% }); %>
+                                    <% } else { %>
+                                    <option disabled>ยังไม่มีสินค้าประเภทนี้</option>
+                                    <% } %>
+                                </optgroup>
+                                <optgroup label="แผ่บพับ">
+                                    <% if (products.some(product => product.categories === 'leaflet')) { %>
+                                    <% products.forEach((product) => { %>
+                                    <% if(product.categories === 'leaflet') { %>
+                                    <option value="<%= product.product_id %>"><%= product.productName %></option>
+                                    <% } %>
+                                    <% }); %>
+                                    <% } else { %>
+                                    <option disabled>ยังไม่มีสินค้าประเภทนี้</option>
+                                    <% } %>
+                                </optgroup>
+                                <optgroup label="สติ๊กเกอร์">
+                                    <% if (products.some(product => product.categories === 'sticker')) { %>
+                                    <% products.forEach((product) => { %>
+                                    <% if(product.categories === 'sticker') { %>
+                                    <option value="<%= product.product_id %>"><%= product.productName %></option>
+                                    <% } %>
+                                    <% }); %>
+                                    <% } else { %>
+                                    <option disabled>ยังไม่มีสินค้าประเภทนี้</option>
+                                    <% } %>
+                                </optgroup>
+                                <optgroup label="ใบบิล">
+                                    <% if (products.some(product => product.categories === 'bill')) { %>
+                                    <% products.forEach((product) => { %>
+                                    <% if(product.categories === 'bill') { %>
+                                    <option value="<%= product.product_id %>"><%= product.productName %></option>
+                                    <% } %>
+                                    <% }); %>
+                                    <% } else { %>
+                                    <option disabled>ยังไม่มีสินค้าประเภทนี้</option>
+                                    <% } %>
+                                </optgroup>
+                                <optgroup label="ซองจดหมาย">
+                                    <% if (products.some(product => product.categories === 'envelope')) { %>
+                                    <% products.forEach((product) => { %>
+                                    <% if(product.categories === 'envelope') { %>
+                                    <option value="<%= product.product_id %>"><%= product.productName %></option>
+                                    <% } %>
+                                    <% }); %>
+                                    <% } else { %>
+                                    <option disabled>ยังไม่มีสินค้าประเภทนี้</option>
+                                    <% } %>
+                                </optgroup>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col">
+                            <div class="form-outline">
+                                <textarea class="form-control" id="note" rows="4" data-mdb-showcounter="true"
+                                    maxlength="120" name="note"><%= promotions.note %></textarea>
+                                <label class="form-label" for="textAreaExample">หมายเหตุ</label>
+                                <div class="form-helper"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- <div class="mx-4 mt-4 border-bottom">
+                <h4>สินค้าที่ร่วมรายการ</h4>
+            </div> -->
+                <!-- <div class="card-body">
+                <button type="button" class="btn btn-primary float-end mb-3" data-mdb-toggle="modal"
+                    data-mdb-target="#pickProduct">
+                    <i class="fa-solid fa-plus"></i>
+                    เพิ่มสินค้า
+                </button>
+                <table class="table align-middle mb-0 bg-white tb" id="table">
+                    <thead class="bg-light">
+                        <tr>
+                            <th></th>
+                            <th>ชื่อสินค้า</th>
+                            <th>ประเภท</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+
+                    <tbody>
+
+                    </tbody>
+                </table>
+            </div> -->
+            </div>
+            <button type="submit" class="btn btn-primary btn-block float-end fs-6 my-5 back"
+                style="width: 150px;">บันทึก</button>
+        </form>
+        <!-- <div class="modal fade" id="pickProduct" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header border-0">
+                    <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <select class="form-select w-75" id="product-cate" style="height: 35px;" name="categories" required>
+                        <option value="card">นามบัตร</option>
+                        <option value="flyer">ใบปลิว</option>
+                        <option value="leaflet">แผ่บพับ</option>
+                        <option value="sticker">สติ๊กเกอร์</option>
+                        <option value="bill">ใบบิล</option>
+                        <option value="letter">ซองจดหมาย</option>
+                    </select>
+                    <div class="row">
+                        <% products.forEach((product, index) => { %>
+                        <div class="col text-center">
+                            <h5><%= product.productName %></h5>
+                            <img src="<%= product.picture %>" alt="" width="100"> <br>
+                            <input type="checkbox" name="product" id="product<%= product.product_id %>"
+                                value="<%= product.product_id %>" data-img="<%= product.picture %>"
+                                data-name="<%= product.productName %>" data-type="<%= product.categories %>"
+                                style="width: 30px; height: 30px;">
+                        </div>
+                        <% }); %>
+                    </div>
+                </div>
+                <div class="modal-footer ">
+                    <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">Close</button>
+                    <button type="button" id="addProduct" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div> -->
+        <script>
+            const forms = document.querySelectorAll('.needs-validation')
+            // Loop over them and prevent submission
+            Array.from(forms).forEach(form => {
+                form.addEventListener('submit', event => {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+
+                    form.classList.add('was-validated')
+                }, false)
+            })
+
+            document.querySelectorAll('.form-outline').forEach((formOutline) => {
+                new mdb.Input(formOutline).init();
+            });
+
+            $(function () {
+                $('#product-check').multipleSelect({
+                    filter: true,
+                    placeholder: 'เลือกสินค้าที่ร่วมรายการ',
+                    type: 'optgroup',
+
+                    // hideOptgroupCheckboxes: false
+                });
+            })
+
+            $('input[type=radio][name=promoType]').change(function () {
+                if (this.value == 'discount') {
+                    $('#unittype').text('%')
+                } else if (this.value == 'giveaway') {
+                    $('#unittype').text('ชิ้น')
+                }
+            })
+
+            $('input[type=radio][name=condition]').change(function () {
+                if (this.value == 'qty') {
+                    $('#minAmText').text('ยอดจำนวนสินค้าขั้นต่ำ')
+                    $('#unitCondition').text('ชิ้น')
+                } else if (this.value == 'value') {
+                    $('#minAmText').text('ยอดสั่งซื้อขั้นต่ำ')
+                    $('#unitCondition').text('฿')
+                }
+            })
+            $('#addProduct').click(function () {
+                $('input[name="product"]:checked').each(function () {
+                    const id = $(this).val();
+                    const img = $(this).data('img')
+                    const name = $(this).data('name')
+                    const type = $(this).data('type')
+
+                    const row = ` <tr class='product${id}'>
+                            <td class="img-fluid" style="width: 130px;">
+                                <img src="${img}" alt="" >
+                            </td>
+                            <td>
+                                <input type="text" class="form-control" name="product_id" value="${id}"/>
+                                ${name}
+                            </td>
+                            <td>
+                                ${type}
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-danger btn-sm delete" data-mdb-toggle="modal" data-id="${id}">
+                                    ลบ
+                                </button>
+                            </td>
+                        </tr>`
+                    $('tbody').append(row)
+                })
+                $('#pickProduct').modal('hide')
+            })
+
+            $(document).on('click', '.delete', function () {
+                const id = `product` + $(this).data('id');
+                console.log(id);
+                $(`#${id}`).prop('checked', false);
+                $(this).closest('tr').remove();
+            });
+
+            $(document).on('change', 'input[type="checkbox"]', function () {
+                const id = `product` + $(this).data('id');
+                if (!$(this).prop('checked')) {
+                    $(this).closest(`tr.${id}`).remove();
+                }
+            });
+
+
+            const optionArr = JSON.parse('<%- JSON.stringify(selectedProduct) %>');
+            optionArr.forEach(selectedValue => {
+                $(`#product-check option[value="${selectedValue.product_id}"]`)
+                    .prop('selected', true);
+            });
+            $('#promoName').keyup(function () {
+                $('.secondHead-content h5').text($(this).val())
+            })
+        </script>
+</body>

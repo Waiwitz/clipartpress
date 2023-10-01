@@ -1,0 +1,582 @@
+<%- include('../../partials/admin-nav') %>
+<style>
+    .dd-selected-image,
+    .dd-option-image {
+        margin: 0.85em 0.5em;
+        width: 35px !important;
+    }
+
+    .dd-selected,
+    .dd-option {
+        padding: 0;
+        height: 60px;
+    }
+
+    .dd-option-text {
+        line-height: 0;
+    }
+
+    label.dd-selected-text {
+        line-height: 62px !important;
+    }
+</style>
+
+<body style="background-color: #f8f8f8;">
+    <div class="mb-5 secondHead-admin">
+        <div class="secondHead-content">
+            <h1>การชำระเงิน</h1>
+        </div>
+    </div>
+    <div style="padding-bottom: 150px;"></div>
+
+    <div class="box-admin">
+        <% if(success_msg != "") { %>
+        <% success_msg.forEach((item) => { %>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <strong><%- item %></strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <% }); %>
+        <% }else if(errors != "") {%>
+        <% errors.forEach((item) => { %>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong><%- item %></strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <% }); %>
+        <% } %>
+        <div class="row">
+            <div class="col-2">
+                <div class="card m-0 p-2 list-group list-group-light" style="height: 300px;">
+                    <button class="list-group-item list-group-item-action px-3 border-0 active" id="bankBtn"
+                        aria-current="true">
+                        โอนเงินผ่านบัญชีธนาคาร</button>
+                    <button class="list-group-item list-group-item-action px-3 border-0"
+                        id="promptayBtn">พร้อมเพย์</button>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card shadow-5-strong" id="bankSection" style="width: 100%; margin: auto;">
+                    <div class="card-body">
+                        <button type="button" class="btn btn-secondary mb-3 fs-6" data-mdb-toggle="modal"
+                            data-mdb-target="#addBank">
+                            <i class="fa-solid fa-plus"></i>
+                            เพิ่มธนาคาร
+                        </button>
+                        <table class="table align-middle mb-0 bg-white tb" id="table">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>ธนาคาร</th>
+                                    <th>ชื่อเจ้าของบัญชี</th>
+                                    <th>เลข</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <%     function datetimeLocal(datetime) { %>
+                            <%   const dt = new Date(datetime); %>
+                            <%    dt.setMinutes(dt.getMinutes() - dt.getTimezoneOffset()); %>
+                            <%   return dt.toISOString().slice(0, 10) + ' ' + dt.toISOString().slice(11, 16); %>
+                            <%  } %>
+
+                            <tbody>
+
+                                <% banks.forEach((bank, index) => { %>
+                                <tr>
+                                    <td>
+                                        <%= index + 1 %>
+                                    </td>
+                                    <td>
+                                        <img src="/assets/img/logoBank/<%= bank.bank %>.png" alt=""
+                                            style="width: 50px;">
+                                    </td>
+                                    <td>
+                                        <%= bank.name %>
+                                    </td>
+                                    <td>
+                                        <%= bank.number %>
+                                    </td>
+                                    <td>
+                                        <div class="btn btn-warning btn-sm edit" data-mdb-toggle="modal"
+                                            data-mdb-target="#updateModal" data-id="<%= bank.bank_id %>"
+                                            data-bank="<%= bank.bank %>" data-name="<%= bank.name %>"
+                                            data-number="<%= bank.number %>">
+                                            แก้ไข
+                                        </div>
+                                        <button type="button" class="btn btn-danger btn-sm delete"
+                                            data-mdb-toggle="modal" data-mdb-target="#deleteModal"
+                                            data-id="<%= bank.bank_id %>" data-name="">
+                                            ลบ
+                                        </button>
+                                    </td>
+                                </tr>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card shadow-5-strong w-100 m-auto" id="promptaySection">
+                    <div class="card-body">
+                        <form action="/savePromptPay" method="post" id="savePromptPay" class="needs-validation"
+                            novalidate>
+                            <div class="form-check form-switch float-end">
+                                <input class="form-check-input" type="checkbox" value="1" role="switch" name="status"
+                                    id="status" <%= promptpay.status === 1 ? 'checked' : ''%> />
+                                <label class="form-check-label" for="flexSwitchCheckDefault">เปิดใช้งาน</label>
+                            </div>
+                            <div class="col ">
+                                <label for="exampleInputEmail1" class="form-label">ประเภทหมายเลข PromptPay</label><br>
+                                <div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="promptPayType"
+                                            id="inlineRadio1" value="0" required
+                                            <%= promptpay.type === 0 ? 'checked' : ''%> />
+                                        <label class="form-check-label" for="inlineRadio1">หมายเลขโทรศัพท์</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="promptPayType"
+                                            id="inlineRadio2" value="1" required
+                                            <%= promptpay.type === 1 ? 'checked' : ''%> />
+                                        <label class="form-check-label" for="inlineRadio2">รหัสบัตรประชาชน</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col pb-3">
+                                <div class="form-outline">
+                                    <input type="text" class="form-control" id="number" name="promptpayNumber"
+                                        value="<%= promptpay.number %>" pattern="[0-9 ]+" required>
+                                    <label for="number" class="form-label">หมายเลข</label>
+                                    <div class="invalid-feedback">
+                                        หมายเลขต้องเป็นตัวเลขเท่านั้น
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-outline mb-5">
+                                    <input type="text" class="form-control" id="name" name="name"
+                                        pattern="[A-Za-zก-๙ ]+$" value="<%= promptpay.name %>" required>
+                                    <label for="name" class="form-label">ชื่อ-นามสกุลผู้รับ</label>
+                                    <div class="invalid-feedback">
+                                        ชื่อต้องเป็นตัวอักษรเท่านั้น
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary float-end">บันทึก</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+    <!-- <div class="modal fade" id="addpayment" tabindex="-1" aria-labelledby="addpaymentLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addpaymentLabel">เลือกช่องทางการชำระเงิน</h5>
+                    <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex justify-content-center">
+                        <div role="button" class="col-5 m-2 p-3 border text-center" data-mdb-toggle="modal"
+                            data-mdb-target="#addPromptpay">
+                            <div class="m-auto" style="width: 170px; height: 100px;">
+                                <img src="/assets/img/prompt-pay.png" alt="" class="w-100">
+                            </div>
+                            <h4>QR Code PromptPay</h4>
+                        </div>
+                        <div role="button" class="col-5 m-2 p-3 border text-center" data-mdb-toggle="modal"
+                            data-mdb-target="#addBank">
+                            <div class="m-auto" style="width: 170px; height: 100px;">
+                                <img src="/assets/img/allbank.png" alt="" class="w-100">
+                            </div>
+                            <h4>โอนเงินผ่านบัญชีธนาคาร</h4>
+                            </img>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> -->
+    <!-- <div class="modal fade" id="addPromptpay" tabindex="-1" aria-labelledby="addPromptpayLabel" aria-hidden="true"
+        data-mdb-backdrop="static" data-mdb-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button class="btn btn-secondary rounded-circle p-0 me-2" style="width: 40px; height: 40px;"
+                        data-mdb-toggle="modal" data-mdb-target="#addpayment"><i
+                            class="fas fa-angle-left fs-5"></i></button>
+                    <h5 class="modal-title" id="addPromptpayLabel">ตั้งค่า PromptPay</h5>
+                    <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="/savePromptPay" method="post" class="needs-validation" novalidate>
+                    <div class="modal-body">
+                        <div class="col ">
+                            <label for="exampleInputEmail1" class="form-label">ประเภทหมายเลข PromptPay</label><br>
+                            <div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="promptPayType" id="inlineRadio1"
+                                        value="0" required checked />
+                                    <label class="form-check-label" for="inlineRadio1">หมายเลขโทรศัพท์</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="promptPayType" id="inlineRadio2"
+                                        value="1" required />
+                                    <label class="form-check-label" for="inlineRadio2">รหัสบัตรประชาชน</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col pb-3">
+                            <div class="form-outline">
+                                <input type="text" class="form-control" id="number" name="promptpayNumber"
+                                    pattern="[0-9]+" maxlength="10" required>
+                                <label for="number" class="form-label">หมายเลข</label>
+                                <div class="invalid-feedback">
+                                    หมายเลขต้องเป็นตัวเลขเท่านั้น
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-outline mb-5">
+                                <input type="text" class="form-control" id="name" name="name" required>
+                                <label for="name" class="form-label">ชื่อ-นามสกุลผู้รับ</label>
+                                <div class="invalid-feedback">
+                                    ชื่อต้องเป็นตัวอักษรเท่านั้น
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">ยกเลิก</button>
+                        <button type="submit" class="btn btn-primary">บันทึก</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div> -->
+
+    <div class="modal fade" id="addBank" tabindex="-1" aria-labelledby="addPromptpayLabel" aria-hidden="true"
+        data-mdb-backdrop="static" data-mdb-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <!-- <button class="btn btn-secondary rounded-circle p-0 me-2" style="width: 40px; height: 40px;"
+                        data-mdb-toggle="modal" data-mdb-target="#addpayment"><i
+                            class="fas fa-angle-left fs-5"></i></button> -->
+                    <h5 class="modal-title" id="addPromptpayLabel">เพิ่มบัญชีธนาคาร</h5>
+                    <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="/addBank" method="post" class="needs-validation" novalidate>
+                    <div class="modal-body">
+                        <div class="col pb-3">
+                            <select id="selectBank">
+                                <option value="bbl" data-imagesrc="/assets/img/logoBank/bbl.png">ธนาคารกรุงเทพ</option>
+                                <option value="ktb" data-imagesrc="/assets/img/logoBank/ktb.png">ธนาคารกรุงไทย</option>
+                                <option value="gsb" data-imagesrc="/assets/img/logoBank/gsb.png">ธนาคารออมสิน
+                                </option>
+                                <option value="bay" data-imagesrc="/assets/img/logoBank/bay.png">ธนาคารกรุงศรีอยุธยา
+                                </option>
+                                <option value="kbank" data-imagesrc="/assets/img/logoBank/kbank.png">ธนาคารกสิกรไทย
+                                </option>
+                                <option value="scb" data-imagesrc="/assets/img/logoBank/scb.png">ธนาคารไทยพาณิชย์
+                                </option>
+
+                                <option value="ttb" data-imagesrc="/assets/img/logoBank/ttb.png">ธนาคารทหารไทยธนชาต
+                                </option>
+                                <option value="cimb" data-imagesrc="/assets/img/logoBank/cimb.png">ธนาคารซีไอเอ็มบี ไทย
+                                </option>
+                                <option value="sc" data-imagesrc="/assets/img/logoBank/sc.png">ธนาคารสแตนดาร์ดชาร์เตอร์ด
+                                </option>
+                                <option value="uob" data-imagesrc="/assets/img/logoBank/uob.png">ธนาคารยูโอบี</option>
+                                <option value="kk" data-imagesrc="/assets/img/logoBank/kk.png">ธนาคารเกียรตินาคินภัทร
+                                </option>
+                                <option value="lhb" data-imagesrc="/assets/img/logoBank/lhb.png">ธนาคารแลนด์ แอนด์
+                                    เฮ้าส์
+                                </option>
+                                <option value="icbc" data-imagesrc="/assets/img/logoBank/icbc.png">ธนาคารไอซีบีซี
+                                </option>
+                                <option value="tcrb" data-imagesrc="/assets/img/logoBank/tcrb.png">ธนาคารไทยเครดิต
+                                </option>
+                                <option value="mega" data-imagesrc="/assets/img/logoBank/mega.png">ธนาคารเมกะ
+                                    สากลพาณิชย์</option>
+                            </select>
+                        </div>
+                        <div class="col pb-3">
+                            <div class="form-outline">
+                                <input type="text" class="form-control" name="bankOwnerName" pattern="[A-Za-zก-๙ ]+$"
+                                    maxlength="10" required>
+                                <label for="number" class="form-label">ชื่อเจ้าของบัญชี</label>
+                                <div class="invalid-feedback">
+                                    ชื่อต้องเป็นตัวอักษรเท่านั้น
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col">
+                            <div class="form-outline mb-5">
+                                <input type="text" class="form-control bankNumber" name="bankNumber" required minlength="10">
+                                <label for="name" class="form-label">เลขบัญชี</label>
+                                <div class="invalid-feedback">
+                                    กรุณากรอกเลขบัญชีให้ครบ
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">ยกเลิก</button>
+                        <button type="submit" class="btn btn-primary">บันทึก</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="updateModal" tabindex="-1" aria-labelledby="addPromptpayLabel" aria-hidden="true"
+        data-mdb-backdrop="static" data-mdb-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <!-- <button class="btn btn-secondary rounded-circle p-0 me-2" style="width: 40px; height: 40px;"
+                    data-mdb-toggle="modal" data-mdb-target="#addpayment"><i
+                        class="fas fa-angle-left fs-5"></i></button> -->
+                    <h5 class="modal-title" id="addPromptpayLabel">แก้ไขบัญชีธนาคาร</h5>
+                    <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="/updateBank" method="post" id="updateForm" class="needs-validation" novalidate>
+                    <div class="modal-body">
+                        <div class="col pb-3">
+                            <select class="selectBank" id="NewSelectBank">
+                                <option value="bbl" data-imagesrc="/assets/img/logoBank/bbl.png">ธนาคารกรุงเทพ</option>
+                                <option value="ktb" data-imagesrc="/assets/img/logoBank/ktb.png">ธนาคารกรุงไทย</option>
+                                <option value="gsb" data-imagesrc="/assets/img/logoBank/gsb.png">ธนาคารออมสิน
+                                </option>
+                                <option value="bay" data-imagesrc="/assets/img/logoBank/bay.png">
+                                    ธนาคารกรุงศรีอยุธยา
+                                </option>
+                                <option value="kbank" data-imagesrc="/assets/img/logoBank/kbank.png">ธนาคารกสิกรไทย
+                                </option>
+                                <option value="scb" data-imagesrc="/assets/img/logoBank/scb.png">ธนาคารไทยพาณิชย์
+                                </option>
+
+                                <option value="ttb" data-imagesrc="/assets/img/logoBank/ttb.png">ธนาคารทหารไทยธนชาต
+                                </option>
+                                <option value="cimb" data-imagesrc="/assets/img/logoBank/cimb.png">ธนาคารซีไอเอ็มบี ไทย
+                                </option>
+                                <option value="sc" data-imagesrc="/assets/img/logoBank/sc.png">ธนาคารสแตนดาร์ดชาร์เตอร์ด
+                                </option>
+                                <option value="uob" data-imagesrc="/assets/img/logoBank/uob.png">ธนาคารยูโอบี</option>
+                                <option value="kk" data-imagesrc="/assets/img/logoBank/kk.png">ธนาคารเกียรตินาคินภัทร
+                                </option>
+                                <option value="lhb" data-imagesrc="/assets/img/logoBank/lhb.png">ธนาคารแลนด์ แอนด์
+                                    เฮ้าส์
+                                </option>
+                                <option value="icbc" data-imagesrc="/assets/img/logoBank/icbc.png">ธนาคารไอซีบีซี
+                                </option>
+                                <option value="tcrb" data-imagesrc="/assets/img/logoBank/tcrb.png">ธนาคารไทยเครดิต
+                                </option>
+                                <option value="mega" data-imagesrc="/assets/img/logoBank/mega.png">ธนาคารเมกะ
+                                    สากลพาณิชย์</option>
+                            </select>
+                        </div>
+                        <div class="col pb-3">
+                            <div class="form-outline">
+                                <input type="text" class="form-control" id="bankOwnerName" name="newBankOwnerName"
+                                    pattern="[A-Za-zก-๙ ]+$" maxlength="10" required>
+                                <label for="number" class="form-label">ชื่อเจ้าของบัญชี</label>
+                                <div class="invalid-feedback">
+                                    ชื่อต้องเป็นตัวอักษรเท่านั้น
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-outline mb-5">
+                                <input type="text" class="form-control bankNumber" id="bankNumber" name="newBankNumber" required
+                                    minlength="12">
+                                <label for="name" class="form-label">เลขบัญชี</label>
+                                <div class="invalid-feedback">
+                                    กรุณากรอกเลขบัญชีให้ครบ
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">ยกเลิก</button>
+                        <button type="submit" class="btn btn-primary">บันทึก</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">ลบประเภท</h5>
+                    <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="/deleteCoupon" id="deleteForm" method="post">
+                        <div>
+                            <p>ต้องการลบบัญชีธนาคาร <b id="NameWarning"></b> ใช่หรือไม่ ?</p>
+                        </div>
+                        <input type="hidden" id="id" name="coupon_id" value="" />
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary " data-mdb-dismiss="modal">ยกเลิก</button>
+                            <button type="submit" class="btn btn-danger">ยืนยัน</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script src="/js/validateBs.js"></script>
+<script>
+    $('#promptaySection').hide()
+    document.querySelectorAll('.form-outline').forEach((formOutline) => {
+        new mdb.Input(formOutline).init();
+    });
+
+    $('#selectBank').ddslick({
+        width: '100%',
+        height: 300,
+        imagePosition: "left",
+    });
+
+
+
+    $('#selectBank .dd-selected-value').attr('name', 'bank')
+    $(document).ready(function () {
+        $('.table').DataTable({
+            order: [
+                [0, 'desc']
+            ],
+        });
+
+        $('.list-group-item').each(function () {
+            $(this).click(function () {
+                $('.list-group-item').removeClass('active')
+                $(this).addClass('active')
+            })
+        })
+
+        $('#bankBtn').click(function () {
+            $('#promptaySection').hide()
+            $('#bankSection').show()
+        })
+
+        $('#promptayBtn').click(function () {
+            $('#bankSection').hide()
+            $('#promptaySection').show()
+        })
+
+        $('.bankNumber').mask('000-000-0000')
+        // $('input[name="promptpayNumber"]').mask('000 000 0000')
+        $('input[type=radio][name="promptPayType"]').change(function () {
+            if (this.value == '0') {
+                $('input[name="promptpayNumber"]').attr('minlength', '12')
+                $('input[name="promptpayNumber"]').mask('000 000 0000')
+            } else if (this.value == '1') {
+                $('input[name="promptpayNumber"]').attr('minlength', '17')
+                $('input[name="promptpayNumber"]').mask('0 0000 00000 00 0')
+
+            }
+        })
+        $('input[name="promptpayNumber"]').on('input', function () {
+            // Trigger the change event to apply minlength and masking
+            $('input[type=radio][name="promptPayType"]:checked').trigger('change');
+        });
+
+
+        $(document).on("click", ".edit", function () {
+            $('#NewSelectBank').ddslick({
+                width: '100%',
+                height: 300,
+                imagePosition: "left",
+            });
+            $('#NewSelectBank .dd-selected-value').attr('name', 'newBank')
+            let bank = $(this).data('bank')
+            const options = $('.dd-option-value');
+            let index = -1;
+
+            options.each(function (i) {
+                if ($(this).val() === bank) {
+                    index = i;
+                    return false;
+                }
+            });
+
+            if (index !== -1) {
+                $('#NewSelectBank').ddslick('select', {
+                    index: index
+                });
+            }
+
+            if ($(this).data('bank') == $('#NewSelectBank option').val()) {
+                $('#NewSelectBank option').attr('selected', 'selected')
+            }
+            // $('#NewSelectBank').ddslick('select', {index: i });
+            $('#updateForm').attr('action', `/updateBank/${$(this).data('id')}`)
+            $('#bankOwnerName').val($(this).data('name'))
+            $('#bankNumber').val($(this).data('number'))
+        });
+
+        $(document).on("click", ".delete", function () {
+            $('#deleteForm').attr('action', `/deleteBank/${$(this).data("id")}`)
+        });
+
+
+        $('#savePromptPay').submit(function (event) {
+            const formData = $(this).serialize();
+            event.preventDefault();
+            let loading = `    <div class="backdrop">
+        <div class="d-flex justify-content-center align-self-center">
+            <div class="spinner-border text-light fs-1" role="status">
+              <span class="visually-hidden"></span>
+            </div>
+          </div>
+    </div>`
+            if (!this.checkValidity()) {
+                event.stopPropagation();
+            } else {
+                $(this).removeClass('was-validated')
+                $('body').append(loading)
+                $.ajax({
+                    url: `/savePromptPay`,
+                    type: 'POST',
+                    data: formData,
+                    success: function () {
+                        setTimeout(() => {
+                            $('.backdrop').remove();
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'สำเร็จ',
+                                text: 'บันทึกข้อมูลพร้อมเพย์แล้ว',
+                            });
+                        }, 600);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error deleting item:',
+                            error);
+                        setTimeout(() => {
+                            $('.backdrop').remove();
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'มีบางอย่างผิดพลาด...',
+                                text: 'กรุณาลองเพิ่มที่อยู่ใหม่อีกครั้ง',
+                            });
+                        }, 600);
+                    }
+                });
+            }
+        })
+    });
+</script>

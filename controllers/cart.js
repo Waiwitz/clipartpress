@@ -1,10 +1,11 @@
+
 const dbConnection = require("../config/database");
 const multer = require('multer');
 const path = require('path');
 
 const storage = multer.diskStorage({
     destination: function (req, file, callback) {
-        callback(null, 'public/uploads/product') // Set the destination folder for uploaded files
+        callback(null, 'public/uploads/artwork') // Set the destination folder for uploaded files
     },
     filename: function (req, file, callback) {
         callback(null, `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`); // Set the file name to be saved
@@ -18,31 +19,73 @@ const upload = multer({
 const insertCart = async (req, res) => {
     const productId = req.body.productid;
     const userId = req.session.user_id;
-    const name = req.body.jobname;
-    const quantity = req.body.quantity;
-    const design = req.file.path.replace('public', '');
-    const specs = req.body.spec;
+    const quantity = req.body.qt;
+    const artwork = req.file.path.replace('public', '');
+    // const specs = req.body.spec;
     const options = req.body.option;
     const price = req.body.total_price;
+    const size = req.body.size;
 
-    let insertionSuccess = true;
+    const selectedData = [size, artwork, price, quantity];
 
-
-    const data = [name, JSON.stringify(specs), JSON.stringify(options),design, price, quantity, userId, productId];
     try {
-        await dbConnection.query("INSERT INTO cart SET printing_name = ? , spec = ?, options = ?, design_file = ?, price = ?, quantity = ?, user_id = ?, product_id = ?", data, (error) => {
-            if (error) throw error;
-        });
+        await dbConnection.query("INSERT INTO cart_detail SET size = ?, design_file = ?, price = ?, quantity = ?", selectedData)
+            .then(async ([row]) => {
+                const cart_detail_id = row.insertId;
+                await dbConnection.query("INSERT INTO cart SET user_id = ?, product_id = ?, cart_detail_id = ?", [userId, productId, cart_detail_id], (error) => {
+                    if (error) throw error;
+                });
+                for (let i = 0; i < options.length; i++) {
+                    dbConnection.query('INSERT INTO cart_selected_options SET cart_detail_id = ?, option_id = ?', [cart_detail_id, options[i]], (error) => {
+                        if (error) throw error;
+                    })
+                }
+                req.flash('success_msg', 'เพิ่มสินค้าลงตระกร้าแล้ว')
+                res.redirect(`/cart`);
+            })
     } catch (error) {
         console.log(error);
-        insertionSuccess = false;
         return res.redirect(`/product/all`);
     }
+};
 
+const updateCart = async (req, res) => {
+    // const productId = req.params.productid;
+    const cartId = req.params.cartDetailid;
+    // const userId = req.session.user_id;
+    const quantity = req.body.qt;
+    let artwork;
+    if (req.file) {
+        artwork = req.file.path.replace('public', '');
+    }
+    const options = req.body.option;
+    const price = req.body.total_price;
+    const size = req.body.size;
 
-    if (insertionSuccess) {
-        return res.send('เพิ่มลงตระกร้าแล้ว');
+    let selectedData;
+    let query;
+
+    if (artwork) {
+        query = 'UPDATE cart_detail SET size = ?, design_file = ?, price = ?, quantity = ? WHERE cart_detail_id = ?'
+        selectedData = [size, artwork, price, quantity, cartId];
     } else {
+        query = 'UPDATE cart_detail SET size = ?, price = ?, quantity = ? WHERE cart_detail_id = ?'
+        selectedData = [size, price, quantity, cartId];
+    }
+    try {
+        dbConnection.query(query, selectedData, (error) => {
+            if (error) throw error;
+        })
+        for (const option of options) {
+             dbConnection.query('UPDATE cart_selected_options SET option_id = ? WHERE cart_detail_id = ?', [option, cartId], (error) => {
+                if (error) throw error;
+            })
+        }
+        req.flash('success_msg', 'แก้ไขสินค้าในตะกร้าแล้ว')
+        res.redirect(`/cart`);
+
+    } catch (error) {
+        console.log(error);
         return res.redirect(`/product/all`);
     }
 };
@@ -62,5 +105,6 @@ const deleteCart = async (req, res) => {
 module.exports = {
     upload: upload,
     insertCart: insertCart,
+    updateCart: updateCart,
     deleteCart: deleteCart
 }

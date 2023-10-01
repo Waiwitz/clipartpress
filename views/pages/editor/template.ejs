@@ -1,0 +1,187 @@
+<%- include('../../partials/header') %>
+
+<style>
+  nav {
+    height: 7vh;
+  }
+</style>
+
+<body style="background-color: rgb(248, 248, 248);">
+  <!-- <h1>Edit Template: <%= template.name %></h1> -->
+  <div class="container" id="template-editor">
+    <!-- <div class="d-flex justify-content-center mb-5">
+      <div class="text-center m-3">
+        <span class="d-block rounded-circle step step-active ">1</span>
+        แก้ไขเทมเพลต
+      </div>
+      <span class="process-line"></span>
+      <div class="text-center m-3">
+        <span class="d-block rounded-circle step">2</span>
+        เลือกออฟชั่น
+      </div>
+    </div> -->
+    <div class="d-flex justify-content-between">
+      <div class="menu-tool shadow-3-soft">
+        <div>
+          <select name="" id="size">
+            <% if (template.categorie === 'card') {%>
+            <option value="9x5.5">9 x 5.5 cm</option>
+            <option value="9x5">9 x 5 cm</option>
+            <option value="8x5.5">8 x 5.5 cm</option>
+            <% } %>
+          </select>
+          <button class="mx-2" id="additext">
+            <i class="fa-solid fa-font"></i>
+          </button>
+          <select name="" id="" style="width: 150px;">
+            <option value="">
+
+            </option>
+          </select>
+          <select name="" id="" style="width: 150px;">
+            <option value="">Font</option>
+          </select>
+          
+          <button class="mx-2" id="addshape">
+            <i class="fa-solid fa-shapes"></i>
+          </button>
+        </div>
+      </div>
+
+      <button class="btn btn-primary fs-6">เลือกออฟชั่น ></button>
+
+    </div>
+
+    <div class="canvas-container w-100">
+      <% if (template.categorie === 'card') {%>
+      <div class="m-3 canvas-wrap" id="cvw1">
+        <canvas id="canvas1" width="600" height="600" class="shadow-2-strong m-auto"></canvas>
+      </div>
+      <div class="m-3 canvas-wrap" id="cvw2">
+        <canvas id="canvas2" width="600" height="600" class="shadow-2-strong"></canvas>
+      </div>
+      <% } %>
+    </div>
+    <div class="page-row shadow-3-soft">
+      <% const json = JSON.stringify(template.elements) %>
+      <% const templates = JSON.parse(json); %>
+      <% if (template.categorie === 'card') {%>
+      <div class="pages page-selected" data-target="cvw1">
+        <img id="preview-img" src="">
+      </div>
+      <div class="pages" data-target="cvw2">
+        <img id="preview-img" src="">
+      </div>
+      <% } %>
+    </div>
+  </div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/fabric"></script>
+<script>
+  // window.addEventListener('beforeunload', function (event) {
+  //   // Display a confirmation message
+  //   event.returnValue = '';
+  // });
+
+
+  const front = new fabric.Canvas('canvas1');
+  const back = new fabric.Canvas('canvas2');
+  front.setBackgroundColor('#ffffff', front.renderAll.bind(front));
+  back.setBackgroundColor('#ffffff', back.renderAll.bind(back));
+
+  $(document).ready(function () {
+    $(".cate-button").on("click", function () {
+      const targetSection = $(this).data("target");
+      $(".cate-button").removeClass("cate-active");
+      $(this).addClass("cate-active");
+      $(".itemlist").hide();
+      $("#" + targetSection).show();
+    });
+
+    $(".enter-product").on("click", function () {
+      const id = $(this).data('id');
+      $("#product_id").val(id);
+
+      var link = $('#product-link');
+      var hrefValue = '/product/item/' + id;
+      link.attr('href', hrefValue);
+
+    })
+
+    $("#cvw2").hide();
+    $(".pages").on("click", function () {
+      const target = $(this).data("target");
+      console.log(target);
+      $(".pages").removeClass("page-selected");
+      $(this).addClass("page-selected");
+      $(".canvas-wrap").hide();
+      $("#" + target).show();
+    });
+
+    $('#size').change(() => {
+      const selected = $(this).find(':selected').val();
+      const [width, height] = selected.split('x');
+      var widtdCal = (width * 37.7952755906) * 3;
+      var heightCal = (height * 37.7952755906) * 3;
+
+      front.setWidth(widtdCal);
+      front.setHeight(heightCal);
+      back.setWidth(widtdCal);
+      back.setHeight(heightCal);
+    });
+
+    $('#additext').on('click', function () {
+      var newText = new fabric.IText('New Text', {
+        left: 10,
+        top: 10,
+        fontFamily: 'Arial',
+        fontSize: 18,
+        fill: 'black'
+      });
+
+      if ($('#cvw1').is(':hidden')) {
+        back.add(newText);
+      } else if ($('#cvw2').is(':hidden')) {
+        front.add(newText);
+      }
+    });
+  });
+
+  // const rect = new fabric.Rect({
+  //   top: 100,
+  //   left: 100,
+  //   width: 60,
+  //   height: 70,
+  //   fill: 'red',
+  // });
+  // canvas.add(rect);
+
+  // Load the template's data onto the canvas
+  const json = `<%- JSON.stringify(template.elements) %>`;
+  const template = JSON.parse(json);
+
+  template.forEach(element => {
+    if (element.page === 'front') {
+      if (element.type === 'text') {
+        front.add(new fabric.IText(element.content, {
+          left: element.x,
+          top: element.y,
+          fontSize: element.fontSize
+        }));
+      }
+    }
+  });
+
+  const preview = document.getElementById('preview');
+  const previewImg = document.getElementById('preview-img');
+
+  function livePreview() {
+    const dataURL = front.toDataURL();
+    previewImg.src = dataURL;
+  }
+
+  // Call the updatePreview function whenever the canvas content changes
+  front.on('object:modified', livePreview);
+  front.on('object:added', livePreview);
+  front.on('object:removed', livePreview);
+</script>

@@ -17,6 +17,11 @@
                 </div>
             <% }); %>
         <% } %>
+        <% if(session.verified == 0) { %>
+            <div class="alert alert-warning">
+                บัญชีของคุณยังไม่ได้ยืนยัน  <a href="#">ส่งอีเมลยืนยันอีกครั้ง</a>
+            </div>
+        <% } %>
         <div class="d-flex">
             <%- include('../partials/usermenu') %>
             <div class="setting-box">
@@ -44,4 +49,6 @@
         </div>
     </div>
 </body>
+<%- include('../partials/head') %>
 <%- include('../partials/footer') %>
+<%- include('../partials/chat') %>

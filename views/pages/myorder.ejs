@@ -1,0 +1,79 @@
+<%- include('../partials/header') %>
+<body style="background-color: #f8f8f8;">
+    <div class="banner shadow-5-strong">
+        <img class="imageFitBox" src="/assets/img/Flyers-Brochure-Test-mage.jpg" alt="">
+        <div class="banner-content overlay">
+            <div>
+                <h1><%= currentMenu %></h1>
+                <ol class="breadcrumb justify-content-center bg-light shadow-5-strong">
+                    <li class="breadcrumb-item"><a href="/">หน้าแรก</a></li>
+                    <li class="breadcrumb-item active" aria-current="page"><%= currentMenu %></li>
+                </ol>
+            </div>
+        </div>
+    </div>
+    <div class="container-lg mt-5 mb-5 p-auto">
+        <div class="d-flex">
+            <div class="myorder-tab active" id="waitforpay">
+                <i class="fa-solid fa-hourglass-start me-1"></i>
+                <span>รอชำระ</span>
+            </div>
+            <div class="myorder-tab" id="waitforpay">
+                <i class="fa-regular fa-clock me-1"></i>
+                <span>รอตรวจสอบ</span>
+            </div>
+            <div class="myorder-tab" id="waitforpay">
+                <i class="fa-solid fa-box me-1"></i>
+                <span>รอจัดส่ง</span>
+            </div>
+            <div class="myorder-tab" id="waitforpay">
+                <i class="fa-solid fa-truck-fast me-1"></i>
+                <span>จัดส่งสำเร็จ</span>
+            </div>
+            <div class="myorder-tab" id="waitforpay">
+                <i class="fa-solid fa-circle-xmark me-1"></i>
+                <span>ยกเลิก</span>
+            </div>
+        </div>
+
+        <div>
+            <div class="card order-item">
+                <div class="card-body m-3">
+                    <div class="d-flex justify-content-between">
+                        <h3>รายการ 01</h3>
+                    </div>
+                    <hr>
+                    <div class="d-flex">
+                        <div class="col me-3" id="product-picture">
+                            <div class="myorder-product-img">
+                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRudVYQys6rTbDytpASp-NC6nJkVT8Tiq2fog&usqp=CAU"
+                                    alt="" class="imageFitBox">
+                            </div>
+                            <button class="btn btn-primary w-100">รายละเอียด</button>
+                        </div>
+                        <div class="col-8">
+                            <div style="height: 160px;">
+                                <h3>ชื่อสินค้า</h3>
+                                <p>วันที่ทำรายการ: </p>
+                            </div>
+                            <div class="border-top bottom-price">
+                                <div class="text-center bg-light-subtle">
+                                    <span class="fs-5">฿1000</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col border-start" id="right-price">
+                            <div class="text-center m-5 pt-4">
+                                <span class="fs-5">฿1000</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+    </script>
+</body>
+<%- include('../partials/footer') %>
+<%- include('../partials/chat') %>

@@ -1,0 +1,474 @@
+<body class="h-100" style="background-color: #f8f8f8;">
+    <%- include('../../partials/admin-nav') %>
+    <div class="mb-5 secondHead-admin">
+        <div class="secondHead-content">
+            <h1>คูปอง</h1>
+            <!-- <ol class="list-unstyled d-flex ">
+                <li class="breadcrumb-item"><a class="link-light" href="#">หน้าแรก</a></li>
+                <li class="active text-light ms-2">/ สินค้า</li>
+            </ol> -->
+        </div>
+    </div>
+    <div style="padding-bottom: 150px;"></div>
+
+    <div class="box-admin">
+        <% if(success_msg != "") { %>
+        <% success_msg.forEach((item) => { %>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <strong><%- item %></strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <% }); %>
+        <% }else if(errors != "") {%>
+        <% errors.forEach((item) => { %>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong><%- item %></strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <% }); %>
+        <% } %>
+
+        <button type="button" class="btn btn-secondary mb-3 fs-6" data-mdb-toggle="modal" data-mdb-target="#addcoupon">
+            <i class="fa-solid fa-plus"></i>
+            เพิ่มคูปอง
+        </button>
+        <div class="card shadow-5-strong" id="all-tb" style="width: 100%; margin: auto; border-top-left-radius: 0;">
+            <div class="card-body">
+                <table class="table align-middle mb-0 bg-white tb" id="table">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>#</th>
+                            <th>ชื่อคูปอง</th>
+                            <th>โค้ด</th>
+                            <th>ส่วนลด</th>
+                            <th>สถานะ</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+
+                    <tbody>
+                        <% coupons.forEach((coupon, index) => { %>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <p class="fw-normal mb-1"><%= index %></p>
+                                </div>
+                            </td>
+                            <td>
+                                <%= coupon.coupon_name %>
+                            </td>
+                            <td><span><%= coupon.coupon_code %></span>
+                                <i class="fas fa-clone fs-6 text-end hover-zoom copyCode" style="width: 50px;"
+                                    role="button" data-code="<%= coupon.coupon_code %>"></i>
+                            </td>
+                            <td>
+                                <% if(coupon.coupon_type == 'percent') { %>
+                                <%= coupon.discount_value %> %
+                                <% }else if(coupon.coupon_type == 'value') { %>
+                                <%= coupon.discount_value %> บาท
+                                <% } %>
+                            </td>
+                            <td>
+                                <% if(coupon.status === 1) { %>
+                                เปิดใช้งาน
+                                <% }else { %>
+                                ปิด
+                                <% } %>
+                            </td>
+                            <td>
+
+                                <button class="btn btn-warning btn-sm edit" data-mdb-toggle="modal"
+                                    data-mdb-target="#updatecoupon" data-id="<%= coupon.coupon_id %>"
+                                    data-name="<%= coupon.coupon_name %>" data-code="<%= coupon.coupon_code %>"
+                                    data-status="<%= coupon.status %>" data-type="<%= coupon.coupon_type %>"
+                                    data-value="<%= coupon.discount_value %>" data-min="<%= coupon.min_amount %>"
+                                    data-start="<%= coupon.start_date %>" data-end="<%= coupon.end_date %>"
+                                    data-limit="<%= coupon.user_limitUse %>" data-amount="<%= coupon.coupon_amount %>"
+                                    data-note="<%= coupon.note %>">
+                                    แก้ไข
+                                </button>
+                                <button type="button" class="btn btn-danger btn-sm delete" data-mdb-toggle="modal"
+                                    data-mdb-target="#deleteModal" data-coupon-id="<%= coupon.coupon_id %>" data-name="<%= coupon.coupon_name %>">
+                                    ลบ
+                                </button>
+                            </td>
+                        </tr>
+                        <%   }); %>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+
+        <form action="/addcoupon" method="post" class="needs-validation" novalidate>
+            <div class="modal fade" id="addcoupon" tabindex="-1" aria-labelledby="addcoupon" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">เพิ่มคูปอง</h5>
+                            <button type="button" class="btn-close" data-mdb-dismiss="modal"
+                                aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row mb-4">
+                                <div class="col">
+                                    <label class="form-label" for="form6Example1">ชื่อคูปอง<span
+                                            class="text-danger ms-1">*</span></label>
+                                    <input type="text" class="form-control" name="couponName" required />
+                                </div>
+                                <div class="col">
+                                    <label class="form-label" for="couponCode">โค้ด <span
+                                            class="text-danger ms-1">*</span></label>
+                                    <div class="form-outline">
+                                        <i class="fas fa-dice trailing" id="randomCode" role="button"
+                                            style="pointer-events: all;"></i>
+                                        <input type="text" class="form-control form-icon-trailing" id="couponCode"
+                                            name="couponCode" maxlength="6" required />
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <label class="form-label" for="inlineFormSelectPref">สถานะ</label>
+                                    <select class="form-select" style="height: 35px;" name="status" required>
+                                        <option value="1">เปิดใช้งาน</option>
+                                        <option value="0">ปิด</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row mb-4">
+                                <div class="col">
+                                    <div class="d-inline-flex mb-1">
+                                        <label class="form-label me-2">ประเภทส่วนลด :</label>
+                                        <div class="form-check me-3">
+                                            <input class="form-check-input" type="radio" name="couponType" id="type1"
+                                                value="percent" required />
+                                            <label class="form-check-label" for="type1">เปอร์เซ็นต์</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="couponType" id="type2"
+                                                value="value" required />
+                                            <label class="form-check-label" for="type2">มูลค่าราคา</label>
+                                        </div>
+                                    </div>
+                                    <div class="input-group">
+                                        <input type="number" id="product-name" class="form-control" name="discountValue"
+                                            required />
+                                        <span class="input-group-text" id="unittype"></span>
+                                    </div>
+
+                                </div>
+                                <div class="col">
+                                    <label class="form-label" for="form6Example1">ยอดสั่งซื้อขั้นต่ำ<span
+                                            class="text-danger ms-1"></span></label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" name="minAmount" required />
+                                        <span class="input-group-text" id="unittype">฿</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mb-4">
+                                <div class="col">
+                                    <label class="form-label">วันที่เริ่ม <span
+                                            class="text-danger ms-2">*</span></label> <br>
+                                    <input type="datetime-local" class="form-control" name="startDate" required />
+                                </div>
+                                <div class="col">
+                                    <label class="form-label">วันที่สิ้นสุด <span
+                                            class="text-danger ms-2">*</span></label> <br>
+                                    <input type="datetime-local" class="form-control" name="endDate" required />
+                                </div>
+                            </div>
+                            <div class="row mb-4">
+                                <div class="col">
+                                    <label class="form-label" for="userLimit">จำกัดการใช้ต่อบัญชี</label>
+                                    <br>
+                                    <input type="number" id="" class="form-control" name="userLimit" />
+                                </div>
+                                <div class="col">
+                                    <label class="form-label" for="couponAmount">จำนวนคูปอง</label> <br>
+                                    <input type="number" id="" class="form-control" name="couponAmount" />
+                                </div>
+                            </div>
+                            <div class="row mb-4">
+                                <div class="col">
+                                    <div class="form-outline">
+                                        <textarea class="form-control" id="textAreaExample" rows="4"
+                                            data-mdb-showcounter="true" maxlength="120" name="note"></textarea>
+                                        <label class="form-label" for="textAreaExample">หมายเหตุ</label>
+                                        <div class="form-helper"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">ยกเลิก</button>
+                            <button type="submit" class="btn btn-primary">บันทึก</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <form action="/updatecoupon" method="post" class="needs-validation" novalidate>
+        <div class="modal fade" id="updatecoupon" tabindex="-1" aria-labelledby="updatecoupon" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="coupon-head">เพิ่มคูปอง</h5>
+                        <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="id" id="couponid">
+                        <div class="row mb-4">
+                            <div class="col">
+                                <label class="form-label" for="couponName">ชื่อคูปอง<span
+                                        class="text-danger ms-1">*</span></label>
+                                <input type="text" id="couponName" class="form-control" name="newCouponName" required />
+                            </div>
+                            <div class="col">
+                                <label class="form-label" for="couponCode">โค้ด <span
+                                        class="text-danger ms-1">*</span></label>
+                                <div class="form-outline">
+                                    <i class="fas fa-dice trailing" id="newRandomCode" role="button"
+                                        style="pointer-events: all;"></i>
+                                    <input type="text" id="newCouponCode" class="form-control form-icon-trailing"
+                                        name="newCouponCode" maxlength="6" required />
+                                </div>
+                            </div>
+                            <div class="col">
+                                <label class="form-label" for="inlineFormSelectPref">สถานะ</label>
+                                <select class="form-select" style="height: 35px;" id="status" name="newStatus" required>
+                                    <option value="1">เปิดใช้งาน</option>
+                                    <option value="0">ปิด</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-4">
+                            <div class="col">
+                                <div class="d-inline-flex mb-1">
+                                    <label class="form-label me-2">ประเภทส่วนลด :</label>
+                                    <div class="form-check me-3">
+                                        <input class="form-check-input" type="radio" name="newCouponType"
+                                            id="couponType1" value="percent" required />
+                                        <label class="form-check-label" for="couponType1">เปอร์เซ็นต์</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="newCouponType"
+                                            id="couponType2" value="value" required />
+                                        <label class="form-check-label" for="couponType2">มูลค่าราคา</label>
+                                    </div>
+                                </div>
+                                <div class="input-group">
+                                    <input type="number" id="discountValue" class="form-control" name="newDiscountValue"
+                                        required />
+                                    <span class="input-group-text" id="newunittype">@</span>
+                                </div>
+
+                            </div>
+                            <div class="col">
+                                <label class="form-label" for="form6Example1">ยอดสั่งซื้อขั้นต่ำ<span
+                                        class="text-danger ms-1"></span></label>
+                                <div class="input-group">
+                                    <input type="number" id="minAmount" class="form-control" name="newMinAmount"
+                                        value="0" required />
+                                    <span class="input-group-text">฿</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mb-4">
+                            <div class="col">
+                                <label class="form-label" for="start">วันที่เริ่ม <span
+                                        class="text-danger ms-2">*</span></label> <br>
+                                <input type="datetime-local" id="start" class="form-control" name="newStartDate" />
+                            </div>
+                            <div class="col">
+                                <label class="form-label" for="start">วันที่สิ้นสุด <span
+                                        class="text-danger ms-2">*</span></label> <br>
+                                <input type="datetime-local" id="end" class="form-control" name="newEndDate" />
+                            </div>
+                        </div>
+                        <div class="row mb-4">
+                            <div class="col">
+                                <label class="form-label" for="userLimit">จำกัดการใช้ต่อบัญชี</label> <br>
+                                <input type="number" id="userLimit" class="form-control" name="newUserLimit" />
+                            </div>
+                            <div class="col">
+                                <label class="form-label" for="couponAmount">จำนวนคูปอง</label> <br>
+                                <input type="number" id="couponAmount" class="form-control" name="newCouponAmount" />
+                            </div>
+                        </div>
+                        <div class="row mb-4">
+                            <div class="col">
+                                <div class="form-outline">
+                                    <textarea class="form-control" id="note" rows="4" data-mdb-showcounter="true"
+                                        maxlength="120" name="newNote"></textarea>
+                                    <label class="form-label" for="textAreaExample">หมายเหตุ</label>
+                                    <div class="form-helper"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">ยกเลิก</button>
+                        <button type="submit" class="btn btn-primary">บันทึก</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">ลบประเภท</h5>
+                    <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="/deleteCoupon" method="post">
+                        <div>
+                            <p>ต้องการลบคูปอง <b id="NameWarning"></b> ใช่หรือไม่ ?</p>
+                        </div>
+                        <input type="hidden" id="id" name="coupon_id" value="" />
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary " data-mdb-dismiss="modal">ยกเลิก</button>
+                            <button type="submit" class="btn btn-danger">ยืนยัน</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script>
+    const forms = document.querySelectorAll('.needs-validation')
+    // Loop over them and prevent submission
+    Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+
+            form.classList.add('was-validated')
+        }, false)
+    })
+
+    function generateCouponCode(length) {
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let couponCode = '';
+
+        for (let i = 0; i < length; i++) {
+            const randomIndex = Math.floor(Math.random() * characters.length);
+            couponCode += characters.charAt(randomIndex);
+        }
+
+        return couponCode;
+    }
+
+
+
+    $(document).ready(function () {
+        $('.tb').DataTable({
+            order: [
+                [0, 'desc']
+            ],
+        });
+
+        document.querySelectorAll('.form-outline').forEach((formOutline) => {
+            new mdb.Input(formOutline).init();
+        });
+
+        $('#randomCode').click(function () {
+            $('#couponCode').val(generateCouponCode(6));
+        })
+        $('#newRandomCode').click(function () {
+            $('#newCouponCode').val(generateCouponCode(6));
+        })
+        
+        $('input[type=radio][name=couponType]').change(function () {
+            if (this.value == 'percent') {
+                $('#unittype').text('%')
+            } else if (this.value == 'value') {
+                $('#unittype').text('฿')
+            }
+        })
+        $('input[type=radio][name=newCouponType]').change(function () {
+            if (this.value == 'percent') {
+                $('#newunittype').text('%')
+            } else if (this.value == 'value') {
+                $('#newunittype').text('฿')
+            }
+        })
+        $(".copyCode").click(function () {
+            var code = $(this).data('code');
+            var textArea = document.createElement("textarea");
+            textArea.value = code;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand("copy");
+            document.body.removeChild(textArea);
+            alert("Text copied to clipboard: " + code);
+        });
+
+        $(document).on("click", ".edit", function () {
+            $("input[type='text'], input[type='number'], input[type='datetime-local']").val("");
+
+            var coupon_id = $(this).data("id");
+            var name = $(this).data("name");
+            var code = $(this).data("code");
+            var status = $(this).data("status");
+            var type = $(this).data("type");
+            var value = $(this).data("value");
+            var minAm = $(this).data("min");
+            var start = $(this).data("start");
+            var end = $(this).data("end");
+            var limit = $(this).data("limit");
+            var amount = $(this).data("amount");
+            var note = $(this).data("note");
+            $("#couponid").val(coupon_id);
+
+            $("#coupon-head").text(name)
+            $("#couponName").val(name);
+            $("#newCouponCode").val(code);
+            $("#status").val(status);
+            if (type == 'percent') {
+                $("#couponType1").attr("checked", true);;
+            } else if (type === 'value') {
+                $("#couponType2").attr("checked", true);
+            }
+            // $("#couponid").val(coupon_id);
+            // $("#couponid").val(coupon_id);
+            $("#discountValue").val(value);
+            $("#minAmount").val(minAm);
+            console.log(type);
+
+
+            function datetimeLocal(datetime) {
+                const dt = new Date(datetime);
+                dt.setMinutes(dt.getMinutes() - dt.getTimezoneOffset());
+                return dt.toISOString().slice(0, 16);
+            }
+            $("#start").val(datetimeLocal(start));
+            $("#end").val(datetimeLocal(end));
+            $("#userLimit").val(limit);
+            $("#couponAmount").val(amount);
+            $("#note").val(note);
+
+            if (type == 'percent') {
+                $('#newunittype').text('%')
+            } else if (type == ' value') {
+                $('#newunittype').text('฿')
+            }
+        });
+
+        $(document).on("click", ".delete", function () {
+            var coupon_id = $(this).data("coupon-id");
+            const name = $(this).data('name')
+            $("#id").val(coupon_id);
+            $('#NameWarning').text(name)
+        });
+    });
+</script>

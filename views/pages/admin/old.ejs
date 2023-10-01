@@ -1,0 +1,848 @@
+<%- include('../../partials/admin-nav') %>
+
+<body>
+    <div class="mb-5 secondHead-admin">
+        <div class="secondHead-content">
+            <h1><%= product.productName %>></h1>
+            <!-- <ol class="list-unstyled d-flex ">
+                <li class="breadcrumb-item"><a class="link-light" href="#">หน้าแรก</a></li>
+                <li class="active text-light ms-2">/ สินค้า</li>
+            </ol> -->
+        </div>
+    </div>
+    <div style="padding-bottom: 150px;"></div>
+    <div class="box-admin">
+        <% if(success_msg != "") { %>
+            <% success_msg.forEach((item) => { %>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <strong><%- item %></strong> 
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            <% }); %>
+            <% }else if(errors != "") {%>
+            <% errors.forEach((item) => { %>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong><%- item %></strong> 
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            <% }); %>
+            <% } %>
+        <form action="/updateProduct/<%= product.product_id %>" method="post" enctype="multipart/form-data">
+            <div id="product-form">
+                <div class="card">
+                    <div class="mx-4 mt-4 border-bottom">
+                        <h4>รายละเอียดสินค้า</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <div>
+                                <div class="product-preview-upload me-4 mb-2">
+                                    <div class="option-img ">
+                                        <i class="fa-solid fa-plus"></i>
+                                        <input type="file" name="imgproduct" id="imgproduct"
+                                            onchange="previewImage(event, [0])" accept="image/png, image/jpeg"
+                                            multiple />
+                                        <img src="<%= product.picture %>" alt="" id="option_preview" draggable="false"
+                                            class="img_option imageFitBox">
+                                    </div>
+                                </div>
+                                <span class="mx-4"> รองรับไฟล์</span><br>
+                                <span class="mx-4"> PNG, JPEG</span>
+                            </div>
+                            <div class="row w-100">
+                                <div class="col p-0">
+                                    <div class="form-outline">
+                                        <input type="text" id="product-name" class="form-control" name="product_name"
+                                            value=" <%= product.productName %>" required />
+                                        <label class="form-label" for="form6Example1">ชื่อสินค้า <span class="text-danger ms-1">*</span></label>
+                                    </div>
+                                </div>
+
+                                <div class="col d-flex">
+                                    <!-- <label class="form-label" for="inlineFormSelectPref">ประเภท</label> <br> -->
+                                    <select class="form-select" id="categories" style="height: 35px;" name="categories" required>
+                                        <% const values = ['card', 'flyer', 'leaflet', 'sticker', 'bill', 'letter']; %>
+                                        <% const thai = ['นามบัตร', 'ใบปลิว', 'แผ่บพับ', 'สติ๊กเกอร์', 'ใบบิล', 'ซองจดหมาย']; %>
+                                        <% for (let i = 0; i < values.length; i++) { %>
+                                        <option value="<%= values[i] %>"><%= thai[i] %></option>
+                                        <% } %>
+                                    </select>
+                                    <span class="text-danger ms-2">*</span>
+                                </div>
+
+                                <div class="col d-flex">
+                                    <!-- <label class="form-label" for="inlineFormSelectPref">สถานะ</label> <br> -->
+                                    <select class="form-select" style="height: 35px;" name="status" required>
+                                        <option value="1" <%= product.status === 1 ? 'selected' : '' %>>เปิดรับทำ
+                                        </option>
+                                        <option value="0" <%= product.status === 0 ? 'selected' : '' %>>งดรับทำ</option>
+                                    </select>
+                                    <span class="text-danger ms-2">*</span>
+                                </div>
+
+                                <div class="w-100 ps-0 mt-2">
+                                    <!-- Message input -->
+                                    <div class="form-outline ">
+                                        <textarea class="form-control" id="description" rows="4"
+                                            name="product_description" required> <%= product.description %></textarea>
+                                        <label class="form-label" for="description">รายละเอียดสินค้า <span class="text-danger ms-1">*</span></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="mx-4 mt-4 border-bottom">
+                        <h4>กำหนดส่วนลด</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row row-cols-lg-auto mb-4">
+                            <div class="col">
+                                <label class="form-label" for="dc-num">ส่วนลด(%)</label> <br>
+                                <input type="number" id="discount" class="form-control" name="discount" value="<%= product.discount %>" min="0" max="100"/>
+                            </div>
+                            <div class="col">
+                                <label class="form-label" for="dc-start">วันที่เริ่ม</label> <br>
+                                <input type="datetime-local" id="dc-start" class="form-control" name="dc_start" value="<%= product.discount_start %>"/>
+                            </div>
+                            <div class="col">
+                                <label class="form-label" for="dc-end">วันที่สิ้นสุด</label> <br>
+                                <input type="datetime-local" id="dc-end" class="form-control" name="dc_end" value="<%= product.discount_end %>"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-primary btn-block my-5 float-end next fs-6"
+                    style="width: 150px;">ถัดไป</button>
+            </div>
+
+            <div id="option-form">
+                <div class="card">
+                    <div>
+                        <div class="mx-4 mt-4 border-bottom">
+                            <h4>กำหนดราคาเหมาตามปริมาณ</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="row row-cols-auto mb-4">
+                                <div class="col d-flex">
+                                    <input type="hidden" name="qtId[0][]" value="<%= priceTiers[0].qtTier_id %>">
+                                    <div class="form-outline w-50 me-2">
+                                        <input type="number" class="spec-name form-control" name="minqt[0][]"
+                                            value="<%= priceTiers[0].minqt %>" required>
+                                        <label class="form-label">จำนวนขั้นต่ำ <span class="text-danger ms-2">*</span></label>
+                                    </div>
+                                    <div class="form-outline w-50">
+                                        <input type="number" class="spec-name form-control" name="priceTier[0][]"
+                                            value="<%= priceTiers[0].priceqt %>" required>
+                                        <label class="form-label">ราคา <span class="text-danger ms-2">*</span></label>
+                                    </div>
+                                </div>
+                                <button type="button" id="add-price" class="btn btn-secondary">
+                                    <i class="fa-solid fa-plus"></i>
+                                </button>
+                            </div>
+                            <div id="newPriceRow">
+                                <% for (let j = 1; j < priceTiers.length; j++) { %>
+                                <div class="row row-cols-auto mb-4 newPrice" id="<%= priceTiers[j].qtTier_id %>">
+                                    <div class="col d-flex">
+                                        <input type="hidden" name="qtId[<%= j %>][]"
+                                            value="<%= priceTiers[j].qtTier_id %>">
+                                        <div class="form-outline w-50 me-2">
+                                            <input type="number" class="spec-name form-control" name="minqt[<%= j %>][]"
+                                                value="<%= priceTiers[j].minqt %>" required>
+                                            <label class="form-label">จาก</label>
+                                        </div>
+                                        <div class="form-outline w-50">
+                                            <input type="number" class="spec-name form-control"
+                                                name="priceTier[<%= j %>][]" value="<%= priceTiers[j].priceqt %>"
+                                                required>
+                                            <label class="form-label">ราคา</label>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-danger remove-price deleteQt"
+                                        data-mdb-toggle="modal" data-mdb-target="#deleteQt"
+                                        data-id="<%= priceTiers[j].qtTier_id %>"><i class="fa-solid fa-trash"
+                                            style="color: #ffffff;"></i></button>
+                                </div>
+                                <% }; %>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="mx-4 mt-4 border-bottom">
+                            <h4>กำหนดราคาเหมาตามขนาด</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="row row-cols-auto mb-4" id="<%= sizeTiers[0].sizeTier_id %>">
+                                <div class="col d-flex">
+                                    <input type="hidden" name="sizeId[0][]" value="<%= sizeTiers[0].sizeTier_id %>">
+                                    <div class="form-outline w-50 me-2">
+                                        <input type="number" class="spec-name form-control" name="minsize[0][]"
+                                            value="<%= sizeTiers[0].minSize %>" required>
+                                        <label class="form-label">หน่วยขนาดขั้นต่ำ (cm) <span class="text-danger ms-2">*</span></label>
+                                    </div>
+                                    <div class="form-outline w-50">
+                                        <input type="number" class="spec-name form-control" name="priceSize[0][]"
+                                            value="<%= sizeTiers[0].pricesize %>" required>
+                                        <label class="form-label">ราคา <span class="text-danger ms-2">*</span></label>
+                                    </div>
+                                </div>
+                                <button type="button" id="add-size" class="btn btn-secondary">
+                                    <i class="fa-solid fa-plus"></i>
+                                </button>
+                            </div>
+                            <div id="newSizeRow">
+                                <% for (let i = 1; i < sizeTiers.length; i++) { %>
+                                <div class="row row-cols-auto mb-4 newSize" id="<%= sizeTiers[i].sizeTier_id %>">
+                                    <div class="col d-flex">
+                                        <input type="hidden" name="sizeId[<%= i %>][]"
+                                            value="<%= sizeTiers[i].sizeTier_id %>">
+                                        <div class="form-outline w-50 me-2">
+                                            <input type="number" class="spec-name form-control" name="minsize[<%= i %>][]"
+                                                value="<%= sizeTiers[i].minSize %>" required>
+                                            <label class="form-label">หน่วยขนาด</label>
+                                        </div>
+                                        <div class="form-outline w-50">
+                                            <input type="number" class="spec-name form-control"
+                                                name="priceSize[<%= i %>][]" value="<%= sizeTiers[i].pricesize %>"
+                                                required>
+                                            <label class="form-label">ราคา</label>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-danger deleteSize" data-mdb-toggle="modal"
+                                        data-mdb-target="#deleteSize" data-id="<%= sizeTiers[i].sizeTier_id %>"><i
+                                            class="fa-solid fa-trash" style="color: #ffffff;"></i></button>
+                                </div>
+                                <% }; %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="mx-4 mt-4 border-bottom d-flex justify-content-between">
+                        <h4>เลือกออฟชั่น</h4>
+                        <!-- <button class="btn btn-primary m-1">
+                            <i class="fas fa-plus"></i>
+                            เพิ่มออฟชั่น
+                        </button> -->
+                    </div>
+                    <div class="card-body" id="option-mutiselect">
+
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <button type="button" class="btn btn-primary btn-block fs-6 my-5 back"
+                        style="width: 150px;">ย้อนกลับ</button>
+
+                    <button type="submit" class="btn btn-primary btn-block fs-6 my-5 back"
+                        style="width: 150px;">บันทึก</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="modal fade" id="deleteQt" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">ลบราคาเหมา</h5>
+                    <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        <p class="fs-5">ต้องการลบใช่หรือไม่ ? หากลบแล้วข้อมูลแถวนี้จะหายไปไม่สามารถนำกลับมาได้</p>
+                    </div>
+                    <input type="hidden" id="idtier" name="id" value="" />
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary " data-mdb-dismiss="modal">ยกเลิก</button>
+                        <button type="button" id="remove_qt" class="btn btn-danger">ยืนยัน
+                            <div class="spin-loading d-none">
+                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="deleteSize" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">ลบราคาเหมา</h5>
+                    <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        <p class="fs-5">ต้องการลบใช่หรือไม่ ? หากลบแล้วข้อมูลแถวนี้จะหายไปไม่สามารถนำกลับมาได้</p>
+                    </div>
+                    <input type="hidden" id="idsize" name="idsize" value="" />
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary " data-mdb-dismiss="modal">ยกเลิก</button>
+                        <button type="button" id="remove_size" class="btn btn-danger">ยืนยัน</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="liveToast" class="toast align-items-center" role="alert" aria-live="assertive" aria-atomic="true"
+            style="border-left: 6px solid #28da0d;">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <span id="toast-text"></span>
+                </div>
+                <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/js/validateBs.js"></script>
+    <script>
+        const toastTrigger1 = document.getElementById('remove_qt');
+        const toastTrigger2 = document.getElementById('remove_size');
+        let toastBootstrap;
+        const toastLiveExample = document.getElementById('liveToast');
+
+        if (toastTrigger1) {
+            toastBootstrap = bootstrap.Toast.getOrCreateInstance(toastLiveExample)
+            toastTrigger1.addEventListener('click', () => {
+                toastBootstrap.show()
+            })
+        }
+
+        if (toastTrigger2) {
+            toastBootstrap = bootstrap.Toast.getOrCreateInstance(toastLiveExample)
+            toastTrigger2.addEventListener('click', () => {
+                toastBootstrap.show()
+            })
+        }
+
+
+        $('#dc-start').prop("disabled", true);
+        $('#dc-end').prop("disabled", true);
+        $("#discount").on("change", function () {
+            var inputValue = $(this).val();
+
+            if (parseFloat(inputValue) > 0) {
+                $('#dc-start').prop("disabled", false);
+                $('#dc-end').prop("disabled", false);
+            } else {
+                $('#dc-start').prop("disabled", true);
+                $('#dc-end').prop("disabled", true);
+            }
+        });
+
+        document.querySelectorAll('.form-outline').forEach((formOutline) => {
+            new mdb.Input(formOutline).init();
+        });
+
+        function previewImage(event, index) {
+            var input = event.target;
+            var imgPreview = document.getElementById('option_preview');
+            console.log(imgPreview)
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    imgPreview.src = e.target.result;
+                }
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                imgPreview.src = "";
+            }
+        }
+        var specCount = 0;
+        var img = 0
+        let quantityCount = -1;
+        let sizeCount = -1;
+
+        $('#add-price').on('click', function () {
+            quantityCount++
+            var newPriceRow = `
+            <div class="row row-cols-auto mb-4 newPrice">
+                        <div class="col d-flex">
+                            <div class="form-outline w-50 me-2">
+                                <input type="text" class="spec-name form-control" name="newminqt[${quantityCount}][]" required>
+                                <label class="form-label">จำนวนขั้นต่ำ</label>
+                            </div>
+                            <div class="form-outline w-50">
+                                <input type="text" class="spec-name form-control" name="newpriceTier[${quantityCount}][]" required>
+                                <label class="form-label">ราคา</label>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-danger remove-price"><i class="fa-solid fa-trash" style="color: #ffffff;"></i></button>
+                    </div>
+          `;
+
+            $('#newPriceRow').append(newPriceRow);
+            document.querySelectorAll('.form-outline').forEach((formOutline) => {
+                new mdb.Input(formOutline).init();
+            });
+        })
+
+        $('#add-size').on('click', function () {
+            sizeCount++
+            var newrow = `
+            <div class="row row-cols-auto mb-4 newSize">
+                        <div class="col d-flex">
+                            <div class="form-outline w-50 me-2">
+                                <input type="text" class="form-control" name="newminsize[${sizeCount}][]" required>
+                                <label class="form-label">หน่วยขนาดขั้นต่ำ (cm) </label>
+                            </div>
+                            <div class="form-outline w-50">
+                                <input type="text" class="form-control" name="newpriceSize[${sizeCount}][]" required>
+                                <label class="form-label">ราคา</label>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-danger remove-size"><i class="fa-solid fa-trash" style="color: #ffffff;"></i></button>
+                    </div>
+          `;
+
+            $('#newSizeRow').append(newrow);
+            document.querySelectorAll('.form-outline').forEach((formOutline) => {
+                new mdb.Input(formOutline).init();
+            });
+        })
+
+        // $('#newPriceRow').on('click', '.remove-price', function () {
+        //     $(this).closest(`.newPrice`).remove();
+        // });
+
+        // $('#newSizeRow').on('click', '.remove-size', function () {
+        //     $(this).closest(`.newSize`).remove();
+        // });
+
+        $(document).on("click", ".deleteQt", function () {
+            var id = $(this).data("id");
+            $("#idtier").val(id);
+            $('#remove_qt').click(function () {
+                var id = $("#idtier").val();
+                $("#overlay").show();
+                // setTimeout(function () {
+                //     $(this).attr('disabled', false);
+                //     $(this).val('Submit');
+                // }, 2000);
+                $.ajax({
+                    url: '/deleteQt/' + id,
+                    type: 'DELETE',
+                    success: async function () {
+                        console.log('ssssss');
+                        $(`#${id}`).remove();
+                        $('#deleteQt').modal('hide');
+                        $("#overlay").fadeIn(300);
+                        $('#toast-text').text('ลบราคาเหมาตามปริมาณแล้ว')
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error deleting item:', error);
+                        // Handle error cases here
+                    }
+                });
+            });
+        });
+
+
+        $(document).on("click", ".deleteSize", function () {
+            var id = $(this).data("id");
+            $("#idsize").val(id);
+
+            $('#remove_size').click(function () {
+                var id = $("#idsize").val();
+                
+                $.ajax({
+                    url: `/deleteSize/${id}`,
+                    type: 'DELETE',
+                    async: false,
+                    timeout: 30000,
+                    success: function () {
+                        console.log('ssssss');
+                        $(`#${id}`).remove();
+                        $('#deleteSize').modal('hide');
+                        $('#toast-text').text('ลบราคาเหมาตามขนาดแล้ว')
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error deleting item:', error);
+                        // Handle error cases here
+                    }
+                });
+            });
+        });
+
+        $(document).ready(function () {
+            $('#categories').val(`<%= product.categories %>`);
+        });
+
+        $(document).ready(function () {
+            $('#option-form').hide();
+
+            $(".next").on("click", function () {
+                $("#step1").removeClass("step-active");
+                $('#step2').addClass("step-active");
+                $("#product-form").hide();
+                $("#option-form").show();
+            });
+            $(".back").on("click", function () {
+                $('#step2').removeClass("step-active");
+                $("#step1").addClass("step-active");
+                $("#product-form").show();
+                $("#option-form").hide();
+            });
+
+            function generateForm(category) {
+                var form;
+                // $('#option-mutiselect').empty();
+                if (category === "card") {
+                    form = `<div class="d-flex align-items-center mb-2">
+                            <input type="text" name="spec[0][]" hidden/>
+                            <span class="me-2">ประเภทกระดาษ :</span>
+                            <select multiple="multiple" class="option-checkbox w-75" name="option[0][]" multiple>
+                                <% options.forEach((option) => { %>
+                                <% if (option.parcel_type === 'papertype') { %>
+                                <option value="<%= option.option_id  %>"><%= option.option_name %></option>
+                                <% } %>
+                                <% }); %>
+                            </select>
+                            <span class="text-danger ms-2">*</span>
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <input type="text" name="spec[1][]" hidden/>
+                            <span class="me-2">ด้านพิมพ์ :</span>
+                            <select multiple="multiple" class="option-checkbox w-75" name="option[1][]" multiple>
+                                <% options.forEach((option) => { %>
+                                <% if (option.parcel_type === 'printside') { %>
+                                <option value="<%= option.option_id  %>"><%= option.option_name %></option>
+                                <% } %>
+                                <% }); %>
+                            </select>
+                            <span class="text-danger ms-2">*</span>
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <input type="text" name="spec[2][]" hidden/>
+                            <span class="me-2">การปั้ม :</span>
+                            <select multiple="multiple" class="option-checkbox w-75" name="option[2][]" multiple>
+                                <% options.forEach((option) => { %>
+                                <% if (option.parcel_type === 'pumping') { %>
+                                <option value="<%= option.option_id  %>"><%= option.option_name %></option>
+                                <% } %>
+                                <% }); %>
+                            </select>
+                            <span class="text-danger ms-2">*</span>
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <input type="text" name="spec[3][]" hidden/>
+                            <span class="me-2">การเคลือบ :</span>
+                            <select multiple="multiple" class="option-checkbox w-75" name="option[3][]" multiple>
+                                <% options.forEach((option) => { %>
+                                <% if (option.parcel_type === 'oli') { %>
+                                <option value="<%= option.option_id  %>"><%= option.option_name %></option>
+                                <% } %>
+                                <% }); %>
+                            </select>
+                            <span class="text-danger ms-2">*</span>
+                        </div>`
+                } else if (category === "flyer") {
+                    form = `<div class="d-flex align-items-center mb-2">
+                        <input type="text" name="spec[0][]" hidden/>
+                            <span class="me-2">ประเภทกระดาษ :</span>
+                            <select multiple="multiple" class="option-checkbox w-75" name="option[0][]" multiple>
+                                <% options.forEach((option) => { %>
+                                <% if (option.parcel_type === 'papertype') { %>
+                                <option value="<%= option.option_id  %>"><%= option.option_name %></option>
+                                <% } %>
+                                <% }); %>
+                            </select>
+                            <span class="text-danger ms-2">*</span>
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <input type="text" name="spec[1][]" hidden/>
+                            <span class="me-2">ด้านพิมพ์ :</span>
+                            <select multiple="multiple" class="option-checkbox w-75" name="option[1][]" multiple>
+                                <% options.forEach((option) => { %>
+                                <% if (option.parcel_type === 'printside') { %>
+                                <option value="<%= option.option_id  %>"><%= option.option_name %></option>
+                                <% } %>
+                                <% }); %>
+                            </select>
+                            <span class="text-danger ms-2">*</span>
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <input type="text" name="spec[2][]" hidden/>
+                            <span class="me-2">การเคลือบ :</span>
+                            <select multiple="multiple" class="option-checkbox w-75" name="option[2][]" multiple>
+                                <% options.forEach((option) => { %>
+                                <% if (option.parcel_type === 'oli') { %>
+                                <option value="<%= option.option_id  %>"><%= option.option_name %></option>
+                                <% } %>
+                                <% }); %>
+                            </select>
+                            <span class="text-danger ms-2">*</span>
+                        </div>`
+                } else if (category === "leaflet") {
+                    form = `<div class="d-flex align-items-center mb-2">
+                        <input type="text" name="spec[0][]" hidden/>
+                            <span class="me-2">ประเภทกระดาษ :</span>
+                            <select multiple="multiple" class="option-checkbox w-75" name="option[0][]" multiple>
+                                <% options.forEach((option) => { %>
+                                <% if (option.parcel_type === 'papertype') { %>
+                                <option value="<%= option.option_id  %>"><%= option.option_name %></option>
+                                <% } %>
+                                <% }); %>
+                            </select>
+                            <span class="text-danger ms-2">*</span>
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <input type="text" name="spec[1][]" hidden/>
+                            <span class="me-2">ด้านพิมพ์ :</span>
+                            <select multiple="multiple" class="option-checkbox w-75" name="option[1][]" multiple>
+                                <% options.forEach((option) => { %>
+                                <% if (option.parcel_type === 'printside') { %>
+                                <option value="<%= option.option_id  %>"><%= option.option_name %></option>
+                                <% } %>
+                                <% }); %>
+                            </select>
+                            <span class="text-danger ms-2">*</span>
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <input type="text" name="spec[2][]" hidden/>
+                            <span class="me-2">การพับ :</span>
+                            <select multiple="multiple" class="option-checkbox w-75" name="option[2][]" multiple>
+                                <% options.forEach((option) => { %>
+                                <% if (option.parcel_type === 'fold') { %>
+                                <option value="<%= option.option_id  %>"><%= option.option_name %></option>
+                                <% } %>
+                                <% }); %>
+                            </select>
+                            <span class="text-danger ms-2">*</span>
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <input type="text" name="spec[3][]" hidden/>
+                            <span class="me-2">การเคลือบ :</span>
+                            <select multiple="multiple" class="option-checkbox w-75" name="option[3][]" multiple>
+                                <% options.forEach((option) => { %>
+                                <% if (option.parcel_type === 'oli') { %>
+                                <option value="<%= option.option_id  %>"><%= option.option_name %></option>
+                                <% } %>
+                                <% }); %>
+                            </select>
+                            <span class="text-danger ms-2">*</span>
+                        </div>`
+                } else if (category === "sticker") {
+                    form = `<div class="d-flex align-items-center mb-2">
+                        <input type="text" name="spec[0][]" value="" hidden/>
+                            <span class="me-2">ประเภทกระดาษ :</span>
+                            <select multiple="multiple" class="option-checkbox w-75" name="option[0][]" multiple>
+                                <% options.forEach((option) => { %>
+                                <% if (option.parcel_type === 'papertype') { %>
+                                <option value="<%= option.option_id  %>"><%= option.option_name %></option>
+                                <% } %>
+                                <% }); %>
+                            </select>
+                            <span class="text-danger ms-2">*</span>
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <input type="text" name="spec[1][]" hidden/>
+                            <span class="me-2">การปั้ม :</span>
+                            <select multiple="multiple" class="option-checkbox w-75" name="option[1][]" multiple>
+                                <% options.forEach((option) => { %>
+                                <% if (option.parcel_type === 'pumping') { %>
+                                <option value="<%= option.option_id  %>"><%= option.option_name %></option>
+                                <% } %>
+                                <% }); %>
+                            </select>
+                            <span class="text-danger ms-2">*</span>
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <input type="text" name="spec[2][]" hidden/>
+                            <span class="me-2">การไดคัท :</span>
+                            <select multiple="multiple" class="option-checkbox w-75" name="option[2][]" multiple>
+                                <% options.forEach((option) => { %>
+                                <% if (option.parcel_type === 'die-cut') { %>
+                                <option value="<%= option.option_id  %>"><%= option.option_name %></option>
+                                <% } %>
+                                <% }); %>
+                            </select>
+                            <span class="text-danger ms-2">*</span>
+                        </div>
+                      `
+                } else if (category === "bill") {
+                    form = `<div class="d-flex align-items-center mb-2">
+                        <input type="text" name="spec[0][]" hidden/>
+                            <span class="me-2">ประเภทกระดาษ :</span>
+                            <select multiple="multiple" class="option-checkbox w-75" name="option[0][]" multiple>
+                                <% options.forEach((option) => { %>
+                                <% if (option.parcel_type === 'papertype') { %>
+                                <option value="<%= option.option_id  %>"><%= option.option_name %></option>
+                                <% } %>
+                                <% }); %>
+                            </select>
+                            <span class="text-danger ms-2">*</span>
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <input type="text" name="spec[1][]" hidden/>
+                            <span class="me-2">สี :</span>
+                            <select multiple="multiple" class="option-checkbox w-75" name="option[1][]" multiple>
+                                <% options.forEach((option) => { %>
+                                <% if (option.parcel_type === 'color') { %>
+                                <option value="<%= option.option_id  %>"><%= option.option_name %></option>
+                                <% } %>
+                                <% }); %>
+                            </select>
+                            <span class="text-danger ms-2">*</span>
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <input type="text" name="spec[2][]" hidden/>
+                            <span class="me-2">จำนวนชั้น :</span>
+                            <select multiple="multiple" class="option-checkbox w-75" name="option[2][]" multiple>
+                                <% options.forEach((option) => { %>
+                                <% if (option.parcel_type === 'layer') { %>
+                                <option value="<%= option.option_id  %>"><%= option.option_name %></option>
+                                <% } %>
+                                <% }); %>
+                            </select>
+                            <span class="text-danger ms-2">*</span>
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <input type="text" name="spec[3][]" hidden/>
+                            <span class="me-2">รันเลข :</span>
+                            <select multiple="multiple" class="option-checkbox w-75" name="option[3][]" multiple>
+                                <% options.forEach((option) => { %>
+                                <% if (option.parcel_type === 'number') { %>
+                                <option value="<%= option.option_id  %>"><%= option.option_name %></option>
+                                <% } %>
+                                <% }); %>
+                            </select>
+                            <span class="text-danger ms-2">*</span>
+                        </div>`
+                } else if (category === "letter") {
+                    form = `<div class="d-flex align-items-center mb-2">
+                        <input type="text" name="spec[0][]" hidden/>
+                            <span class="me-2">ประเภทกระดาษ :</span>
+                            <select multiple="multiple" class="option-checkbox w-75" name="option[0][]" multiple>
+                                <% options.forEach((option) => { %>
+                                <% if (option.parcel_type === 'papertype') { %>
+                                <option value="<%= option.option_id  %>"><%= option.option_name %></option>
+                                <% } %>
+                                <% }); %>
+                            </select>
+                            <span class="text-danger ms-2">*</span>
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <input type="text" name="spec[1][]" hidden/>
+                            <span class="me-2">ด้านพิมพ์ :</span>
+                            <select multiple="multiple" class="option-checkbox w-75" name="option[1][]" multiple>
+                                <% options.forEach((option) => { %>
+                                <% if (option.parcel_type === 'printside') { %>
+                                <option value="<%= option.option_id  %>"><%= option.option_name %></option>
+                                <% } %>
+                                <% }); %>
+                            </select>
+                            <span class="text-danger ms-2">*</span>
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <input type="text" name="spec[2][]" hidden/>
+                            <span class="me-2">การปั้ม :</span>
+                            <select multiple="multiple" class="option-checkbox w-75" name="option[2][]" multiple>
+                                <% options.forEach((option) => { %>
+                                <% if (option.parcel_type === 'pumping') { %>
+                                <option value="<%= option.option_id  %>"><%= option.option_name %></option>
+                                <% } %>
+                                <% }); %>
+                            </select>
+                            <span class="text-danger ms-2">*</span>
+                        </div>
+                      `
+                }
+
+                $('#option-mutiselect').empty().append(form);
+                // $('button.next').removeClass('disabled')
+
+                const optionArr = JSON.parse('<%- JSON.stringify(selectedOp) %>');
+                optionArr.forEach(selectedValue => {
+                    $('.option-checkbox option[value="' + selectedValue.option_id + '"]')
+                        .prop('selected', true);
+                });
+
+
+                $('.option-checkbox').multipleSelect('refreshOptions', {
+                    filter: true,
+                    keepOpen: true,
+                    placeholder: 'เลือกตัวเลือกที่ใช้กับสเปคนี้',
+                    // type: 'optgroup',
+                    // hideOptgroupCheckboxes: false
+                });
+                $(".option-checkbox").val(`<%- product.categories %>`)
+            }
+            const defaultCategory = `<%- product.categories %>`
+            generateForm(defaultCategory);
+
+            $("#categories").change(function () {
+                var selectedCategory = $(this).val();
+                generateForm(selectedCategory);
+                // $('button.next').removeClass('disabled');
+            });
+        });
+    
+    </script>
+
+</body>
+
+
+
+
+
+
+
+<% let optionType = '' %>
+<% headoption.forEach((head) => { %>
+<% if(head.option_type == 'papertype') { %>
+<% optionType = 'ประเภทกระดาษ' %>
+<% } else if (head.option_type == 'oil') { %>
+<% optionType = 'การเคลือบเงา' %>
+<% } else if (head.option_type == 'pumping') { %>
+<% optionType = 'การปั้ม' %>
+<% } else if (head.option_type == 'die-cut') { %>
+<% optionType = 'การไดคัท' %>
+<% } else if (head.option_type == 'printside') { %>
+<% optionType = 'ด้านพิมพ์' %>
+<% } else if (head.option_type == 'folding') { %>
+<% optionType = 'การพับ' %>
+<% } else if (head.option_type == 'color') { %>
+<% optionType = 'สี' %>
+<% } else if (head.option_type == 'number') { %>
+<% optionType = 'รันเลข' %>
+<% } else if (head.option_type == 'layer') { %>
+<% optionType = 'จำนวนชั้น' %>
+<% } %>
+<div class="mb-5" id="<%= count++ %>">
+    <input type="text" name="spec" value="รูปแบบ" hidden>
+    <legend><%= optionType %></legend>
+    <hr>
+    <div class="form-check ps-0">
+        <div class="option-select">
+            <div class="border" role="button" data-mdb-toggle="modal"
+                data-mdb-target="#optionImgModal">
+                <img class="selectedimg" id="selectedimg<%= count %>" src="" alt=""
+                    style="width: 80px; height: 80px;">
+            </div>
+            <select name="option" id="side" class="form-select radio-choice"
+                data-img-id="<%= count %>">
+                <% options.forEach((option) => { %>
+                <% if (head.option_type === option.option_type ) {%>
+                <option value="<%= option.option_id %>"
+                    data-price="<%= option.price_per_unit %>"
+                    data-img="<%= option.option_img %>">
+                    <%= option.option_name %>
+                </option>
+                <% } %>
+                <% }) %>
+            </select>
+        </div>
+    </div>
+</div>
+<% }) %>

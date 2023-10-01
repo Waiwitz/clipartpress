@@ -1,0 +1,105 @@
+<%- include('../../partials/admin-nav') %>
+
+<body class="h-100" style="background-color: rgb(248, 248, 248);">
+    <div class="mb-5 secondHead-admin">
+        <div class="secondHead-content">
+            <h1>ออเดอร์</h1>
+        </div>
+    </div>
+    <div style="padding-bottom: 150px;"></div>
+
+    <div class="box-admin">
+        <div class="card" style="width: 100%; margin: auto;">
+            <div class="card-body">
+                <table class="table align-middle mb-0 bg-white table-striped" id="table">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>#</th>
+                            <th>เลขออเดอร์</th>
+                            <th>สินค้า</th>
+                            <th>ที่อยู่</th>
+                            <th>วันที่สั่ง</th>
+                            <th>สถานะ</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+
+
+                    <tbody id="user_list">
+                        <tr>
+                            <td style="width: 50px;">
+                                <div class="d-flex align-items-center">
+                                    <p class="fw-normal mb-1"></p>
+                                </div>
+                            </td>
+                            <td class="product-picture w-25">
+                            
+                            </td>
+                            <td>
+                                    <img src="" alt="">
+                                    <span>dddddddd</span>
+                            </td>
+                            <td>
+                                <p class="fw-normal mb-1">ddd dd</p>
+                            </td>
+                            <td></td>
+                            <td class="text-center">
+                                <div class="status pending">
+                                    รอตรวจสอบ
+                                </div>
+                            </td>
+                            <td>
+                                <a href="" class="btn btn-primary">
+                                    <i class="fa-solid fa-eye fs-5"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <form action="/deleteUser" method="post">
+                            <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel"
+                                aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="editModalLabel">ลบผู้ใช้</h5>
+                                            <button type="button" class="btn-close" data-mdb-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form action="/deleteType" id="editForm" method="post">
+                                                <div>
+                                                    <p>ต้องการลบผู้ใช้ใช่หรือไม่ ?</p>
+                                                </div>
+                                                <input type="hidden" id="userid" name="user_id" value="" />
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary "
+                                                        data-mdb-dismiss="modal">ยกเลิก</button>
+                                                    <button type="submit" class="btn btn-danger">ยืนยัน</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    $(document).on("click", ".delete", function () {
+        var userid = $(this).data("user-id");
+        $("#userid").val(userid);
+    });
+
+
+    $(document).ready(function () {
+        $('#table').DataTable({
+            order: [
+                [3, 'desc']
+            ],
+        });
+    });
+</script>

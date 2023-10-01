@@ -1,0 +1,48 @@
+@media only screen and (max-width: 992px) {
+
+    .nav-link {
+        padding-left: 10px !important;
+    }
+
+    .banner-content {
+        top: 45.5px !important;
+    }
+
+    .nav-space {
+        height: 45.5px;
+    }
+
+    #rs-productList {
+        display: block !important;
+    }
+
+    .cate-select-group {
+        width: 100%;
+    }
+
+}
+
+
+.bottom-price {
+    display: none;
+}
+@media only screen and (max-width: 749px) {
+
+    .order-item .col,
+    .order-item .col-7 {
+        /* width: 100% !important; */
+    }
+
+    
+    #right-price {
+        display: none;
+    }
+
+    .bottom-price {
+        display: block ;
+    }
+
+    .myorder-tab span {
+        display: none;
+    }
+}

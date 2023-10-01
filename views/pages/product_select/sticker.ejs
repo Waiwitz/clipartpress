@@ -1,69 +1,6 @@
-<div class="mb-5" id="<%= count++ %>">
-    <input type="text" name="spec" value="รูปแบบ" hidden>
-    <legend>ขนาดของชิ้นงาน
-        <i class="fa-solid fa-circle-question"></i>
-        <div class="des-question">
-            <p>ขนาดของตัวสติ๊กเกอร์ที่จะถูกพิมพ์ลงบนแผ่น A3 หรือ A4</p>
-        </div>
-    </legend>
-    <hr>
-    <select class="form-select" id="size" name="size"">
-        <option value=" 3x3">3 x 3 cm</option>
-        <option value="4x4">4 x 4 cm</option>
-        <option value="5x5">5 x 5 cm</option>
-        <option value="6x6">6 x 6 cm</option>
-    </select>
-    <p>จำนวนที่จะได้รับสติ๊กเกอร์บนกระดาษ A3+ คือ <span id="per-sticker"></span> ดวงต่อแผ่น</p>
-    <!-- <div class="form-check ps-0">
-        <div class="option-select">
-            <select name="option" id="option" class="radio-choice">
-                <option value="">3 x 3</option>
-                <option value="">4 x 4</option>
-                <option value="">5 x 5</option>
-                <option value="">5 x 5</option>
-            </select>
-        </div>
-    </div> -->
-
-    <button type="button" class="btn btn-primary w-100 mt-2 fs-6" data-mdb-toggle="modal"
-        data-mdb-target="#customSizeModal">กำหนดขนาดชิ้นงานเอง</button>
-</div>
-
-<div class="modal fade slidedown" id="customSizeModal" tabindex="-1" aria-labelledby="customSizeModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editModalLabel">กำหนดขนาดชิ้นงาน</h5>
-                <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="form-outline mb-2">
-                    <input type="text" id="widthSize" class="form-control" name="widthSize" required />
-                    <label class="form-label" for="widthSize">ความกว้าง</label>
-                </div>
-                <div class="form-outline mb-2">
-                    <input type="text" id="heightSize" class="form-control" name="heightSize" required />
-                    <label class="form-label" for="heightSize">ความสูง</label>
-                </div>
-                <select class="form-select" style="height: 35px;" id="unitSize" name="unitSize">
-                    <option value="inch">นิ้ว (Inch)</option>
-                    <option value="mm">มิลลิเมตร (MM)</option>
-                    <option value="cm">เซ็นติเมตร (CM)</option>
-                </select>
-                <input type="hidden" id="id" name="option_id" value="" />
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary " data-mdb-dismiss="modal">ยกเลิก</button>
-                    <button type="button" class="btn btn-primary" onclick="addSize()"
-                        data-mdb-dismiss="modal">ยืนยัน</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
 <div class="mb-5" id="<%= count++ %>">
-    <input type="text" name="spec" value="รูปแบบ" hidden>
+    <input type="text" name="spec" value="ประเภทกระดาษ" hidden>
     <legend>ประเภทกระดาษ</legend>
     <hr>
     <div class="form-check ps-0">
@@ -71,10 +8,10 @@
             <div class="border">
                 <img class="selectedimg" id="selectedimg<%= count %>" src="" alt="" style="width: 80px; height: 80px;">
             </div>
-            <select name="option" id="papertype" class="form-select radio-choice" data-img-id="<%= count %>">
+            <select name="option[]" id="papertype" class="form-select radio-choice" data-img-id="<%= count %>">
                 <% options.forEach((option) => { %>
-                <% if(option.parcel_type === 'papertype'){ %>
-                <option value="<%= option.option_name %>" data-price="<%= option.option_perPrice %>"
+                <% if(option.option_type === 'papertype'){ %>
+                <option value="<%= option.option_id %>" data-price="<%= option.price_per_unit %>"
                     data-img="<%= option.option_img %>">
                     <%= option.option_name %>
                 </option>
@@ -87,7 +24,7 @@
 
 
 <div class="mb-5" id="<%= count++ %>">
-    <input type="text" name="spec" value="รูปแบบ" hidden>
+    <input type="text" name="spec" value="การปั้ม" hidden>
     <legend>การปั้ม</legend>
     <hr>
     <div class="form-check ps-0">
@@ -95,10 +32,10 @@
             <div class="border">
                 <img class="selectedimg" id="selectedimg<%= count %>" src="" alt="" style="width: 80px; height: 80px;">
             </div>
-            <select name="option" id="pumping" class="form-select radio-choice" data-img-id="<%= count %>">
+            <select name="option[]" id="pumping" class="form-select radio-choice" data-img-id="<%= count %>">
                 <% options.forEach((option) => { %>
-                <% if(option.parcel_type === 'pumping'){ %>
-                <option value="<%= option.option_name %>" data-price="<%= option.option_perPrice %>"
+                <% if(option.option_type === 'pumping'){ %>
+                <option value="<%= option.option_id %>" data-price="<%= option.price_per_unit %>"
                     data-img="<%= option.option_img %>">
                     <%= option.option_name %>
                 </option>
@@ -110,7 +47,7 @@
 </div>
 
 <div class="mb-5" id="<%= count++ %>">
-    <input type="text" name="spec" value="รูปแบบ" hidden>
+    <input type="text" name="spec" value="การไดคัท" hidden>
     <legend>การไดคัท</legend>
     <hr>
     <div class="form-check ps-0">
@@ -118,10 +55,10 @@
             <div class="border">
                 <img class="selectedimg" id="selectedimg<%= count %>" src="" alt="" style="width: 80px; height: 80px;">
             </div>
-            <select name="option" id="die-cut" class="form-select radio-choice" data-img-id="<%= count %>">
+            <select name="option[]" id="die-cut" class="form-select radio-choice" data-img-id="<%= count %>">
                 <% options.forEach((option) => { %>
-                <% if(option.parcel_type === 'die-cut'){ %>
-                <option value="<%= option.option_name %>" data-price="<%= option.option_perPrice %>"
+                <% if(option.option_type === 'die-cut'){ %>
+                <option value="<%= option.option_id %>" data-price="<%= option.price_per_unit %>"
                     data-img="<%= option.option_img %>">
                     <%= option.option_name %>
                 </option>
@@ -132,48 +69,6 @@
     </div>
 </div>
 
-<div class="mb-5" id="<%= count++ %>">
-    <legend>จำนวน</legend>
-    <hr>
-    <select name="qt" id="qt-select" class="form-select">
-        <option value="1">1 แผ่น</option>
-        <option value='5'>5 แผ่น</option>
-        <option value="10">10 แผ่น</option>
-        <option value="50">50 แผ่น</option>
-        <option value="100">100 แผ่น</option>
-        <option value="200">200 แผ่น</option>
-        <option value="500">500 แผ่น</option>
-        <option value="1000">1000 แผ่น</option>
-        <option value="2000">2000 แผ่น</option>
-    </select>
-    <p>จำนวนดวงสติ๊กเกอร์ที่จะได้ทั้งหมดคือ <span id="all-sticker"></span> ดวง</p>
-
-    <button type="button" class="btn btn-primary w-100 mt-2 fs-6" data-mdb-toggle="modal"
-        data-mdb-target="#customQtModal" onclick="addQt()">กำหนดจำนวนเอง</button>
-</div>
-
-<div class="modal fade slidedown" id="customQtModal" tabindex="-1" aria-labelledby="customSizeModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editModalLabel">กำหนดจำนวน</h5>
-                <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="form-outline mb-2">
-                    <input type="text" id="custom-qt" class="form-control" name="widthSize" required />
-                    <label class="form-label" for="widthSize">จำนวน</label>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary " data-mdb-dismiss="modal">ยกเลิก</button>
-                    <button type="button" class="btn btn-primary" onclick="addQt()"
-                        data-mdb-dismiss="modal">ยืนยัน</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
 <!-- <div class="form-check">
         <input class="form-check-input" value="1" type="radio" name="flexRadioDefault" id="flexRadioDefault1" checked>
@@ -192,82 +87,3 @@
         <label class="form-label" for="widthSize">จำนวน</label>
     </div> -->
 </div>
-
-<script>
-    const sizeSelect = document.getElementById('size')
-    const selectQt = document.getElementById('qt-select');
-    const allsum = document.getElementById('all-sticker')
-    const perStickerElement = document.getElementById('per-sticker').textContent;
-
-    function updatePerSticker() {
-        const selected = sizeSelect.value;
-        const number = document.getElementById('per-sticker');
-        const [width, height] = selected.split('x');
-        let x = Math.floor((32.9 / width)) * Math.floor((48.3 / height));
-        number.textContent = Math.floor(x);
-    }
-
-    function updateAllSticker() {
-        const selected = sizeSelect.value;
-        const [width, height] = selected.split('x');
-        let x = Math.floor((32.9 / width)) * Math.floor((48.3 / height));
-
-        // const numSticker = parseInt(perStickerElement);
-        const selectedQt = selectQt.value;
-        let y = selectedQt * x;
-        allsum.textContent = y;
-    }
-
-
-
-    function addSize() {
-        const width = document.getElementById('widthSize').value;
-        const height = document.getElementById('heightSize').value;
-        const unit = document.getElementById('unitSize').value;
-
-        let value;
-        let text;
-
-        if (unit === 'inch') {
-            const calWidth = width * 2.54;
-            const calheight = height * 2.54;
-            value = `${calWidth}x${calheight}`;
-            text = `${width} x ${height} inch (${calWidth} x ${calheight} cm)`;
-        } else if (unit === 'mm') {
-            const calWidth = width * 0.1;
-            const calheight = height * 0.1;
-            value = `${calWidth}x${calheight}`;
-            text = `${width} x ${height} inch (${calWidth} x ${calheight} cm)`;
-        } else if (unit === 'cm') {
-            value = `${width}x${height}`;
-            text = `${width} x ${height} cm`;
-        }
-
-        // Create a new option element
-        const option = document.createElement('option');
-        option.value = value;
-        option.textContent = text;
-        option.selected = true;
-        sizeSelect.appendChild(option);
-        sizeSelect.addEventListener('change', updatePerSticker);
-        updatePerSticker()
-
-    }
-
-    function addQt() {
-        const qt = document.getElementById('custom-qt').value;
-        const option = document.createElement('option');
-        console.log(qt);
-        option.value = qt;
-        option.textContent = qt + ' แผ่น';
-        option.selected = true;
-        selectQt.appendChild(option);
-    }
-
-    sizeSelect.addEventListener('change', updatePerSticker);
-    updatePerSticker()
-
-    sizeSelect.addEventListener('change', updateAllSticker);
-    selectQt.addEventListener('change', updateAllSticker);
-    updateAllSticker()
-</script>

@@ -1,4 +1,8 @@
 const express = require('express');
+const fs = require('fs');
+const crypto = require('crypto');
+const path = require('path');
+const axios = require('axios');
 const registerController = require('../controllers/registerController');
 const loginController = require('../controllers/loginController');
 const userController = require('../controllers/userController')
@@ -9,11 +13,12 @@ const verifyToken = require('../config/verifyToken');
 const dbConnection = require("../config/database");
 const resetPassword = require("../controllers/resetPassword");
 const optionsController = require("../controllers/optionsController");
-
-
-// const initPassportLocal = require('../controllers/passport')
-// initPassportLocal()
-
+const productsController = require('../controllers/productsController');
+const couponController = require('../controllers/couponController');
+const promotionController = require('../controllers/promotionController');
+const orderController = require('../controllers/orderController');
+const paymentController = require('../controllers/paymentController');
+const shipmentController = require('../controllers/shipmentController');
 
 let Routes = (app) => {
 
@@ -38,6 +43,12 @@ let Routes = (app) => {
     router.get("/register", registerController.getRegisterPage, loginController.checkLoggedOut);
     router.post("/register", registerController.validateReg, registerController.createNewUserController);
     router.get("/verify", registerController.verify);
+    router.get('/sucessfulRegister', (req, res) => {
+        res.render('pages/scRegister', {
+            Title: 'Clipart Press',
+        });
+    });
+
     // เข้าสู่ระบบ
     router.get("/login", loginController.checkLoggedOut, loginController.getPageLogin);
     router.post("/login", loginController.login);
@@ -96,7 +107,7 @@ let Routes = (app) => {
 
     // ที่อยู่ 
     router.get('/address', verifyToken, (req, res) => {
-        dbConnection.query('SELECT * FROM address WHERE user_id = ? AND deleted_at is NULL', [req.session.user_id]).then(([data]) => {
+        dbConnection.query('SELECT * FROM address WHERE user_id = ? AND deleted_at is NULL ORDER BY address.default_address DESC', [req.session.user_id]).then(([data]) => {
             res.render('pages/address', {
                 currentMenu: 'ที่อยู่',
                 address: data,
@@ -105,7 +116,7 @@ let Routes = (app) => {
         })
     });
     router.post("/address", userController.checkInputAddress, userController.addAddress)
-    router.post("/updateAddress", userController.editAddress)
+    router.post("/updateAddress/:id", userController.editAddress)
     router.post("/deleteAddress", userController.deleteAddress)
 
     // เปลี่ยนรหัสผ่าน
@@ -120,14 +131,21 @@ let Routes = (app) => {
 
     // หน้าสินค้าทั้งหมด
     router.get('/product/all/', (req, res) => {
-        dbConnection.query('SELECT * FROM product WHERE deleted_at is null')
-            .then(([products]) => {
-                res.render('pages/product', {
-                    currentMenu: "สินค้า",
-                    products: products,
-                    currentLink: "allproduct"
-                })
+        dbConnection.query('SELECT pm.*, p.*, phm.* FROM promotions pm JOIN product_has_promotion phm ON phm.promo_id = pm.promo_id ' +
+            'JOIN product p ON p.product_id = phm.product_id WHERE pm.deleted_at IS null AND phm.deleted_at IS null').then(([promotions]) => {
+            dbConnection.query('SELECT s.*, q.* FROM pricingTiers_size s JOIN pricingTiers_qty q ON q.product_id = s.product_id WHERE s.deleted_at IS null || q.deleted_at IS null').then(([priceTiers]) => {
+                dbConnection.query('SELECT * FROM product WHERE deleted_at is null')
+                    .then(([products]) => {
+                        res.render('pages/product', {
+                            currentMenu: "สินค้า",
+                            products: products,
+                            currentLink: "allproduct",
+                            promotions: promotions,
+                            priceTiers: priceTiers
+                        })
+                    })
             })
+        })
     });
     // router.get('/product/categories/:id', (req, res) => {
     //     const categoryId = req.params.id;
@@ -145,15 +163,16 @@ let Routes = (app) => {
 
     //         })
     // });
-
     // หน้ารายละเอียดสินค้าและเลือกสเปค
+    // SELECT o.*, op.* FROM options o JOIN options_product op ON op.option_id = o.option_id WHERE JSON_CONTAINS(op.product_id, JSON_ARRAY(?)) AND o.deleted_at IS NULL
     // `SELECT p.*, o.*, op.* FROM options_product op JOIN options o ON o.option_id = op.option_id JOIN product p ON p.product_id = op.product_id WHERE o.deleted_at IS null AND p.product_id = ?`
     // `SELECT p.*, o.* FROM product p JOIN options o ON JSON_CONTAINS(o.product_id, JSON_ARRAY(?)) WHERE p.product_id = ?`
+    //SELECT o.*, po.* FROM options o JOIN product_options po ON JSON_SEARCH(po.option_id, 'all', CAST(o.option_id AS CHAR)) IS NOT NULL WHERE po.product_id = ${productId}
     router.get('/product/item/:id', async (req, res) => {
         const productId = req.params.id;
         await dbConnection.query(`SELECT * FROM product WHERE product_id = ${productId}`)
             .then(async ([row]) => {
-                await dbConnection.query(`SELECT o.*, op.* FROM options o JOIN options_product op ON op.option_id = o.option_id WHERE JSON_CONTAINS(op.product_id, JSON_ARRAY(?)) AND o.deleted_at IS NULL`, [productId])
+                await dbConnection.query(`SELECT po.* , o.* FROM options o JOIN product_options po ON po.option_id = o.option_id WHERE po.product_id = ${productId} AND po.deleted_at IS NULL`, )
                     .then(([rows]) => {
                         // const product = {
                         //     product_id: rows.product_id,
@@ -170,48 +189,271 @@ let Routes = (app) => {
                                 option_name: row.option_name,
                                 option_img: row.option_img,
                                 price_per_unit: row.price_per_unit,
-                                parcel_type: row.parcel_type,
+                                option_type: row.option_type,
                                 description: row.description,
                                 // Add other option properties as needed
                             };
                         });
-                        dbConnection.query('SELECT * FROM pricingQt_tier WHERE product_id = ?', [productId])
-                            .then(([tiers]) => {
-                                dbConnection.query('SELECT * FROM pricingSize_tier WHERE product_id = ?', [productId])
-                                    .then(([sizes]) => {
-                                        res.render('pages/product_detail', {
-                                            currentMenu: "",
-                                            product: row[0],
-                                            options: options,
-                                            tiers: tiers,
-                                            sizes: sizes,
-                                            currentLink: ""
+                        dbConnection.query('SELECT * FROM pricingTiers_size WHERE product_id = ?', [productId]).then(([sizeTiers]) => {
+                            dbConnection.query('SELECT * FROM pricingTiers_qty WHERE product_id = ?', [productId])
+                                .then(([qtyTiers]) => {
+                                    dbConnection.query('SELECT pm.*, p.*, phm.* FROM promotions pm JOIN product_has_promotion phm ON phm.promo_id = pm.promo_id ' +
+                                            'JOIN product p ON p.product_id = phm.product_id WHERE pm.deleted_at IS null AND phm.deleted_at IS null AND phm.product_id = ?', productId)
+                                        .then(([promotions]) => {
+                                            res.render('pages/product_detail', {
+                                                currentMenu: "",
+                                                product: row[0],
+                                                options: options,
+                                                sizeTiers: sizeTiers,
+                                                qtyTiers: qtyTiers,
+                                                promotions: promotions,
+                                                currentLink: ""
+                                            })
                                         })
-                                    })
-                            })
+                                })
+                        });
                     })
             })
     });
 
     router.post('/addtocart', cart.upload.single('designfile'), cart.insertCart)
-    router.get('/cart', (req, res) => {
-        dbConnection.query(`SELECT c.*, p.* From cart c JOIN product p ON c.product_id = p.product_id ` +
-                `WHERE c.user_id = '${req.session.user_id}' AND c.deleted_at IS NULL`)
-            .then(([products]) => {
-                res.render('pages/cart', {
-                    currentMenu: "รถเข็น",
-                    cartlist: products,
-                    currentLink: ""
-                })
-            })
+    router.get('/cart', verifyToken, (req, res) => {
+        // `SELECT c.*, sp.*, o.*, p.*, ohs.* From cart c JOIN selected_product_option sp ON c.selected_option_id = sp.selected_option_id ` +
+        // `JOIN options_has_selected ohs ON ohs.selected_option_id = sp.selected_option_id ` +
+        // `JOIN options o ON o.option_id = ohs.option_id JOIN product p ON p.product_id = c.product_id ` +
+        // `WHERE c.user_id = '${req.session.user_id}' AND c.deleted_at IS NULL`
+        dbConnection.query(`SELECT c.*, p.*, cd.*, cso.*, o.* FROM cart c JOIN product p ON p.product_id = c.product_id JOIN cart_detail cd ON cd.cart_detail_id = c.cart_detail_id ` +
+                `JOIN cart_selected_options cso ON cso.cart_detail_id = cd.cart_detail_id JOIN options o ON o.option_id = cso.option_id WHERE c.user_id = '${req.session.user_id}' AND c.deleted_at IS NULL`)
+            .then(([rows]) => {
+                dbConnection.query('SELECT pm.*, p.*, phm.* FROM promotions pm JOIN product_has_promotion phm ON phm.promo_id = pm.promo_id ' +
+                        'JOIN product p ON p.product_id = phm.product_id WHERE pm.deleted_at IS null AND phm.deleted_at IS null')
+                    .then(([promotions]) => {
+                        const cartsItem = [];
+                        rows.forEach((row) => {
+                            // Check if the cart item already exists in cartsItem array
+                            const existingCartItem = cartsItem.find((item) => item.cart_id === row.cart_id);
+                            if (existingCartItem) {
+                                // Add the option to the existing cart item
+                                existingCartItem.options.push({
+                                    option_id: row.option_id,
+                                    option_name: row.option_name,
+                                    option_type: row.option_type
+                                });
+                            } else {
+                                // Create a new cart item and add it to cartsItem array
+                                const cartItem = {
+                                    cart_id: row.cart_id,
+                                    user_id: row.user_id,
+                                    product_id: row.product_id,
+                                    productName: row.productName,
+                                    picture: row.picture,
+                                    size: row.size,
+                                    quantity: row.quantity,
+                                    price: row.price,
+                                    options: [{
+                                        option_id: row.option_id,
+                                        option_name: row.option_name,
+                                        option_type: row.option_type
+                                    }],
+                                };
+                                cartsItem.push(cartItem);
+                            }
+                        });
 
+                        res.render('pages/cart', {
+                            currentMenu: "รถเข็น",
+                            cartsItem: cartsItem,
+                            // options: options,
+                            promotions: promotions,
+                            currentLink: ""
+                        })
+                    })
+            })
     });
+
+    router.get('/getCoupon', (req, res) => {
+        const data = {};
+        // 'SELECT cp.*, cu.* FROM coupon cp JOIN users_use_coupon cu ON cu.coupon_id = cp.coupon_id'
+        dbConnection.query('SELECT * FROM coupon WHERE deleted_at is null').then(([coupons]) => {
+            data.coupons = coupons;
+            dbConnection.query('SELECT c.*, o.* FROM coupon c JOIN orders o ON o.coupon_id = c.coupon_id').then(([coupons_used]) => {
+                data.coupons_used = coupons_used;
+                try {
+                    res.json(data)
+                } catch (error) {
+                    if (error) throw error
+                }
+            })
+        })
+    })
+
+    router.get('/editproduct-cart/:productid/:cartid', async (req, res) => {
+        const productId = req.params.productid;
+        const cartid = req.params.cartid;
+        await dbConnection.query(`SELECT * FROM product WHERE product_id = ${productId}`)
+            .then(async ([row]) => {
+                await dbConnection.query(`SELECT po.* , o.* FROM options o JOIN product_options po ON po.option_id = o.option_id WHERE po.product_id = ${productId} AND po.deleted_at IS NULL`, )
+                    .then(([rows]) => {
+
+                        const flattenedRows = rows.flat();
+                        const options = flattenedRows.map(row => {
+                            return {
+                                option_id: row.option_id,
+                                option_name: row.option_name,
+                                option_img: row.option_img,
+                                price_per_unit: row.price_per_unit,
+                                option_type: row.option_type,
+                                description: row.description,
+                            };
+                        });
+
+
+                        dbConnection.query('SELECT * FROM pricingTiers_size WHERE product_id = ?', [productId]).then(([sizeTiers]) => {
+                            dbConnection.query('SELECT * FROM pricingTiers_qty WHERE product_id = ?', [productId])
+                                .then(([qtyTiers]) => {
+                                    dbConnection.query('SELECT pm.*, p.*, phm.* FROM promotions pm JOIN product_has_promotion phm ON phm.promo_id = pm.promo_id ' +
+                                            'JOIN product p ON p.product_id = phm.product_id WHERE pm.deleted_at IS null AND phm.deleted_at IS null AND phm.product_id = ?', productId)
+                                        .then(([promotions]) => {
+                                            dbConnection.query('SELECT o.*, cso.*, cd.*, c.* FROM options o JOIN cart_selected_options cso ON cso.option_id = o.option_id ' +
+                                                    'JOIN cart_detail cd ON cd.cart_detail_id = cso.cart_detail_id JOIN cart c ON c.cart_detail_id = cd.cart_detail_id WHERE c.cart_id = ? AND c.product_id = ? AND c.user_id = ?', [cartid, productId, req.session.user_id])
+                                                .then(([rows]) => {
+                                                    const cartsItem = [];
+                                                    rows.forEach((row) => {
+                                                        const existingCartItem = cartsItem.find((item) => item.cart_id === row.cart_id);
+                                                        if (existingCartItem) {
+                                                            existingCartItem.options.push({
+                                                                option_id: row.option_id,
+                                                                option_name: row.option_name,
+                                                                option_type: row.option_type
+                                                            });
+                                                        } else {
+                                                            const cartItem = {
+                                                                cart_id: row.cart_id,
+                                                                cart_detail_id: row.cart_detail_id,
+                                                                user_id: row.user_id,
+                                                                product_id: row.product_id,
+                                                                productName: row.productName,
+                                                                picture: row.picture,
+                                                                size: row.size,
+                                                                quantity: row.quantity,
+                                                                price: row.price,
+                                                                design_file: row.design_file,
+                                                                options: [{
+                                                                    option_id: row.option_id,
+                                                                    option_name: row.option_name,
+                                                                    option_type: row.option_type
+                                                                }],
+                                                            };
+                                                            cartsItem.push(cartItem);
+                                                        }
+                                                    });
+                                                    if (!req.session.user_id) {
+                                                        res.redirect('/')
+                                                    } else {
+                                                        res.render('pages/editCartProduct', {
+                                                            currentMenu: "",
+                                                            product: row[0],
+                                                            options: options,
+                                                            sizeTiers: sizeTiers,
+                                                            qtyTiers: qtyTiers,
+                                                            promotions: promotions,
+                                                            cart_detail: cartsItem,
+                                                            currentLink: ""
+                                                        })
+                                                    }
+
+                                                })
+                                        })
+                                })
+                        });
+                    })
+            })
+    });
+
+
+    router.post('/updateCart/:cartDetailid', cart.upload.single('designfile'), cart.updateCart)
     router.post('/deleteCart', cart.deleteCart)
 
+    router.get('/checkout', async (req, res) => {
+        await dbConnection.query(`SELECT c.*, p.*, cd.*, cso.*, o.* FROM cart c JOIN product p ON p.product_id = c.product_id JOIN cart_detail cd ON cd.cart_detail_id = c.cart_detail_id ` +
+                `JOIN cart_selected_options cso ON cso.cart_detail_id = cd.cart_detail_id JOIN options o ON o.option_id = cso.option_id WHERE c.user_id = '${req.session.user_id}' AND c.deleted_at IS NULL`)
+            .then(async ([rows]) => {
+                await dbConnection.query('SELECT pm.*, p.*, phm.* FROM promotions pm JOIN product_has_promotion phm ON phm.promo_id = pm.promo_id ' +
+                        'JOIN product p ON p.product_id = phm.product_id WHERE pm.deleted_at IS null AND phm.deleted_at IS null')
+                    .then(async ([promotions]) => {
+                        await dbConnection.query('SELECT * FROM address WHERE user_id = ? AND deleted_at is NULL ORDER BY address.default_address DESC', [req.session.user_id]).then(async ([address]) => {
+                            const cartsItem = [];
+                            rows.forEach((row) => {
+                                // Check if the cart item already exists in cartsItem array
+                                const existingCartItem = cartsItem.find((item) => item.cart_id === row.cart_id);
+                                if (existingCartItem) {
+                                    // Add the option to the existing cart item
+                                    existingCartItem.options.push({
+                                        option_id: row.option_id,
+                                        option_name: row.option_name,
+                                        option_type: row.option_type
+                                    });
+                                } else {
+                                    // Create a new cart item and add it to cartsItem array
+                                    const cartItem = {
+                                        cart_id: row.cart_id,
+                                        user_id: row.user_id,
+                                        product_id: row.product_id,
+                                        productName: row.productName,
+                                        picture: row.picture,
+                                        size: row.size,
+                                        quantity: row.quantity,
+                                        price: row.price,
+                                        options: [{
+                                            option_id: row.option_id,
+                                            option_name: row.option_name,
+                                            option_type: row.option_type
+                                        }],
+                                    };
+                                    cartsItem.push(cartItem);
+                                }
+                            });
+                            await dbConnection.query('SELECT * FROM shipments WHERE deleted_at IS NULL').then(async ([shipments]) => {
+                                await dbConnection.query('SELECT * FROM bank WHERE deleted_at IS NULL').then(async ([banks]) => {
+                                    await dbConnection.query('SELECT * FROM promptpay WHERE status = 1').then(async ([promptpay]) => {
+                                        res.render('pages/checkout', {
+                                            currentMenu: "เช็คเอาท์",
+                                            cartsItem: cartsItem,
+                                            // options: options,
+                                            currentLink: "",
+                                            address: address,
+                                            promotions: promotions,
+                                            shipments: shipments,
+                                            banks: banks,
+                                            promptpay: promptpay,
+                                        })
+                                    })
+                                })
+                            })
+                        })
+                    });
+            });
+    });
+
+    router.get('/placeOrder/:userid', orderController.placeOrder)
+    router.get('/myorder', (req, res) => {
+        res.render('pages/myorder', {
+            currentMenu: 'รายการที่สั่ง',
+            Title: 'Clipart Press || รายการที่สั่ง',
+            currentLink: "myorder"
+        });
+    })
+    router.get('/invoices', (req, res) => {
+        res.render('pages/invoices', {
+            currentMenu: 'รายการที่สั่ง',
+            Title: 'Clipart Press || รายการที่สั่ง',
+            currentLink: "myorder"
+        });
+    })
     router.get('/example', (req, res) => {
         res.render('pages/example', {
             currentMenu: 'ตัวอย่างงาน',
-            Title: 'Clipart Press',
+            Title: 'Clipart Press || ตัวอย่างงาน',
             currentLink: "example"
         });
     });
@@ -224,14 +466,16 @@ let Routes = (app) => {
         });
     });
 
-    router.get('/template', (req, res) => {
-        res.render('pages/editor/template', {});
-    });
-
     // ---------------------------------------------------------------------------------------------------
     // แอดมิน
+    router.get('/admin/dashborad', (req, res) => {
+        res.render('pages/admin/admin_dashborad', {
+            currentLink: "dashborad"
+        })
+    })
+
     router.get('/admin/product-list', (req, res) => {
-        dbConnection.query('SELECT * FROM product WHERE deleted_at is NULL').then(([data]) => {
+        dbConnection.query('SELECT * FROM product WHERE deleted_at is NULL ORDER BY product_id ASC').then(([data]) => {
             // console.log(data)
             res.render('pages/admin/product-list', {
                 products: data,
@@ -242,56 +486,69 @@ let Routes = (app) => {
 
     // เพิ่มสินค้า 
     router.get('/admin/addproduct', async (req, res) => {
-        res.render('pages/admin/addproduct', {
-            currentLink: "addproduct"
+        dbConnection.query('SELECT * FROM options WHERE deleted_at is NULL').then(([rows]) => {
+            res.render('pages/admin/addproduct', {
+                currentLink: "addproduct",
+                options: rows,
+            })
         })
     });
-    router.post("/addproduct", adminController.upload_product.single('imgproduct'), adminController.addProduct);
-    router.post("/updateProduct/:id", adminController.upload_product.single('imgproduct'), adminController.updateProduct); //แก้ไขสินค้า
+    router.post("/addproduct", productsController.upload_product.single('imgproduct'), productsController.addProduct);
 
     router.get('/admin/product/edit/:id', async (req, res) => {
         const productId = req.params.id;
-        await dbConnection.query('SELECT p.*, qp.* FROM product p JOIN pricingQt_tier qp ON qp.product_id = p.product_id WHERE p.product_id = ? ORDER BY qp.minqt ASC', productId).then(([rows]) => {
-            dbConnection.query('SELECT * FROM pricingSize_tier WHERE product_id = ? ORDER BY minsize ASC', productId).then(([size]) => {
-                res.render('pages/admin/editproduct', {
-                    product: rows[0],
-                    priceTiers: rows,
-                    sizeTiers: size,
-                    currentLink: "addproduct"
+        dbConnection.query('SELECT * FROM product WHERE product_id = ?', productId).then(([product]) => {
+            dbConnection.query('SELECT * FROM pricingTiers_size WHERE product_id = ? AND deleted_at IS NULL', productId).then(([sizeTier]) => {
+                dbConnection.query('SELECT * FROM pricingTiers_qty WHERE product_id = ? AND deleted_at IS NULL', productId).then(([qtyTier]) => {
+                    dbConnection.query('SELECT po.* , o.* FROM options o JOIN product_options po ON po.option_id = o.option_id WHERE po.product_id = ? AND po.deleted_at IS NULL', productId).then(([op]) => {
+                        dbConnection.query('SELECT * FROM options WHERE deleted_at is NULL').then(([options]) => {
+
+                            // rows.forEach((row) => {
+                            //     // Check if a size with the same id already exists in sizes
+                            //     let size = sizes.find((s) => s.id === row.id);
+
+                            //     if (!size) {
+                            //         size = {
+                            //             id: row.id,
+                            //             width: row.width,
+                            //             height: row.height,
+                            //             pricingTiers: [],
+                            //         };
+                            //         sizes.push(size);
+                            //     }
+                            //     size.pricingTiers.push({
+                            //         tier_id: row.tier_id,
+                            //         quantity: row.quantity,
+                            //         price: row.price,
+                            //         size_id: row.size_id,
+                            //     });
+                            // });
+
+                            res.render('pages/admin/editproduct', {
+                                product: product[0],
+                                qtyTier: qtyTier,
+                                sizeTier: sizeTier,
+                                selectedOp: op,
+                                options: options,
+                                currentLink: "addproduct"
+                            })
+                        })
+                    })
                 })
             })
         })
     });
+    router.post("/updateProduct/:id", productsController.upload_product.single('imgproduct'), productsController.updateProduct); //แก้ไขสินค้า
+    router.delete("/deleteQt/:id", productsController.deleteQt);
+    router.delete("/deleteSize/:id", productsController.deleteSize);
 
-    router.post("/deleteProduct", adminController.deleteProduct);
 
-    // หน้าประเภท
-    // router.get('/admin/typeproduct', (req, res) => {
-    //     dbConnection.query('SELECT * FROM categories WHERE deleted_at is NULL').then(([data]) => {
-    //         // console.log(data)
-    //         res.render('pages/admin/typeproduct', {
-    //             types: data,
-    //             currentLink: "typeproduct"
-    //         })
-    //     })
-    //     // res.render('pages/typeproduct',{
-    //     //     currentLink: "typeproduct",
-    //     // })
-    // });
+    router.post("/deleteProduct/", adminController.deleteProduct);
 
-    // router.post("/addtype", categoriesController.addType) //เพิ่มประเภท
-    // router.post("/updateType", categoriesController.editType) //แก้ไขประเภท
-    // router.post("/deleteType", categoriesController.deleteType) //แก้ไขประเภท
-    // router.get('/typeproduct/:id',(req, res) => {
-    //     dbConnection.query('SELECT * FROM categories WHERE categoriesID = ?', [req.params.categoriesID]).then(([data]) => {
-    //         res.render('pages/typeproduct', {types : data[0], currentLink: "typeproduct"
-    //         })
-    //     })
-    // });
 
     //หน้าจัดการตัวเลือกวัสดุ 
     router.get('/admin/options', (req, res) => {
-        dbConnection.query('SELECT * FROM options WHERE deleted_at IS NULL').then(([option]) => {
+        dbConnection.query('SELECT * FROM options WHERE deleted_at IS NULL ORDER BY option_id ASC').then(([option]) => {
             dbConnection.query('SELECT * FROM product WHERE deleted_at is NULL').then(([product]) => {
                 res.render('pages/admin/optionValue', {
                     products: product,
@@ -315,6 +572,210 @@ let Routes = (app) => {
     router.post('/deleteOption', optionsController.deleteOption);
 
 
+    // หน้าจัดการออเดอร์
+    router.get('/admin/orders', (req, res) => {
+        res.render('pages/admin/order', {
+            currentLink: "order"
+        })
+    })
+
+    // discount
+    router.get('/admin/promotion', (req, res) => {
+        dbConnection.query('SELECT * FROM promotions WHERE deleted_at IS null').then(([promotions]) => {
+            dbConnection.query('SELECT pm.*, p.*, phm.* FROM promotions pm JOIN product_has_promotion phm ON phm.promo_id = pm.promo_id ' +
+                'JOIN product p ON p.product_id = phm.product_id WHERE p.deleted_at IS null AND phm.deleted_at IS null').then(([rows]) => {
+
+                const promos = [];
+
+                // rows.forEach((row) => {
+                //     let promo = promos.find((p) => p.id === row.id);
+                //     if (!promo) {
+                //         promo = {
+                //             id: row.promo_id,
+                //             promo_name: row.promo_name,
+                //             promo_type: row.promo_type,
+                //             start_date: row.start_date,
+                //             end_date: row.end_date,
+                //             status: row.status,
+                //             product: []
+                //         };
+                //         promos.push(promo);
+                //     }
+                //     promo.product.push({
+                //         productName: row.productName
+                //     });
+                // });
+
+                res.render('pages/admin/promotion', {
+                    currentLink: "promotion",
+                    promotions: promotions,
+                    product: rows,
+                })
+            })
+        })
+    })
+
+    router.get('/admin/promotion/addpromotion', (req, res) => {
+        dbConnection.query('SELECT * FROM product WHERE deleted_at IS NULL').then(([products]) => {
+            dbConnection.query('SELECT pm.*, p.*, phm.* FROM promotions pm JOIN product_has_promotion phm ON phm.promo_id = pm.promo_id ' +
+                'JOIN product p ON p.product_id = phm.product_id ').then(([rows]) => {
+                res.render('pages/admin/addPromotion', {
+                    currentLink: "promotion",
+                    products: products,
+                    promotions: rows
+                })
+            })
+        })
+    })
+    router.post('/addpromotion', promotionController.addPromotion);
+
+
+    router.get('/admin/promotion/edit/:id', async (req, res) => {
+        const id = req.params.id;
+        dbConnection.query('SELECT pm.*, p.*, phm.* FROM promotions pm JOIN product_has_promotion phm ON phm.promo_id = pm.promo_id ' +
+                'JOIN product p ON p.product_id = phm.product_id WHERE pm.promo_id = ? AND phm.deleted_at IS null', id)
+            .then(([rows]) => {
+                dbConnection.query('SELECT * FROM promotions WHERE promo_id = ?', id).then(([promo]) => {
+                    dbConnection.query('SELECT * FROM product WHERE deleted_at IS NULL').then(([products]) => {
+                        if (promo[0].deleted_at !== null) {
+                            req.flash("errors", 'ไม่มีข้อมูลโปรโมชั่นนี้');
+                            res.redirect('/admin/promotion')
+                        } else {
+                            res.render('pages/admin/editPromotion', {
+                                currentLink: "promotion",
+                                products: products,
+                                promotions: rows[0],
+                                selectedProduct: rows
+                            })
+                        }
+                    })
+                })
+            })
+    });
+    router.post('/updatePromotion/:id', promotionController.updatePromotion);
+    router.post('/deletePromotion', promotionController.deletePromotion);
+
+    router.get('/admin/coupon', (req, res) => {
+        dbConnection.query('SELECT * FROM coupon WHERE deleted_at IS NULL').then(([rows]) => {
+            res.render('pages/admin/coupon', {
+                currentLink: "coupon",
+                coupons: rows
+            })
+        })
+    })
+    router.post('/addcoupon', couponController.addCoupon);
+    router.post('/updatecoupon', couponController.updateCoupon);
+    router.post('/deleteCoupon', couponController.deleteCoupon);
+
+
+    router.get('/admin/shipment', (req, res) => {
+        dbConnection.query('SELECT * FROM shipments WHERE deleted_at IS NULL').then(([rows]) => {
+            res.render('pages/admin/shipment', {
+                currentLink: "shipment",
+                shipments: rows
+            })
+        })
+    })
+    router.get('/admin/shipment/addshipment', (req, res) => {
+        res.render('pages/admin/addShipment', {
+            currentLink: "shipment",
+        })
+    })
+    router.get('/admin/shipment/editshipment/:id', (req, res) => {
+        const id = req.params.id;
+        dbConnection.query('SELECT s.*, sp.* FROM shipments s INNER JOIN shipments_price sp ON sp.shipment_id = s.shipment_id WHERE s.shipment_id = ? AND sp.deleted_at IS NULL', id).then(([rows]) => {
+            res.render('pages/admin/editShipment', {
+                currentLink: "shipment",
+                shipments: rows
+            })
+        })
+    })
+    router.post('/addshipment', shipmentController.addShipment);
+    router.post('/editshipment/:id', shipmentController.updateShipment);
+    router.post('/deleteshipment/:id', shipmentController.deleteShipment);
+    router.delete('/deleteShipmentPrice/:id', shipmentController.deletePrice);
+
+
+    router.get('/admin/payment_method', (req, res) => {
+        dbConnection.query('SELECT * FROM bank WHERE deleted_at IS NULL').then(([rows]) => {
+            const decryptedBanks = [];
+            rows.forEach((row) => {
+                const key = Buffer.from('ef045d157e2df86220ee67ac37132a604f51477fef58fdaac52ed312d97a1538', 'hex');
+                const iv = Buffer.from('72d78a8a792f98f086bd892600e3638a', 'hex');
+                var encrypted = row.number;
+                const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
+                let number = decipher.update(encrypted, 'hex', 'utf8');
+                number += decipher.final('utf8');
+                const bank = {
+                    bank_id: row.bank_id,
+                    bank: row.bank,
+                    number: number,
+                    name: row.name,
+                };
+                decryptedBanks.push(bank);
+            });
+
+            dbConnection.query('SELECT * FROM promptpay').then(([pp]) => {
+                const key = Buffer.from('a83662c9b5b271e4b9ca58ec4ae7f429dc65500ac7754712a1ac75037affe7b8', 'hex');
+                const iv = Buffer.from('cfe4c9b8b0518d92cc03130106322533', 'hex');
+                const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
+                let promptpay = pp;
+
+                if (pp.length > 0) {
+                    let ppnumber = decipher.update(pp[0].number, 'hex', 'utf8');
+                    ppnumber += decipher.final('utf8');
+                    promptpay = {
+                        promptpay_id: pp[0].promptpay_id,
+                        number: ppnumber,
+                        type: pp[0].promptpay_type,
+                        name: pp[0].name,
+                        status: pp[0].status,
+                    }
+                }
+
+
+                res.render('pages/admin/payment_method', {
+                    currentLink: "payment_method",
+                    banks: decryptedBanks,
+                    promptpay: promptpay,
+                });
+            })
+            // const filePath = path.join(__dirname, '../public/json/promptpay.json');
+            // fs.readFile(filePath, 'utf8', (err, data) => {
+            //     let arr;
+            //     if (err) {
+            //         console.error(err);
+            //         arr = [];
+            //     } else {
+            //         arr = JSON.parse(data);
+            //         const key = Buffer.from('a83662c9b5b271e4b9ca58ec4ae7f429dc65500ac7754712a1ac75037affe7b8', 'hex');
+            //         const iv = Buffer.from('cfe4c9b8b0518d92cc03130106322533', 'hex');
+            //         const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
+            //         let ppnumber = decipher.update(arr[0].number, 'hex', 'utf8');
+            //         ppnumber += decipher.final('utf8');
+            //         const promptpay = {
+            //             number: ppnumber,
+            //             name: arr[0].name,
+            //             status: arr[0].status,
+            //             type: arr[0].type,
+            //         }
+            //         res.render('pages/admin/payment_method', {
+            //             currentLink: "payment_method",
+            //             banks: decryptedBanks,
+            //             promptpay: promptpay,
+            //         });
+            //     }
+            // })
+
+        });
+    });
+
+
+    router.post('/addBank', paymentController.addBank)
+    router.post('/updateBank/:id', paymentController.editBank)
+    router.post('/deleteBank/:id', paymentController.deleteBank)
+
+    router.post('/savePromptPay', paymentController.promptpay)
     // จัดการ user 
     router.get('/admin/member', (req, res) => {
         dbConnection.query('SELECT * FROM users WHERE deleted_at IS NULL AND user_role = 0').then(([rows]) => {

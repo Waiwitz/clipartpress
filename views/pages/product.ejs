@@ -1,31 +1,29 @@
 <%- include('../partials/header') %>
 
+<style>
+  .banner {
+    background-image: url('/assets/img/Flyers-Brochure-Test-mage.jpg');
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+  }
+</style>
+
 <body class="h-100" style="background-color: rgb(248, 248, 248);">
-  <script>
-    $(document).ready(function () {
-      $('#cardSection').hide();
-      $('#flyerSection').hide();
-      $('#leafletSection').hide();
-      $('#stickerSection').hide();
-      $('#billSection').hide();
-      $('#letterSection').hide();
-    });
-  </script>
   <div class="banner shadow-5-strong">
-    <img class="imageFitBox" src="/assets/img/Flyers-Brochure-Test-mage.jpg" alt="">
+    <!-- <img class="imageFitBox" src="/assets/img/Flyers-Brochure-Test-mage.jpg" alt=""> -->
     <div class="banner-content overlay">
       <div>
         <h1>สินค้างานพิมพ์</h1>
-      <ol class="breadcrumb justify-content-center bg-light shadow-5-strong">
-        <li class="breadcrumb-item"><a href="/">หน้าแรก</a></li>
-        <li class="breadcrumb-item active" aria-current="page"><%= currentMenu %></li>
-      </ol>
-    </div>
+        <ol class="breadcrumb justify-content-center bg-light shadow-5-strong">
+          <li class="breadcrumb-item"><a href="/">หน้าแรก</a></li>
+          <li class="breadcrumb-item active" aria-current="page"><%= currentMenu %></li>
+        </ol>
       </div>
+    </div>
   </div>
-  <div class="container-lg mt-5">
+  <div class="container-md mt-5">
     <div class="mt-3">
-      <div class="d-flex mb-5">
+      <div class="d-flex mb-5" id="rs-productList">
         <!-- ประเภท -->
         <ul class="cate-select-group card">
           <li href="/product/all" class="cate-button cate-active" data-target="allSection">
@@ -38,180 +36,127 @@
           <li class="cate-button" data-target="letterSection">ซองจดหมาย</li>
         </ul>
 
+        <% const cate = ["card", "flyer", "leaflet", "sticker", "bill", "letter"] %>
+        <!-- สินค้าทั้งหมด -->
+        <% let foundItem = false; %>
+        <% let pronoun; %>
 
-        <div>
-          <!-- สินค้าทั้งหมด -->
-          <div class="itemlist" id="allSection">
-            <% if(products.length > 0){ %>
-            <% products.forEach((product) => { %>
-            <div class="card m-0 me-4">
-              <a href="/product/item/<%= product.product_id %>">
-                <div class="ripple p-3 pb-1 product_list_card" data-mdb-ripple-color="light">
-                  <img src="<%= product.picture %>" class="img-fluid rounded" />
-                </div>
-              </a>
-              <div class="card-body p-3">
-                <h5 class="card-title"><%= product.productName %></h5>
-                <p class="card-text text-truncate"><%= product.description %></p>
-              </div>
-              <a href="/product/item/<%= product.product_id %>" class="w-100 position-static p-3 pb-4">
-                <button class="btn btn-primary w-100">สั่งทำ</button>
-              </a>
-            </div>
-            <% }); %>
-            <% } %>
-          </div>
-
-          <!-- นามบัตร -->
-          <div class="itemlist" id="cardSection">
-            <% if(products.length > 0){ %>
-            <% products.forEach((product) => { %>
-            <% if(product.categories === "card"){ %>
-            <div class="card m-0 me-4">
-              <a href="/product/item/<%= product.product_id %>">
-                <div class="ripple p-3 pb-1 product_list_card" data-mdb-ripple-color="light">
-                  <img src="<%= product.picture %>" class="img-fluid rounded" />
-                </div>
-              </a>
-              <div class="card-body p-3">
-                <h5 class="card-title"><%= product.productName %></h5>
-                <p class="card-text text-truncate"><%= product.description %></p>
-              </div>
-              <a href="/product/item/<%= product.product_id %>" class="w-100 position-static p-3 pb-4">
-                <button class="btn btn-primary w-100">สั่งทำ</button>
-              </a>
+        <div class="itemlist " id="allSection">
+          <% if(products.length > 0){ %>
+          <% products.forEach((product) => { %>
+          <div class="card mt-0 mb-4 <%= product.status == 0 ? 'product-refrain' : '' %> ">
+            <% if (promotions.some(promo => promo.product_id === product.product_id)) { %>
+            <div class="promo-sign">
+              <% promotions.forEach((promo) => { %>
+              <% if (promo.product_id === product.product_id) { %>
+                <%= promo.promo_name %>
+              <% } %>
+              <% }) %>
             </div>
             <% } %>
-            <% }); %>
-            <% } else { %>
-              <b>ไม่มีสินค้าประเภทนี้</b>
-            <% } %>
-          </div>
-
-          <div class="itemlist" id="flyerSection">
-            <% if(products.length > 0){ %>
-            <% products.forEach((product) => { %>
-            <% if(product.categories === "flyer"){ %>
-            <div class="card m-0 me-4">
-              <a href="/product/item/<%= product.product_id %>">
-                <div class="ripple p-3 pb-1 product_list_card" data-mdb-ripple-color="light">
-                  <img src="<%= product.picture %>" class="img-fluid rounded" />
+            <a href="/product/item/<%= product.product_id %>">
+              <div class="p-3 pb-1 product_list_card" data-bs-toggle="modal" data-id="<%= product.product_id %>"
+                data-cate="<%= product.categories %>">
+                <% if(product.status == 0) { %>
+                <div class="refrain-sign">
+                  งดรับทำ
+                </div>
+                <% } %>
+                <img src="<%= product.picture %>" class="img-fluid rounded" draggable="false" />
+              </div>
+            </a>
+            <div class="card-body p-3">
+              <h5 class="card-title"><%= product.productName %></h5>
+              <p class="card-text text-truncate"><%= product.description %></p>
+            </div>
+            <div class="p-3">
+              <% const findPrice = priceTiers.filter(price => price.product_id === product.product_id) %>
+              <% let sum = (findPrice[0].size_price + findPrice[0].qty_price) * findPrice[0].quantity %>
+              <span>ราคาเริ่มต้น <%= parseFloat(sum).toFixed(0) %> บาท ต่อ <%= findPrice[0].quantity %> ชิ้น</span>
+              <a href="/product/item/<%= product.product_id %>" class="w-100 position-static ">
+                <div class="w-100 position-static mt-3 pb-4">
+                  <button
+                    class="btn btn-primary w-100 enter-product fs-6 <%= product.status == 0 ? 'refrain-button' : '' %>"
+                    data-bs-toggle="modal" data-id="<%= product.product_id %>"
+                    data-cate="<%= product.categories %>">สั่งทำ</button>
                 </div>
               </a>
-              <div class="card-body p-3">
-                <h5 class="card-title"><%= product.productName %></h5>
-                <p class="card-text text-truncate"><%= product.description %></p>
-              </div>
-              <a href="/product/item/<%= product.product_id %>" class="w-100 position-static p-3 pb-4">
-                <button class="btn btn-primary w-100">สั่งทำ</button>
-              </a>
             </div>
-            <% } %>
-            <% }); %>
-            <% } else { %>
-              <b>ไม่มีสินค้าประเภทนี้</b>
-            <% } %>
           </div>
-
-          <div class="itemlist" id="leafletSection">
-            <% if(products.length > 0){ %>
-            <% products.forEach((product) => { %>
-            <% if(product.categories === "leaflet"){ %>
-            <div class="card m-0 me-4">
-              <a href="/product/item/<%= product.product_id %>">
-                <div class="ripple p-3 pb-1 product_list_card" data-mdb-ripple-color="light">
-                  <img src="<%= product.picture %>" class="img-fluid rounded" />
-                </div>
-              </a>
-              <div class="card-body p-3">
-                <h5 class="card-title"><%= product.productName %></h5>
-                <p class="card-text text-truncate"><%= product.description %></p>
-              </div>
-              <a href="/product/item/<%= product.product_id %>" class="w-100 position-static p-3 pb-4">
-                <button class="btn btn-primary w-100">สั่งทำ</button>
-              </a>
-            </div>
-            <% } %>
-            <% }); %>
-            <% } else { %>
-                <b>ไม่มีสินค้าประเภทนี้</b>
-            <% } %>
-          </div>
-
-          <div class="itemlist" id="stickerSection">
-            <% if(products.length > 0){ %>
-            <% products.forEach((product) => { %>
-            <% if(product.categories === "sticker"){ %>
-            <div class="card m-0 me-4">
-              <a href="/product/item/<%= product.product_id %>">
-                <div class="ripple p-3 pb-1 product_list_card" data-mdb-ripple-color="light">
-                  <img src="<%= product.picture %>" class="img-fluid rounded" />
-                </div>
-              </a>
-              <div class="card-body p-3">
-                <h5 class="card-title"><%= product.productName %></h5>
-                <p class="card-text text-truncate"><%= product.description %></p>
-              </div>
-              <a href="/product/item/<%= product.product_id %>" class="w-100 position-static p-3 pb-4">
-                <button class="btn btn-primary w-100">สั่งทำ</button>
-              </a>
-            </div>
-            <% } %>
-            <% }); %>
-            <% } %>
-          </div>
-
-          <div class="itemlist" id="billSection">
-            <% if(products.length > 0){ %>
-            <% products.forEach((product) => { %>
-            <% if(product.categories === "bill"){ %>
-            <div class="card m-0 me-4">
-              <a href="/product/item/<%= product.product_id %>">
-                <div class="ripple p-3 pb-1 product_list_card" data-mdb-ripple-color="light">
-                  <img src="<%= product.picture %>" class="img-fluid rounded" />
-                </div>
-              </a>
-              <div class="card-body p-3">
-                <h5 class="card-title"><%= product.productName %></h5>
-                <p class="card-text text-truncate"><%= product.description %></p>
-              </div>
-              <a href="/product/item/<%= product.product_id %>" class="w-100 position-static p-3 pb-4">
-                <button class="btn btn-primary w-100">สั่งทำ</button>
-              </a>
-            </div>
-            <% } %>
-            <% }); %>
-            <% } %>
-          </div>
-
-          <div class="itemlist" id="letterSection">
-            <% if(products.length > 0){ %>
-            <% products.forEach((product) => { %>
-            <% if(product.categories === "letter"){ %>
-            <div class="card m-0 me-4">
-              <a href="/product/item/<%= product.product_id %>">
-                <div class="ripple p-3 pb-1 product_list_card" data-mdb-ripple-color="light">
-                  <img src="<%= product.picture %>" class="img-fluid rounded" />
-                </div>
-              </a>
-              <div class="card-body p-3">
-                <h5 class="card-title"><%= product.productName %></h5>
-                <p class="card-text text-truncate"><%= product.description %></p>
-              </div>
-              <a href="/product/item/<%= product.product_id %>" class="w-100 position-static p-3 pb-4">
-                <button class="btn btn-primary w-100">สั่งทำ</button>
-              </a>
-            </div>
-            <% } %>
-            <% }); %>
-            <% } %>
-          </div>
-
+          <% }); %>
+          <% } else { %>
+          <b class="m-auto">ไม่มีสินค้าที่วางขายตอนนี้</b>
+          <% } %>
         </div>
+
+        <% for( let i = 0; i < cate.length; i++ ) { %>
+        <div class="itemlist" id="<%= cate[i] %>Section">
+          <% let categoryFound = false; %>
+          <% if(products.length > 0){ %>
+          <% products.forEach((product) => { %>
+          <% if(product.categories === cate[i]){ %>
+          <% categoryFound = true; %>
+          <div class="card mt-0 mb-4 <%= product.status == 0 ? 'product-refrain' : '' %> ">
+            <% if (promotions.some(promo => promo.product_id === product.product_id)) { %>
+            <div class="promo-sign">
+              <% promotions.forEach((promo) => { %>
+              <span><%= promo.promo_name %></span>
+              <% }) %>
+            </div>
+            <% } %>
+            <a href="/product/item/<%= product.product_id %>">
+              <div class="p-3 pb-1 product_list_card" data-bs-toggle="modal" data-id="<%= product.product_id %>"
+                data-cate="<%= product.categories %>">
+                <% if(product.status == 0) { %>
+                <div class="refrain-sign">
+                  งดรับทำ
+                </div>
+                <% } %>
+                <img src="<%= product.picture %>" class="img-fluid rounded" draggable="false" />
+              </div>
+            </a>
+            <div class="card-body p-3">
+              <h5 class="card-title"><%= product.productName %></h5>
+              <p class="card-text text-truncate"><%= product.description %></p>
+            </div>
+            <div class="p-3">
+              <% const findPrice = priceTiers.filter(price => price.product_id === product.product_id) %>
+              <% let sum = (findPrice[0].size_price + findPrice[0].qty_price) * findPrice[0].quantity %>
+              <span>ราคาเริ่มต้น <%= parseFloat(sum).toFixed(0) %> บาท ต่อ <%= findPrice[0].quantity %> ชิ้น</span>
+              <a href="/product/item/<%= product.product_id %>" class="w-100 position-static ">
+                <div class="w-100 position-static mt-3 pb-4">
+                  <button
+                    class="btn btn-primary w-100 enter-product fs-6 <%= product.status == 0 ? 'refrain-button' : '' %>"
+                    data-bs-toggle="modal" data-id="<%= product.product_id %>"
+                    data-cate="<%= product.categories %>">สั่งทำ</button>
+                </div>
+              </a>
+            </div>
+          </div>
+          <% found = true; %>
+          <% } %>
+          <% }); %>
+          <% } %>
+          <% if (!categoryFound) {%>
+          <b class="m-auto fs-4">ยังไม่มีสินค้าประเภทนี้</b>
+          <% } %>
+        </div>
+        <% } %>
+
       </div>
     </div>
   </div>
+
   <script>
+    $(document).ready(function () {
+      $('#cardSection').hide();
+      $('#flyerSection').hide();
+      $('#leafletSection').hide();
+      $('#stickerSection').hide();
+      $('#billSection').hide();
+      $('#letterSection').hide();
+    });
+
     $(document).ready(function () {
       $(".cate-button").on("click", function () {
         const targetSection = $(this).data("target");
@@ -220,6 +165,25 @@
         $(".itemlist").hide();
         $("#" + targetSection).show();
       });
+
+      $(".enter-product, .product_list_card").on("click", function () {
+        const id = $(this).data('id');
+        const cate = $(this).data('cate');
+
+        $("#product_id").val(id);
+
+        var link = $('#product-link');
+        var hrefValue = '/product/item/' + id;
+        link.attr('href', hrefValue);
+
+      })
+
+      // $('#product_id').on('input', function () {
+      //   var id = $(this).val();
+      //   var link = $('#product-link');
+      //   var hrefValue = '/product/item/' + id;
+      //   link.attr('href', hrefValue);
+      // });
     });
   </script>
 </body>
@@ -227,3 +191,4 @@
 
 
 <%- include('../partials/footer') %>
+<%- include('../partials/chat') %>

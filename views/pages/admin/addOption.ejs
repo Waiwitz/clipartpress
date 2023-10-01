@@ -4,25 +4,27 @@
     <div class="mb-5 secondHead-admin">
         <div class="secondHead-content">
             <h1>เพิ่มตัวเลือกสินค้า</h1>
-            <ol class="list-unstyled d-flex ">
+            <!-- <ol class="list-unstyled d-flex ">
                 <li class="breadcrumb-item"><a class="link-light" href="#">หน้าแรก</a></li>
                 <li class="active text-light ms-2">/ ตัวเลือกสินค้า</li>
                 <li class="active text-light ms-2">/ เพิ่มตัวเลือกสินค้า</li>
-            </ol>
+            </ol> -->
         </div>
     </div>
     <div style="padding-bottom: 150px;"></div>
     <div class="box-admin">
         <% if(success_msg != "") { %>
         <% success_msg.forEach((item) => { %>
-        <div class="alert alert-success">
-            <%- item %>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <strong><%- item %></strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
         <% }); %>
         <% }else if(errors != "") {%>
         <% errors.forEach((item) => { %>
-        <div class="alert alert-danger">
-            <%- item %>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong><%- item %></strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
         <% }); %>
         <% } %>
@@ -31,15 +33,22 @@
                 <div class="card-body">
                     <div class="sub-options mb-4">
                         <div class="sub-option-row">
-                            <div class="row row-cols-lg-auto mb-4">
-                                <div class="col" style="width: 15%;">
-                                    <div class="option-img ">
-                                        <i class="fa-solid fa-plus"></i>
-                                        <input type="file" name="option_img[]" onchange="previewImage(event, [0])"
-                                            accept="image/png, image/jpeg" multiple />
-                                        <img src="https://www.solidbackgrounds.com/images/950x350/950x350-white-solid-color-background.jpg"
-                                            alt="" id="option_preview[0]" draggable="false" class="img_option">
+                            <div class="row mb-4">
+                                <div class="col-2">
+                                    <div class="product-preview-upload me-4 mb-2">
+                                        <div class="option-img">
+                                            <div class="upload-icon">
+                                                <i class="fa-regular fa-image"></i>
+                                                <p>คลิกเพื่อเลือกรูปสินค้า</p>
+                                            </div>
+                                            <input type="file" name="option_img[]" onchange="previewImage(event, [0])"
+                                                accept="image/png, image/jpeg" multiple />
+                                            <img src="/assets/img/white-bg.jpg" id="option_preview[0]" draggable="false"
+                                                class="img_option">
+                                        </div>
                                     </div>
+                                    <!-- <span class="mx-4"> รองรับไฟล์</span><br>
+                                    <span class="mx-4"> PNG, JPEG</span> -->
                                 </div>
                                 <div class="col" style="width: 42.5%;">
                                     <div class="form-outline mb-3">
@@ -57,13 +66,19 @@
                                     <select class="form-select mb-3" id="parcel" aria-label="Default select example"
                                         name="option_parcel[]">
                                         <option value="papertype">ประเภทกระดาษ</option>
-                                        <option value="oil">การเคลือบเงา</option>
+                                        <option value="laminating">การเคลือบเงา</option>
                                         <option value="pumping">การปั้ม</option>
                                         <option value="die-cut">การไดคัท</option>
+                                        <option value="printside">ด้านพิมพ์</option>
                                         <option value="folding">การพับ</option>
+                                        <optgroup label="ตัวเลือกเฉพาะบิล">
+                                            <option value="color">สี</option>
+                                            <option value="number">รันเลข</option>
+                                            <option value="layer">จำนวนชั้น</option>
+                                        </optgroup>
                                     </select>
 
-                                    <select multiple="multiple" id="product-cb" class="option-checkbox w-100"
+                                    <!-- <select multiple="multiple" id="product-cb" class="option-checkbox w-100"
                                         name="product[0][]" multiple>
                                         <% if( products.length > 0 ){ %>
                                         <% products.forEach((product) => { %>
@@ -95,7 +110,7 @@
                                         <% } %>
                                         <% })%>
                                         <% } %>
-                                    </select>
+                                    </select> -->
                                 </div>
                             </div>
                         </div>
@@ -110,13 +125,14 @@
     </div>
 
 
+    <script src="/js/validateBs.js"></script>
     <script>
         $('.option-checkbox').multipleSelect({
             filter: true,
             keepOpen: true,
             placeholder: 'เลือกสินค้าที่ใช้ตัวเลือกนี้',
             type: 'optgroup',
-            hideOptgroupCheckboxes: true
+            hideOptgroupCheckboxes: false
 
         })
 
@@ -155,7 +171,7 @@
                                         <i class="fa-solid fa-plus"></i>
                                         <input type="file" name="option_img[]" onchange="previewImage(event, [${ img }])"
                                             accept="image/png, image/jpeg" multiple />
-                                        <img src="https://www.solidbackgrounds.com/images/950x350/950x350-white-solid-color-background.jpg"
+                                        <img src="/assets/img/white-bg.jpg"
                                             alt="" id="option_preview[${specCount}]" draggable="false" class="img_option">
                                     </div>
                                 </div>
@@ -174,54 +190,26 @@
                                 <div class="col" style="width: 42.5%;">
                                     <select class="form-select mb-3" id="parcel" aria-label="Default select example"
                                         name="option_parcel[${specCount}]">
-                                        <option selected disabled>หมวดหมู่</option>
-                                        <option value="foramt">ขนาดของชิ้นงาน</option>
                                         <option value="papertype">ประเภทกระดาษ</option>
-                                        <option value="oil">การเคลือบเงา</option>
+                                        <option value="laminating">การเคลือบเงา</option>
                                         <option value="pumping">การปั้ม</option>
                                         <option value="die-cut">การไดคัท</option>
+                                        <option value="printside">ด้านพิมพ์</option>
                                         <option value="folding">การพับ</option>
-                                    </select>
-
-                                    <select multiple="multiple" id="product-cb" class="option-checkbox w-100"
-                                        name="product[${specCount}][]" multiple>
-                                        <% if( products.length > 0 ){ %>
-                                        <% products.forEach((product) => { %>
-                                        <% if(product.categories === 'card'){ %>
-                                        <optgroup label="นามบัตร">
-                                            <option value="<%= product.product_id %>">
-                                                <%= product.productName %></option>
+                                        <optgroup label="ตัวเลือกเฉพาะบิล">
+                                            <option value="color">สี</option>
+                                            <option value="number">รันเลข</option>
+                                            <option value="layer">จำนวนชั้น</option>
                                         </optgroup>
-                                        <% }else if(product.categories === 'flyer'){ %>
-                                        <optgroup label="ใบปลิว/แผ่นพับ">
-                                            <option value="<%= product.product_id %>">
-                                                <%= product.productName %></option>
-                                        </optgroup>
-                                        <% }else if(product.categories === 'sticker'){ %>
-                                        <optgroup label="สติ๊กเกอร์">
-                                            <option value="<%= product.product_id %>">
-                                                <%= product.productName %></option>
-                                        </optgroup>
-                                        <% }else if(product.categories === 'bill'){ %>
-                                        <optgroup label="ใบบิล">
-                                            <option value="<%= product.product_id %>">
-                                                <%= product.productName %></option>
-                                        </optgroup>
-                                        <% }else if(product.categories === 'letter'){ %>
-                                        <optgroup label="ซองจดหมาย">
-                                            <option value="<%= product.product_id %>">
-                                                <%= product.productName %></option>
-                                        </optgroup>
-                                        <% } %>
-                                        <% })%>
-                                        <% } %>
                                     </select>
                                 </div>
+                                <div class="col">
+                                    <button class="remove-spec btn btn-danger">ลบ</button>
+                                    </div>
                             </div>
                         </div>
+                        
                     </div>
-                    <button class="remove-spec btn btn-danger">ลบ</button>
-
                 </div>
             </div>
   `;
@@ -236,7 +224,7 @@
                 keepOpen: true,
                 placeholder: 'เลือกสินค้าที่ใช้ตัวเลือกนี้',
                 type: 'optgroup',
-                hideOptgroupCheckboxes: true
+                hideOptgroupCheckboxes: false
             });
         });
 

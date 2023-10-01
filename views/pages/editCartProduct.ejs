@@ -1,0 +1,652 @@
+<%- include('../partials/header') %>
+
+<body class="h-100">
+    <div class="container-lg mt-5">
+        <div class="d-flex justify-content-between flex-wrap">
+            <div class="left-box-product">
+                <div class="card productPic">
+                    <div class="card-body p-0">
+                        <span class="product_name"><%= product.productName %></span>
+                        <div class="product_img">
+                            <img src="<%= product.picture %>" alt="" class="imageFitBox" draggable="false">
+                        </div>
+                    </div>
+                </div>
+                <% if (promotions.some(promo => promo.product_id == product.product_id)) { %>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="mb-0">โปรโมชั่น</h3>
+                    </div>
+                    <div class="card-body">
+                        <% promotions.forEach((promo) => { %>
+                        <div>
+                            <% let type; %>
+                            <% let condition; %>
+                            <% if (promo.promo_type === 'discount') { %>
+                            <% type = `ส่วนลด ${promo.type_value} % ` %>
+                            <% } else if (promo.promo_type === 'giveaway') { %>
+                            <% type = `แถม ${promo.type_value} ชิ้น ` %>
+                            <% }  %>
+
+                            <% if (promo.promo_condition === 'qty') { %>
+                            <% condition = `เมื่อจำนวนสินค้าถึง ${promo.min_reach} ชิ้น` %>
+                            <% } else if (promo.promo_condition === 'value'){ %>
+                            <% condition = `เมื่อยอดสั่งซื้อถึง ${promo.min_reach} บาท` %>
+                            <% }  %>
+                            <i class="bi bi-tag fs-5 d-inline"></i>
+                            <span><%= type + condition %></span>
+                        </div>
+                        <% }) %>
+                    </div>
+                </div>
+                <% } %>
+
+                <div class="card select-conclusion">
+                    <div class="card-header">
+                        <h3 class="mb-0">สรุปสิ่งที่เลือก</h3>
+                    </div>
+                    <div class="card-body">
+                        <% let i = 1; %>
+                        <% const card = ['ประเภทกระดาษ', 'ด้านพิมพ์', 'การปั้ม', 'การเคลือบ'] %>
+                        <% const flyer = ['ประเภทกระดาษ', 'ด้านพิมพ์', 'การเคลือบ'] %>
+                        <% const leaflet = ['ประเภทกระดาษ', 'ด้านพิมพ์', 'การพับ', 'การเคลือบ'] %>
+                        <% const sticker = ['ประเภทกระดาษ', 'การปั้ม', 'การไดคัท'] %>
+                        <% const bill = ['ประเภทกระดาษ', 'สี', 'จำนวนชั้น', 'รันเลข'] %>
+                        <% const letter = ['ประเภทกระดาษ', 'ด้านพิมพ์', 'การปั้ม'] %>
+                        <div class="d-flex justify-content-between fs-5">
+                            <p>ขนาดของชิ้นงาน</p>
+                            <p class="select-option" id="select-option-<%= i++ %>">-</p>
+                        </div>
+                        <% if (product.categories == 'card') { %>
+                        <% card.forEach((item) => { %>
+                        <div class="d-flex justify-content-between fs-5">
+                            <p><%= item %></p>
+                            <p class="select-option" id="select-option-<%= i++ %>">-</p>
+                        </div>
+                        <% }) %>
+                        <% } else if (product.categories == 'flyer') { %>
+                        <% flyer.forEach((item) => { %>
+                        <div class="d-flex justify-content-between fs-5">
+                            <p><%= item %></p>
+                            <p class="select-option" id="select-option-<%= i++ %>">-</p>
+                        </div>
+                        <% }) %>
+                        <% } else if (product.categories == 'leaflet') { %>
+                        <% leaflet.forEach((item) => { %>
+                        <div class="d-flex justify-content-between fs-5">
+                            <p><%= item %></p>
+                            <p class="select-option" id="select-option-<%= i++ %>">-</p>
+                        </div>
+                        <% }) %>
+                        <% } else if (product.categories == 'sticker') { %>
+                        <% sticker.forEach((item) => { %>
+                        <div class="d-flex justify-content-between fs-5">
+                            <p><%= item %></p>
+                            <p class="select-option" id="select-option-<%= i++ %>">-</p>
+                        </div>
+                        <% }) %>
+                        <% } else if (product.categories == 'bill') { %>
+                        <% bill.forEach((item) => { %>
+                        <div class="d-flex justify-content-between fs-5">
+                            <p><%= item %></p>
+                            <p class="select-option" id="select-option-<%= i++ %>">-</p>
+                        </div>
+                        <% }) %>
+                        <% } else if (product.categories == 'letter') { %>
+                        <% letter.forEach((item) => { %>
+                        <div class="d-flex justify-content-between fs-5">
+                            <p><%= item %></p>
+                            <p class="select-option" id="select-option-<%= i++ %>">-</p>
+                        </div>
+                        <% }) %>
+                        <% } %>
+                        <div class="d-flex justify-content-between fs-5">
+                            <p>จำนวน</p>
+                            <p class="select-option" id="select-option-qty">-</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="right-box-product p-3">
+                <form action="/updateCart/<%= cart_detail[0].cart_detail_id %>" method="post" enctype="multipart/form-data">
+                    <div class="w-75 m-auto">
+                        <div class="spec-picking">
+                            <input type="text" name="productid" value="<%= product.product_id %>" hidden>
+                            <% let count = 1; %>
+                            <div class="mb-5" id="<%= count++ %>">
+                                <!-- <input type="text" name="size" value="ขนาดของชิ้นงาน" hidden> -->
+                                <legend>ขนาดของชิ้นงาน
+                                    <% if(product.categories === 'sticker'){ %>
+                                    <i class="fa-solid fa-circle-question"></i>
+                                    <% } %>
+                                    <div class="des-question">
+                                        <p>ขนาดของตัวสติ๊กเกอร์ที่จะถูกพิมพ์ลงบนแผ่น A3 หรือ A4</p>
+                                    </div>
+                                </legend>
+                                <hr>
+                                <select class="form-select" id="size" name="size">
+                                    <% if(product.categories === 'card'){ %>
+                                    <option value="9x5.5">9 x 5.5 cm (ขนาดมาตรฐานสากล)</option>
+                                    <option value="4x4">9 x 5 cm</option>
+                                    <option value="5x5">8 x 5.5 cm</option>
+                                    <% } else if(product.categories === 'flyer') { %>
+
+                                    <% } else if(product.categories === 'leaflet') { %>
+
+                                    <% } else if(product.categories === 'sticker') { %>
+                                    <option value="3x3">3 x 3 cm</option>
+                                    <option value="4x4">4 x 4 cm</option>
+                                    <option value="5x5">5 x 5 cm</option>
+                                    <option value="6x6">6 x 6 cm</option>
+                                    <% } else if(product.categories === 'bill') { %>
+
+                                    <% } else if(product.categories === 'letter') { %>
+                                    <option value="4.125x9.5">เบอร์ 10 4.125 x 9.5 inch</option>
+                                    <option value="3.875x8.875">เบอร์ 9 3.875 x 8.875 inch</option>
+                                    <option value="4.375x5.75">A2 4.375 x 5.75 inch</option>
+                                    <option value="4.75x6.5">A6 4.75 X 6.5 inch</option>
+                                    <option value="5.25x7.25">A7 5.25 x 7.25 inch</option>
+                                    <option value="9x12">9 x 12 inch</option>
+                                    <% } %>
+                                </select>
+
+                                <% if (product.categories != 'card') { %>
+                                <button type="button" id="customSizeBtn" class="btn btn-primary w-100 my-2 fs-6"
+                                    data-mdb-toggle="modal"
+                                    data-mdb-target="#customSizeModal">กำหนดขนาดชิ้นงานเอง</button>
+                                <% } %>
+                                <div id="countSticker1" style="display: none;">
+                                    <p style="font-size: 18px;">จำนวนที่จะได้รับสติ๊กเกอร์บนกระดาษ A3+ คือ <span
+                                            id="per-sticker"></span> ดวงต่อแผ่น</p>
+                                </div>
+
+                                <!-- <div class="form-check ps-0">
+                                    <div class="option-select">
+                                        <select name="option" id="option" class="radio-choice">
+                                            <option value="">3 x 3</option>
+                                            <option value="">4 x 4</option>#
+                                            <option value="">5 x 5</option>
+                                            <option value="">5 x 5</option>
+                                        </select>
+                                    </div>
+                                </div> -->
+
+                            </div>
+
+                            <div class="modal fade slidedown" id="customSizeModal" tabindex="-1"
+                                aria-labelledby="customSizeModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="editModalLabel">กำหนดขนาดชิ้นงาน</h5>
+                                            <button type="button" class="btn-close" data-mdb-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="form-outline mb-2">
+                                                <input type="text" id="widthSize" class="form-control" />
+                                                <label class="form-label" for="widthSize">ความกว้าง</label>
+                                            </div>
+                                            <div class="form-outline mb-2">
+                                                <input type="text" id="heightSize" class="form-control" />
+                                                <label class="form-label" for="heightSize">ความสูง</label>
+                                            </div>
+                                            <select class="form-select" style="height: 35px;" id="unitSize"
+                                                name="unitSize">
+                                                <option value="inch">นิ้ว (Inch)</option>
+                                                <option value="mm">มิลลิเมตร (MM)</option>
+                                                <option value="cm">เซ็นติเมตร (CM)</option>
+                                            </select>
+                                            <input type="hidden" id="id" name="option_id" value="" />
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary "
+                                                    data-mdb-dismiss="modal">ยกเลิก</button>
+                                                <button type="button" class="btn btn-primary" onclick="addSize()"
+                                                    data-mdb-dismiss="modal">ยืนยัน</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <% if(product.categories === 'card'){ %>
+                            <%- include('./product_select/card', { count: count, options: options }) %>
+                            <% } else if(product.categories === 'flyer') { %>
+                            <%- include('./product_select/flyer', { count: count, options: options }) %>
+                            <% } else if(product.categories === 'leaflet') { %>
+                            <%- include('./product_select/leaflet', { count: count, options: options }) %>
+                            <% } else if(product.categories === 'sticker') { %>
+                            <%- include('./product_select/sticker', { count: count, options: options }) %>
+                            <% } else if(product.categories === 'bill') { %>
+                            <%- include('./product_select/bill', { count: count, options: options }) %>
+                            <% } else if(product.categories === 'letter') { %>
+                            <%- include('./product_select/letter', { count: count, options: options }) %>
+                            <% } %>
+
+                            <div class="mb-5" id="qty">
+                                <legend>จำนวน</legend>
+                                <hr>
+                                <select name="qt" id="qt-select" class="form-select">
+                                    <% let unit = '' %>
+                                    <% if(product.categories === 'card' || product.categories === 'flyer' ){ %>
+                                    <% unit = 'ใบ' %>
+                                    <% } else if(product.categories === 'leaflet') { %>
+                                    <% unit = 'แผ่น' %>
+                                    <% } else if(product.categories === 'sticker') { %>
+                                    <% unit = 'แผ่น' %>
+
+                                    <% } else if(product.categories === 'bill') { %>
+                                    <% unit = 'เล่ม' %>
+                                    <% } else if(product.categories === 'letter') { %>
+                                    <% unit = 'ซอง' %>
+                                    <% } %>
+                                    <option value="10">10 <%= unit %></option>
+                                    <option value="50">50 <%= unit %></option>
+                                    <option value="100">100 <%= unit %></option>
+                                    <option value="200">200 <%= unit %></option>
+                                    <option value="500">500 <%= unit %></option>
+                                    <option value="1000">1000 <%= unit %></option>
+                                    <option value="2000">2500 <%= unit %></option>
+                                    <option value="2000">5000 <%= unit %></option>
+                                    <option value="2000">10000 <%= unit %></option>
+                                </select>
+                                <div id="countSticker2" style="display: none;">
+                                    <p style="font-size: 18px;">จำนวนดวงสติ๊กเกอร์ที่จะได้ทั้งหมดคือ <span
+                                            id="all-sticker"></span> ดวง</p>
+                                </div>
+
+                                <button type="button" class="btn btn-primary w-100 mt-2 fs-6" data-mdb-toggle="modal"
+                                    data-mdb-target="#customQtModal">กำหนดจำนวนเอง</button>
+                            </div>
+
+                            <div class="modal fade slidedown needs-validation" id="customQtModal" tabindex="-1"
+                                aria-labelledby="customSizeModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="editModalLabel">กำหนดจำนวน</h5>
+                                            <button type="button" class="btn-close" data-mdb-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="form-outline mb-2">
+                                                <input type="number" id="custom-qt" class="form-control" min="1"
+                                                    max="50000" />
+                                                <label class="form-label" for="custom-qt">จำนวน</label>
+                                            </div>
+                                            <div class="invalid-feedback">
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary "
+                                                    data-mdb-dismiss="modal">ยกเลิก</button>
+                                                <button type="button" class="btn btn-primary" onclick="addQt()"
+                                                    data-mdb-dismiss="modal">ยืนยัน</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="my-4">
+                                <h4>ไฟล์อาร์ตเวิร์ค</h4>
+                                <hr>
+                                <input type="file" class="btn d-block" id="customFile" name="designfile"
+                                    accept="application/pdf" />
+                                <embed src="<%= cart_detail[0].design_file %>" type="application/pdf" frameBorder="2"
+                                    scrolling="auto" height="100%" width="100%"></embed>
+                            </div>
+                            <div class="float-end mt-5">
+                                <span>ยอดรวม: </span>
+                                <span id="sum-price"></span>
+                                <span id="new-price"></span>
+                                <input type="number" name="total_price" id="total-price" value="<%= cart_detail[0].price %>" hidden readonly>
+                                <!-- <span id="total-price">฿0</span> -->
+                                <% if(!login){ %>
+                                <p>กรุณาเข้าสู่ระบบก่อนที่จะเพิ่มสินค้าลงตระกร้า</p>
+                                <% }else if(login === true) { %>
+                                <a href="">
+                                    <button type="submit"
+                                        class="btn btn-primary d-block mt-3 w-100 fs-6">ยืนยันการแก้ไขรายการ</button>
+                                </a>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-lg mt-5">
+        <div>
+            <h2 class="border-bottom">รีวิว</h2>
+        </div>
+
+        <div class="comment w-100 border-bottom">
+            <div class="d-flex mt-5 mb-3 pb-4">
+                <div class="img-fluid border rounded-circle me-3" style="width: 50px; height: 50px;">
+                    <img src="" alt="." width="30">
+                </div>
+                <div>
+                    <span>name</span>
+                    <p>1:15 13/12/2565</p>
+                    <div class="star">
+                        <span class="fa fa-star"></span>
+                        <span class="fa fa-star"></span>
+                        <span class="fa fa-star"></span>
+                        <span class="fa fa-star"></span>
+                        <span class="fa fa-star"></span>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsum ex repellendus libero fuga aspernatur
+                    vitae esse inventore velit harum, nihil earum exercitationem voluptatibus officiis mollitia atque
+                    suscipit dicta repudiandae accusamus!</p>
+            </div>
+            <div class="d-flex">
+                <div class="border m-2" style="width: 140px; height: 140px;">
+                    <img src="" alt="d">
+                </div>
+                <div class="border m-2" style="width: 140px; height: 140px;">
+                    <img src="" alt="d">
+                </div>
+                <div class="border m-2" style="width: 140px; height: 140px;">
+                    <img src="" alt="d">
+                </div>
+                <div class="border m-2" style="width: 140px; height: 140px;">
+                    <img src="" alt="d">
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="optionImgModal" tabindex="-1" aria-labelledby="optionImgModal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                    <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">...</div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script>
+    document.querySelectorAll('.form-outline').forEach((formOutline) => {
+        new mdb.Input(formOutline).init();
+    });
+    const sizeSelect = document.getElementById('size')
+    const selectQt = document.getElementById('qt-select');
+    const allsum = document.getElementById('all-sticker')
+    const perStickerElement = document.getElementById('per-sticker').textContent;
+
+    function updatePerSticker() {
+        const selected = sizeSelect.value;
+        const number = document.getElementById('per-sticker');
+        const [width, height] = selected.split('x');
+        let x = Math.floor((32.9 / width)) * Math.floor((48.3 / height));
+        number.textContent = Math.floor(x);
+    }
+
+    function updateAllSticker() {
+        const selected = sizeSelect.value;
+        const [width, height] = selected.split('x');
+        let x = Math.floor((32.9 / width)) * Math.floor((48.3 / height));
+
+        // const numSticker = parseInt(perStickerElement);
+        const selectedQt = selectQt.value;
+        let y = selectedQt * x;
+        allsum.textContent = y;
+    }
+
+
+
+    function addSize() {
+        const width = document.getElementById('widthSize').value;
+        const height = document.getElementById('heightSize').value;
+        const unit = document.getElementById('unitSize').value;
+
+        let value;
+        let text;
+
+        if (unit === 'inch') {
+            const calWidth = width * 2.54;
+            const calheight = height * 2.54;
+            value = `${calWidth}x${calheight}`;
+            text = `${width} x ${height} inch (${calWidth} x ${calheight} cm)`;
+        } else if (unit === 'mm') {
+            const calWidth = width * 0.1;
+            const calheight = height * 0.1;
+            value = `${calWidth}x${calheight}`;
+            text = `${width} x ${height} inch (${calWidth} x ${calheight} cm)`;
+        } else if (unit === 'cm') {
+            value = `${width}x${height}`;
+            text = `${width} x ${height} cm`;
+        }
+
+        const option = document.createElement('option');
+        option.value = value;
+        option.textContent = text;
+        option.selected = true;
+        sizeSelect.appendChild(option);
+        sizeSelect.addEventListener('change', updatePerSticker);
+        updatePerSticker()
+
+    }
+
+    function addQt() {
+        // const forms = document.querySelectorAll('.needs-validation')
+        // Array.from(forms).forEach(form => {
+        //     form.addEventListener('click', event => {
+        //         if (!form.checkValidity()) {
+        //             event.preventDefault()
+        //             event.stopPropagation()
+        //         }
+
+        //         form.classList.add('was-validated')
+        //     }, false)
+        // })
+        const qt = document.getElementById('custom-qt').value;
+        const option = document.createElement('option');
+        console.log(qt);
+        option.value = qt;
+        option.textContent = qt + ' แผ่น (กำหนดเอง)';
+        option.selected = true;
+        selectQt.appendChild(option);
+
+        calculatePrice();
+    }
+
+    sizeSelect.addEventListener('change', updatePerSticker);
+    updatePerSticker()
+
+    sizeSelect.addEventListener('change', updateAllSticker);
+    selectQt.addEventListener('change', updateAllSticker);
+    updateAllSticker()
+
+    const promotions = JSON.parse('<%- JSON.stringify(promotions) %>')
+    const product = JSON.parse('<%- JSON.stringify(product) %>')
+
+    function calculatePrice() {
+        optionSum = 0;
+        $('select.radio-choice').each(function () {
+            const selectedOption = $(this).find('option:selected');
+            const dataPrice = selectedOption.data('price');
+            if (!isNaN(dataPrice)) {
+                optionSum += parseFloat(dataPrice);
+            }
+        });
+
+        const sizeTier = $('#size').find('option:selected').val(); // ขนาด
+        const qtTier = $('#qt-select').find('option:selected').val(); // จำนวน
+        const [width, height] = sizeTier.split('x');
+
+        let widthprice;
+        let heightprice;
+        let sizePrice
+        let qtprice;
+
+        const sizeTiers = JSON.parse('<%- JSON.stringify(sizeTiers) %>');
+        const qtyTiers = JSON.parse('<%- JSON.stringify(qtyTiers) %>');
+
+
+        for (let i = 0; i < qtyTiers.length && qtTier >= qtyTiers[i].quantity; i++) {
+            qtprice = qtyTiers[i].qty_price;
+            // if (qtTier >= tiers[i].minqt && qtTier <= tiers[i].maxqt) {
+            // }
+        };
+
+        for (let s = 0; s < sizeTiers.length && width >= sizeTiers[s].width && height >= sizeTiers[s].height; s++) {
+            sizePrice = sizeTiers[s].size_price
+
+        }
+        // for (let h = 0; h < sizeTiers.length && heightprice >= sizeTiers[h].height; h++) {
+        //     const element = array[s];
+
+        // }
+
+        // if (isNaN(quantity) || isNaN(quantityPerUnit) || isNaN(optionPrice)) {
+        //     $('#total-price').val('Invalid selection');
+        //     return;
+        // }
+
+        console.log(`${width} x ${height}`);
+        console.log(`ราคาปริมาณต่อหน่วย : ${qtprice}`);
+        // const totalSize = widthprice + heightprice;
+        const perUnitSum = qtprice + sizePrice;
+        const totalPricePerUnit = optionSum + perUnitSum
+        console.log(`${optionSum}, ${sizePrice}, ${qtprice}`);
+        console.log(`${totalPricePerUnit} * ${qtTier}`);
+        const sumPrice = totalPricePerUnit * qtTier;
+        console.log(sumPrice);
+
+        $('#sum-price').text(sumPrice.toFixed(2))
+        $('#total-price').val(sumPrice.toFixed(2));
+
+        let discount
+        if (promotions.find(promo => promo.product_id == product.product_id)) {
+            promotions.forEach((promo) => {
+                let min_reach;
+                if (promo.promo_type == 'discount' && promo.promo_condition == 'value') {
+                    min_reach = promo.min_reach;
+                    if (sumPrice >= min_reach) {
+                        discount = sumPrice - (sumPrice * promo.type_value / 100);
+                        $('#new-price').text(discount.toFixed(2))
+                        $('#sum-price').empty().replaceWith(
+                            `<s class="fw-bold me-2" id="sum-price">${sumPrice}</s>`);
+                    } else {
+                        $('#new-price').empty()
+                        $('#sum-price').empty().replaceWith(
+                            `<b class="fw-bold me-2" id="sum-price">${sumPrice}</b>`);
+                    }
+                }
+            });
+        }
+    }
+
+
+    $(document).ready(function () {
+        const productCate = `<%- product.categories  %>`
+        if (productCate === 'sticker') {
+            $('#countSticker1, #countSticker2').show()
+        }
+        let optionSum = 0;
+        $('select.form-select').on('change', calculatePrice);
+        calculatePrice();
+    });
+
+
+    $(document).ready(() => {
+        $('.form-select').change(function () {
+            const selectedOption = $(this).find('option:selected');
+            const selectedText = selectedOption.text();
+            const index = $(this).closest('.mb-5').attr('id');
+            // console.log('#select-option-'+index+selectedText);
+            $('#select-option-' + index).text(selectedText);
+        });
+
+
+        const optionType = ['papertype', 'laminating', 'pumping', 'die-cut', 'printside', 'folding', 'color',
+            'layer', 'number'
+        ];
+        const carts = JSON.parse('<%- JSON.stringify(cart_detail) %>');
+        carts.forEach((item) => {
+            $(`#size option[value="${item.size}"]`).prop('selected', true);
+            $(`#qt-select option[value="${item.quantity}"]`).prop('selected', true);
+
+            item.options.forEach((option) => {
+                optionType.forEach((type) => {
+                    if ($(`#${type}`).length) {
+                        $(`#${type} option[value="${option.option_id}"]`).prop(
+                            'selected', true);
+                    }
+                });
+            })
+        });
+        $(".form-select").trigger("change");
+    });
+
+    $(document).ready(function () {
+        if (promotions.some(promo => promo.product_id == product.product_id)) {
+            promotions.forEach((promo) => {
+                let min_reach;
+                if (promo.promo_type == 'giveaway' && promo.promo_condition == 'qty') {
+                    let min_reach = promo.min_reach;
+                    console.log(min_reach);
+                    $('#qt-select option').each(function () {
+                        const optionValue = parseInt($(this).val(), 10);
+                        if (optionValue >= min_reach) {
+                            $(this).text($(this).text() + ` + ${promo.type_value}`);
+                        }
+                    });
+                }
+            });
+        }
+    });
+
+    $(document).ready(() => {
+        function updateFirstOptionImage() {
+            $('.form-select').each(function () {
+                const firstOption = $(this).find('option:selected');
+                const optionImg = firstOption.data('img'); // Corrected access to data attribute
+                const imgId = $(this).data('img-id'); // Corrected access to data attribute
+                const imgElement = $('#selectedimg' + imgId);
+                if (optionImg) {
+                    imgElement.attr('src', optionImg);
+                } else {
+                    imgElement.attr('src', '/assets/img/crossed-image-icon.jpg');
+                }
+            });
+        }
+
+        // Call the function on page load to set the images for the first options
+        updateFirstOptionImage();
+
+        $('.radio-choice').on('change', function () {
+            // Get the selected option
+            const selectedOption = $(this).find(':selected');
+            const optionName = selectedOption.val();
+            const optionImg = selectedOption.data('img');
+            const imgId = $(this).data('img-id');
+            const imgElement = $('#selectedimg' + imgId);
+
+            console.log(optionImg);
+            if (optionImg) {
+                imgElement.attr('src', optionImg);
+            } else {
+                imgElement.attr('src', '/assets/img/crossed-image-icon.jpg');
+            }
+        });
+    });
+</script>
+
+<%- include('../partials/footer') %>
+<%- include('../partials/chat') %>

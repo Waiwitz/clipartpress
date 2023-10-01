@@ -1,0 +1,92 @@
+<div class="mb-5" id="<%= count++ %>">
+    <input type="text" name="spec" value="ประเภทกระดาษ" hidden>
+    <legend>ประเภทกระดาษ</legend>
+    <hr>
+    <div class="form-check ps-0">
+        <div class="option-select">
+            <div class="border">
+                <img class="selectedimg" id="selectedimg<%= count %>" src="" alt="" style="width: 80px; height: 80px;">
+            </div>
+            <select name="option[]" id="papertype" class="form-select radio-choice" data-img-id="<%= count %>">
+                <% options.forEach((option) => { %>
+                <% if(option.option_type === 'papertype'){ %>
+                <option value="<%= option.option_id %>" data-price="<%= option.price_per_unit %>"
+                    data-img="<%= option.option_img %>">
+                    <%= option.option_name %>
+                </option>
+                <% } %>
+                <% }) %>
+            </select>
+        </div>
+    </div>
+</div>
+
+
+<div class="mb-5" id="<%= count++ %>">
+    <input type="text" name="spec" value="ประเภทกระดาษ" hidden>
+    <legend>ด้านพิมพ์</legend>
+    <hr>
+    <div class="form-check ps-0">
+        <div class="option-select">
+            <div class="border">
+                <img class="selectedimg" id="selectedimg<%= count %>" src="" alt="" style="width: 80px; height: 80px;">
+            </div>
+            <select name="option[]" id="printside" class="form-select radio-choice" data-img-id="<%= count %>">
+                <% options.forEach((option) => { %>
+                <% if(option.option_type === 'printside'){ %>
+                <option value="<%= option.option_id %>" data-price="<%= option.price_per_unit %>"
+                    data-img="<%= option.option_img %>">
+                    <%= option.option_name %>
+                </option>
+                <% } %>
+                <% }) %>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="mb-5" id="<%= count++ %>">
+    <input type="text" name="spec" value="ประเภทกระดาษ" hidden>
+    <legend>ด้านพิมพ์</legend>
+    <hr>
+    <div class="form-check ps-0">
+        <div class="option-select">
+            <div class="border">
+                <img class="selectedimg" id="selectedimg<%= count %>" src="" alt="" style="width: 80px; height: 80px;">
+            </div>
+            <select name="option[]" id="pumping" class="form-select radio-choice" data-img-id="<%= count %>">
+                <% options.forEach((option) => { %>
+                <% if(option.option_type === 'pumping'){ %>
+                <option value="<%= option.option_id %>" data-price="<%= option.price_per_unit %>"
+                    data-img="<%= option.option_img %>">
+                    <%= option.option_name %>
+                </option>
+                <% } %>
+                <% }) %>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="mb-5" id="<%= count++ %>">
+    <input type="text" name="spec" value="ประเภทกระดาษ" hidden>
+    <legend>ด้านพิมพ์</legend>
+    <hr>
+    <div class="form-check ps-0">
+        <div class="option-select">
+            <div class="border">
+                <img class="selectedimg" id="selectedimg<%= count %>" src="" alt="" style="width: 80px; height: 80px;">
+            </div>
+            <select name="option[]" id="laminating" class="form-select radio-choice" data-img-id="<%= count %>">
+                <% options.forEach((option) => { %>
+                <% if(option.option_type === 'laminating'){ %>
+                <option value="<%= option.option_id %>" data-price="<%= option.price_per_unit %>"
+                    data-img="<%= option.option_img %>">
+                    <%= option.option_name %>
+                </option>
+                <% } %>
+                <% }) %>
+            </select>
+        </div>
+    </div>
+</div>

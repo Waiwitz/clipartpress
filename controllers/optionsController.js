@@ -48,35 +48,37 @@ const addOptions = (req, res) => {
     const price = req.body.option_price;
     const optionPic = req.files.map(file => file.path.replace('public', ''));
     const parcel = req.body.option_parcel;
-    const product = req.body.product;
-    const productArray = [];
+    // const product = req.body.product;
+    // const productArray = [];
     console.log(req.body)
 
     try {
 
         for (let i = 0; i < optionName.length; i++) {
-            const productIdArray = [product[i]];
+            // const productIdArray = [product[i]];
             const option = {
                 option_name: optionName[i],
                 option_img: optionPic[i],
                 price_per_unit: price[i],
-                parcel_type: parcel[i],
+                option_type: parcel[i],
             };
-
+            dbConnection.query('INSERT INTO options SET ?', [option], (error, results, fields) => {
+                if (error) throw error;
+            });
             // dbConnection.query('INSERT INTO options SET ?', option, (error, results, fields) => {
             //     if (error) throw error;
             // });
-            dbConnection.query("INSERT INTO options SET ?", [option])
-                .then(async ([row]) => {
-                    const optionid = row.insertId;
-                    const options_product = {
-                        option_id: optionid,
-                        product_id: JSON.stringify(productIdArray)
-                    };
-                    dbConnection.query('INSERT INTO options_product SET ?', options_product, (error, results, fields) => {
-                        if (error) throw error;
-                    });
-                })
+            // dbConnection.query("INSERT INTO options SET ?", [option])
+            //     .then(async ([row]) => {
+            //         const optionid = row.insertId;
+            //         const options_product = {
+            //             option_id: optionid,
+            //             product_id: JSON.stringify(productIdArray)
+            //         };
+            //         dbConnection.query('INSERT INTO options_product SET ?', options_product, (error, results, fields) => {
+            //             if (error) throw error;
+            //         });
+            //     })
         }
         req.flash("success_msg", 'เพิ่มสำเร็จ');
         return res.redirect("/admin/options");
@@ -105,9 +107,9 @@ const updateOption = async (req, res) => {
     const optionName = req.body.option;
     const price = req.body.option_price;
     const parcel = req.body.option_parcel;
-    const productSelect = req.body.product;
-    const product = JSON.stringify(productSelect)
-    console.log(product);
+    // const productSelect = req.body.product;
+    // const product = JSON.stringify(productSelect)
+    // console.log(product);
     let optionPic;
     let query;
     // console.log(req.body);
@@ -116,18 +118,17 @@ const updateOption = async (req, res) => {
         optionPic = req.file.path.replace('public', '');
         data = [optionName, optionPic, price, parcel, des, id]
         console.log(data);
-        query = 'UPDATE options SET option_name = ?, option_img = ?, price_per_unit = ?, parcel_type = ? WHERE option_id = ?'
+        query = 'UPDATE options SET option_name = ?, option_img = ?, price_per_unit = ?, option_type = ? WHERE option_id = ?'
     } else {
-        data = [optionName, price, parcel, des, id]
+        data = [optionName, price, parcel, id]
         console.log(data);
-        query = 'UPDATE options SET option_name = ?, price_per_unit = ?, parcel_type = ? WHERE option_id = ?'
+        query = 'UPDATE options SET option_name = ?, price_per_unit = ?, option_type = ? WHERE option_id = ?'
     }
     try {
         // await dbConnection.query(query, data, (error) => {
         //     if (error) throw error;
         // });
         await dbConnection.query(query, data).then(async ([]) => {
-                await dbConnection.query('UPDATE options_product SET product_id = ? WHERE option_id = ?', [product, id])
         })
         req.flash("success_msg", 'แก้ไขสำเร็จ');
         return res.redirect("/admin/options");

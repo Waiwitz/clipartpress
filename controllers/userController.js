@@ -71,20 +71,19 @@ const updateProfile = async (req, res) => {
         email,
         name,
         telephone,
-        lineid
     } = req.body;
     let profilePicturePath;
     let query;
     if (req.file) {
         profilePicturePath = req.file.path.replace('public', '');
-        query = 'UPDATE users SET username = ?, email = ?, picture = ? ,name = ?, telephone = ?, lineid = ? WHERE user_id = ?'
+        query = 'UPDATE users SET username = ?, email = ?, picture = ? ,name = ?, telephone = ? WHERE user_id = ?'
     } else {
-        query = 'UPDATE users SET username = ?, email = ? ,name = ?, telephone = ?, lineid = ? WHERE user_id = ?'
+        query = 'UPDATE users SET username = ?, email = ? ,name = ?, telephone = ? WHERE user_id = ?'
     }
 
-  
+
     try {
-        const data = [username, email, profilePicturePath, name, telephone, lineid, req.session.user_id];
+        const data = [username, email, profilePicturePath, name, telephone, req.session.user_id];
         await dbConnection.query(query, data);
         // return res.render('pages/userprofile', { success_msg: ['แก้ไขโปรไฟล์สำเร็จ'] });
         req.flash("success_msg", 'แก้ไขโปรไฟล์สำเร็จ');
@@ -107,17 +106,29 @@ const addAddress = async (req, res) => {
         });
         req.flash("errors", errorsArr);
         return res.redirect("/address");
-    }
+    } 
     const {
         name,
         address,
         province,
         zipcode,
-        telephone
+        telephone,
+        df_address
     } = req.body;
     try {
-
-        await dbConnection.query("INSERT INTO address SET name = ?, address = ?, province = ?, postcode = ?, telephone = ?, user_id = ?", [name, address, province, zipcode, telephone, req.session.user_id]);
+        dbConnection.query('SELECT * FROM address WHERE user_id = ? AND deleted_at is null', req.session.user_id)
+            .then(async ([rows]) => {
+                if (rows <= 0) {
+                    await dbConnection.query("INSERT INTO address SET name = ?, address = ?, province = ?, postcode = ?, telephone = ?, user_id = ?, default_address = 1", [name, address, province, zipcode, telephone, req.session.user_id]);
+                } else  {
+                    if (df_address == '1') {
+                        await dbConnection.query("UPDATE address SET default_address = 0 WHERE user_id = ?", req.session.user_id);
+                        await dbConnection.query("INSERT INTO address SET name = ?, address = ?, province = ?, postcode = ?, telephone = ?, user_id = ?, default_address = 1", [name, address, province, zipcode, telephone, req.session.user_id]);
+                    } else if (df_address == '' || df_address == null) {
+                        await dbConnection.query("INSERT INTO address SET name = ?, address = ?, province = ?, postcode = ?, telephone = ?, user_id = ?, default_address = 0", [name, address, province, zipcode, telephone, req.session.user_id]);
+                    }
+                }
+            })
         req.flash("success_msg", 'เพิ่มที่อยู่สำเร็จ');
         return res.redirect("/address");
     } catch (error) {
@@ -127,20 +138,32 @@ const addAddress = async (req, res) => {
 }
 
 const editAddress = async (req, res) => {
-    const id = req.body.addressID;
+    const id = req.params.id;
     const {
         new_name,
         new_address,
         new_province,
         new_zipcode,
-        new_tel
+        new_tel,
+        df_address
     } = req.body;
     try {
-        await dbConnection.query("UPDATE address SET name = ?, address = ?, province = ?, postcode = ?, telephone = ? WHERE address_id = ?", [new_name, new_address, new_province, new_zipcode, new_tel, id]);
+        if (df_address == '1') {
+            await dbConnection.query("UPDATE address SET default_address = 0 WHERE user_id = ?", req.session.user_id).then(async () => {
+                await dbConnection.query("UPDATE address SET name = ?, address = ?, province = ?, postcode = ?, telephone = ?, default_address = 1 WHERE address_id = ?", [new_name, new_address, new_province, new_zipcode, new_tel, id], (error) => {
+                    if (error) throw error;
+                });
+            })
+        } else if (df_address == '' || df_address == null) {
+            await dbConnection.query("UPDATE address SET name = ?, address = ?, province = ?, postcode = ?, telephone = ?, default_address = 0 WHERE address_id = ?", [new_name, new_address, new_province, new_zipcode, new_tel, id], (error) => {
+                if (error) throw error;
+            });
+        }
         req.flash("success_msg", 'แก้ไขที่อยู่สำเร็จ');
         return res.redirect("/address");
     } catch (error) {
-        req.flash("errors", error.message);
+        console.log(error);
+        // req.flash("errors", error.message);
         return res.redirect("/address");
     }
 }
@@ -209,7 +232,7 @@ const storage_profile = multer.diskStorage({
 const upload_profile = multer({
     storage: storage_profile
 });
- 
+
 
 
 
@@ -218,7 +241,7 @@ module.exports = {
     updateProfile: updateProfile,
     checkInputAddress: checkInputAddress,
     addAddress: addAddress,
-    editAddress:editAddress,
+    editAddress: editAddress,
     deleteAddress: deleteAddress,
     validatePassword: validatePassword,
     changepassword: changepassword,

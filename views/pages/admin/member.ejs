@@ -4,25 +4,27 @@
     <div class="mb-5 secondHead-admin">
         <div class="secondHead-content">
             <h1>ตัวเลือกสินค้า</h1>
-            <ol class="list-unstyled d-flex ">
+            <!-- <ol class="list-unstyled d-flex ">
                 <li class="breadcrumb-item"><a class="link-light" href="#">หน้าแรก</a></li>
                 <li class="active text-light ms-2">/ ตัวเลือกสินค้า</li>
-            </ol>
+            </ol> -->
         </div>
     </div>
     <div style="padding-bottom: 150px;"></div>
     <div class="box-admin">
-        <% if(success_msg != "") { %>
+          <% if(success_msg != "") { %>
         <% success_msg.forEach((item) => { %>
-        <div class="alert alert-success">
-            <%- item %>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <strong><%- item %></strong> 
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
         <% }); %>
         <% }else if(errors != "") {%>
         <% errors.forEach((item) => { %>
-        <div class="alert alert-danger">
-            <%- item %>
-        </div>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <strong><%- item %></strong> 
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
         <% }); %>
         <% } %>
         <!-- <div class="d-flex w-50 float-end justify-content-end">
@@ -49,7 +51,6 @@
                             <th>ชื่อ</th>
                             <th>เบอร์โทร</th>
                             <th>สถานะ</th>
-                            <th>ไลน์ไอดี</th>
                             <th>สถานะยืนยัน</th>
                             <th></th>
                         </tr>
@@ -73,7 +74,6 @@
                             </td>
                             <td><%= users.telephone %></td>
                             <td><%= users.email %></td>
-                            <td><%= users.lineid%></td>
                             <td><% if(users.verified == false) { %>
                                 ยังไม่ยืนยันอีเมล
                                 <% }else{ %>

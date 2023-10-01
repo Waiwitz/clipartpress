@@ -1,9 +1,27 @@
 <%- include('../partials/header') %>
 
-<body>
-    <div class="container-lg mt-5 mb-5 p-auto">
+<body style="background-color: #f8f8f8;">
+    <!-- <div class="banner shadow-5-strong">
+        <img class="imageFitBox" src="/assets/img/Flyers-Brochure-Test-mage.jpg" alt="">
+        <div class="banner-content overlay">
+            <div>
+                <h1><%= currentMenu %></h1>
+                <ol class="breadcrumb justify-content-center bg-light shadow-5-strong px-5">
+                    <li class="breadcrumb-item"><a href="/">หน้าแรก</a></li>
+                    <li class="breadcrumb-item active" aria-current="page"><%= currentMenu %></li>
+                </ol>
+            </div>
+        </div>
+    </div> -->
 
-        <h3 class="mb-3">ตระกร้าสินค้า</h3>
+    <div class="container-lg mt-5 mb-5 p-auto">
+        <div>
+            <h1><%= currentMenu %></h1>
+            <ol class="breadcrumb bg-light">
+                <li class="breadcrumb-item"><a href="/">หน้าแรก</a></li>
+                <li class="breadcrumb-item active" aria-current="page"><%= currentMenu %></li>
+            </ol>
+        </div>
         <% if(success_msg != "") { %>
         <% success_msg.forEach((item) => { %>
         <div class="alert alert-success">
@@ -17,81 +35,242 @@
         </div>
         <% }); %>
         <% } %>
-        <div class="w-100">
-            <% if(cartlist.length > 0) { %>
-            <% cartlist.forEach((cart) => { %>
-            <div class="card mx-0 overflow-hidden cart-box">
-                <div class="card-body overflow-hidden">
-                    <div class="d-flex m-2 justify-content-between flex-wrap">
-                        <div class="d-inline-flex">
-                            <div class="cart-product-picture">
-                                <input type="checkbox">
-                                <img src="<%= cart.picture %>" alt="" class="imageFitBox" draggable="false">
-                            </div>
-                            <div class="d-inline-flex">
-                                <div class="m-2">
-                                    <% const specs = JSON.parse(cart.spec); %>
-                                    <% const options = JSON.parse(cart.options); %>
-                                    <h4><%= cart.productName %></h4>
-                                    <p>ชื่องาน : <%= cart.printing_name %></p>
-                                    <% for (let i = 0; i < specs.length; i++) { %>
-                                    <p> <%= specs[i] %> : <%= options[i] %></p>
-                                    <% } %>
+        <% let qty; %>
+        <% let price; %>
+        <% let SumPrice = 0; %>
+        <% if(cartsItem.length > 0) { %>
+        <div class="d-flex flex-wrap">
+            <div class="col">
+                <% cartsItem.forEach((item) => { %>
+                <% qty = item.quantity %>
+                <% price = item.price %>
+                <% const findPromo = promotions.some(row => row.product_id == item.product_id) %>
+                <% let textPrice = money.format(item.price); %>
+                <% let textQty = item.quantity; %>
+                <div class="card mx-0 overflow-hidden p-2">
+                    <div class="card-body p-2 overflow-hidden">
+                        <div class="row">
+                            <div class="col-2">
+                                <div class="cart-product-picture">
+                                    <img src="<%= item.picture %>" alt="" class="imageFitBox" draggable="false">
                                 </div>
                             </div>
-                        </div>
-                        <div class="border-start p-5">
-                            <p><%= cart.price %></p>
+                            <div class="col-3">
+                                <h4><%= item.productName %></h4>
+                                <div class="collapse-horizontal">
+                                    <p class="mb-2"> ขนาดของชิ้นงาน : <%= item.size %></p>
+                                    <% item.options.forEach((option) => {  %>
+                                    <p class="mb-2"> <%= option.option_type %> : <%= option.option_name %></p>
+                                    <% }) %>
+                                </div>
+                            </div>
+                            <div class="col-2">
+                                <% if (findPromo) { %>
+                                <%  promotions.forEach((promo) => { %>
+                                <%  let min_reach = promo.min_reach;%>
+                                <% if (promo.promo_type == 'giveaway' && promo.promo_condition == 'value') { %>
+                                <% if (item.price >= promo.min_reach) {%>
+                                <% qty = item.quantity + promo.type_value%>
+                                <% textQty = `<b>${qty}</b><br><s>${item.quantity}</s>` %>
+                                <% } %>
+                                <% } else if (promo.promo_type == 'giveaway' && promo.promo_condition == 'qty') { %>
+                                <% if (item.quantity >= promo.min_reach) {%>
+                                <% qty = item.quantity + promo.type_value%>
+                                <% textQty = `<b>${qty}</b><br><s>${item.quantity}</s>` %>
+                                <% } %>
+                                <%  }else if (promo.promo_type == 'discount' && promo.promo_condition == 'value') { %>
+                                <% if (item.price >= promo.min_reach) {%>
+                                <% price = item.price - (item.price * promo.type_value / 100)%>
+                                <% textPrice = `<b>${money.format(price)}</b><br><s>${money.format(item.price)}</s>` %>
+                                <% } %>
+                                <% } else if (promo.promo_type == 'discount' && promo.promo_condition == 'qty') { %>
+                                <% if (item.quantity >= promo.min_reach) {%>
+                                <% price = item.price - (item.price * promo.type_value / 100) %>
+                                <% textPrice = `<b>${money.format(price)}</b><br><s>${money.format(item.price)}</s>` %>
+                                <% } %>
+                                <% } %>
+                                <% }) %>
+                                <% }  %>
+                                <% SumPrice += price %>
+                                <h5>จำนวน</h5>
+                                <%- textQty %>
+                            </div>
+                            <div class="col-3">
+                                <h5>ราคา</h5>
+                                <%- textPrice %>
+                            </div>
+                            <div class="col-1 text-end">
+                                <a href="/editproduct-cart/<%= item.product_id %>/<%= item.cart_id %>/<%= item.cart_detail_id %>"
+                                    class="text-drak d-block mb-5">
+                                    <i class="fa-solid fa-pen-to-square"></i> แก้ไข
+                                </a>
+                                <button type="submit" class="btn btn-danger delete rounded-0" data-mdb-toggle="modal"
+                                    data-mdb-target="#deleteModal" data-cart-id="<%= item.cart_id %>">
+                                    ลบ
+                                </button>
+                            </div>
                         </div>
                     </div>
-                    <div class="border-top d-flex justify-content-between p-3 my-4" style="margin-left: 200px;">
-                        <a href="" class="text-drak">
-                            <i class="fa-solid fa-pen-to-square"></i> แก้ไขรายการ
+                </div>
+                <% }) %>
+            </div>
+            <div class="col-4">
+                <div class="card" style="height: fit-content;">
+                    <div class="card-header">
+                        <h3>สรุปรายการ</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="border-bottom mb-2">
+                            <div class="my-2 d-flex justify-content-between">
+                                <span>ยอดรวมสินค้า (<%= cartsItem.length %> รายการ)</span>
+                                <span>
+                                    <%= money.format(SumPrice) %>
+                                </span>
+                            </div>
+                            <div class="my-2 d-flex justify-content-between">
+                                <span>ค่าส่ง</span>
+                                <span>
+                                    <% let ship = 0; %>
+                                    0
+                                </span>
+                            </div>
+                            <div class="my-2 d-flex justify-content-between">
+                                <span>VAT 7%</span>
+                                <span>
+                                    <% let vat = SumPrice * 7 / 100;%>
+                                    <%= money.format(vat) %>
+                                </span>
+                            </div>
+                        </div>
+                        <!-- <div class="border-bottom mb-2">
+                            <div class="d-flex mb-2">
+                                <div class="form-outline me-1">
+                                    <input type="text" id="coupon" class="form-control" />
+                                    <label class="form-label" for="coupon">คูปอง</label>
+                                </div>
+                                <button class="btn btn-primary" id="applyCode" style="padding: 10px;">apply</button>
+                            </div>
+                            <span id="coupon-detail"></span>
+                        </div> -->
+                        <div class="my-2 d-flex justify-content-between">
+                            <b>ยอดรวมทั้งหมด</b>
+                            <div class="d-flex">
+                                <span class="fw-bold me-2" id="totalPrice">
+                                    <%=money.format(SumPrice + ship + vat) %>
+                                </span>
+                                <span class="fw-bold" id="newPrice">
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <a href="/checkout">
+                            <button class="btn btn-primary w-100 fs-5">เช็คเอาท์</button>
                         </a>
-                        <button type="button" class="btn btn-danger delete rounded-0" data-mdb-toggle="modal"
-                            data-mdb-target="#deleteModal" data-cart-id="<%= cart.cart_id %>">
-                            ลบ
-                        </button>
                     </div>
                 </div>
             </div>
-
-            <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel"
-                aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="editModalLabel">ลบรายการ</h5>
-                            <button type="button" class="btn-close" data-mdb-dismiss="modal"
-                                aria-label="Close"></button>
+        </div>
+        <% } else { %>
+        <div class="text-center">
+            <img src="assets/img/empty.png" alt="cart-empty" width="150"> <br>
+            <h3 class="mt-5">คุณยังไม่มีสินค้าในตระกร้า</h3>
+        </div>
+        <% } %>
+    </div>
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">ลบรายการ</h5>
+                    <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="/deleteCart" id="editForm" method="post">
+                        <div>
+                            <p>ต้องการลบสินค้านี้ออกจากตระกร้าใช่หรือไม่ ?</p>
                         </div>
-                        <div class="modal-body">
-                            <form action="/deleteCart" id="editForm" method="post">
-                                <div>
-                                    <p>ต้องการลบสินค้านี้ออกจากตระกร้าใช่หรือไม่ ?</p>
-                                </div>
-                                <input type="hidden" id="id" name="id" value="" />
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary "
-                                        data-mdb-dismiss="modal">ยกเลิก</button>
-                                    <button type="submit" class="btn btn-danger">ยืนยัน</button>
-                                </div>
-                            </form>
+                        <input type="hidden" id="id" name="id" value="" />
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary " data-mdb-dismiss="modal">ยกเลิก</button>
+                            <button type="submit" class="btn btn-danger">ยืนยัน</button>
                         </div>
-                    </div>
+                    </form>
                 </div>
             </div>
-            <% }) %>
-            <% } %>
         </div>
     </div>
-
     <script>
-         $(document).on("click", ".delete", function () {
+        $(document).on("click", ".delete", function () {
             var id = $(this).data("cart-id");
             $("#id").val(id);
         });
 
+        document.querySelectorAll('.form-outline').forEach((formOutline) => {
+            new mdb.Input(formOutline).init();
+        });
+
+        $(document).ready(() => {
+            const couponReq = () => {
+                const code_input = $('#coupon').val();
+                $.ajax({
+                    url: '/getCoupon',
+                    method: 'GET',
+                    success: (result) => {
+                        const findCode = result.find(row => code_input === row.coupon_code);
+                        console.log(findCode);
+                        if (findCode) {
+                            console.log('เจอ');
+                            var totalPrice = parseFloat($('#totalPrice').text());
+                            let detail = ``;
+                            let newPrice = 0;
+                            console.log(totalPrice);
+                            if (findCode.coupon_type == 'percent') {
+                                detail = `ส่วนลด ${money.format(findCode.discount_value)} %`
+                                newPrice = totalPrice - (totalPrice * findCode.discount_value /
+                                    100);
+                            } else if (findCode.coupon_type == 'value') {
+                                detail = `ส่วนลด ${money.format(findCode.discount_value)} บาท`
+                                newPrice = totalPrice - findCode.discount_value
+                            }
+
+                            let updateOldPrice =
+                                `<s class="fw-bold me-2" id="totalPrice">${money.format(totalPrice)}</s>`
+                            if (totalPrice >= findCode.min_amount) {
+                                $('#coupon-detail').empty().append(detail);
+                                $('#totalPrice').empty().replaceWith(updateOldPrice);
+                                $('#newPrice').empty().append(money.format(newPrice));
+                            } else {
+                                $('#coupon-detail').empty().append(detail +
+                                    '|| ไม่ผ่านไม่เงื่อนไข');
+                                $('#totalPrice').empty().replaceWith(
+                                    `<b class="fw-bold me-2" id="totalPrice">${money.format(totalPrice)}</b>`
+                                );
+                                $('#newPrice').empty()
+                            }
+                        } else {
+                            $('#coupon-detail').empty().append('ไม่พบคูปองนี้');
+                        }
+                        // data.forEach((item) => {
+
+                        // });
+                    },
+                    error: (error) => {
+                        console.error('Error:', error);
+                    },
+                });
+            }
+
+            $('#applyCode').click(() => {
+                couponReq()
+            });
+
+            $('#coupon').keypress((e) => {
+                if (e.which === 13) {
+                    couponReq();
+                }
+            });
+        });
     </script>
 </body>
 <%- include('../partials/footer') %>

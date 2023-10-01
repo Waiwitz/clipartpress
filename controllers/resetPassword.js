@@ -19,7 +19,7 @@ let identify = async (req, res) => {
                         const transporter = nodemailer.createTransport({
                             service: 'gmail',
                             auth: {
-                                user: 'slurpeech@gmail.com',
+                                user: 'slurpeech@gmail.com', 
                                 pass: 'cyoekyuuhppspmmi'
                             }
                         });

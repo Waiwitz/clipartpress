@@ -1,0 +1,412 @@
+<%- include('../../partials/admin-nav') %>
+<style>
+    td {
+        padding: 2.25em 2em !important;
+    }
+</style>
+
+<body>
+    <div class="mb-5 secondHead-admin">
+        <div class="secondHead-content">
+            <h1>เพิ่มการขนส่ง</h1>
+            <!-- <ol class="list-unstyled d-flex ">
+                <li class="breadcrumb-item"><a class="link-light" href="#">หน้าแรก</a></li>
+                <li class="active text-light ms-2">/ สินค้า</li>
+            </ol> -->
+        </div>
+    </div>
+    <div style="padding-bottom: 100px;"></div>
+    <div class="box-admin">
+        <div class="card">
+            <div class="card-body">
+                <form action="/editshipment/<%= shipments[0].shipment_id %>" method="post" class="needs-validation"
+                    novalidate>
+                    <div class="row mb-4">
+                        <div class="col-4">
+                            <label class="form-label" for="shipmentName">ชื่อการขนส่ง<span
+                                    class="text-danger ms-1">*</span></label>
+                            <input type="text" id="shipmentName" class="form-control" name="shipment_name"
+                                value="<%= shipments[0].shipment_name %>" required />
+                            <div class="invalid-feedback">
+                                กรุณากรอกชื่อการขนส่ง
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label me-2">สถานะ :</label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" value="1" role="switch" name="getStatus"
+                                    id="status" <%= shipments[0].status == '1' ? 'checked' : '' %> />
+                                <label class="form-check-label" for="flexSwitchCheckDefault">เปิดใช้งาน</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col">
+                            <label class="form-label me-2">รูปแบบราคาขนส่ง :</label>
+                            <div class="form-check me-3 form-check-inline">
+                                <input class="form-check-input" type="radio" id="type1" name="shipment_type" value="qty"
+                                    required <%= shipments[0].shipment_type == 'qty' ? 'checked' : '' %> />
+                                <label class="form-check-label" for="type1">คิดตามปริมาณ</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" id="type2" name="shipment_type"
+                                    value="free" required
+                                    <%= shipments[0].shipment_type == 'free' ? 'checked' : '' %> />
+                                <label class="form-check-label" for="type2">ฟรี</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="priceTable">
+                        <% if (shipments[0].shipment_type == "qty") { %>
+                        <table class="table table-bordered w-75 mt-3" id="shipmentPrice">
+                            <thead>
+                                <tr>
+                                    <td colspan="3">
+                                        <div class="d-flex">
+                                            <label class="form-label mt-1 me-2" style="width: 100px;">ค่าขนส่งเริ่มต้น
+                                                :</label>
+                                            <div class="input-group w-25">
+                                                <input type="number" class="form-control qtyinput" name="start_price"
+                                                    min="0" value="<%= shipments[0].start_price %>" required />
+                                                <span class="input-group-text" id="unittype">฿</span>
+                                                <div class="invalid-feedback">
+                                                    กรุณากรอกค่าขนส่งเริ่มต้น
+                                                </div>
+                                            </div>
+                                            <span class="text-danger ms-1">*</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </thead>
+                            <tbody id="pricerow">
+                                <tr>
+                                    <td>
+                                        <div class="d-flex">
+                                            <input type="hidden" name="sp_id[0]"
+                                                value="<%= shipments[0].shipment_price_id %>">
+                                            <span class="form-label mt-1" for="inlineFormSelectPref"
+                                                style="width: 80px;">เมื่อซื้อถึง</span>
+                                            <div class="input-group mx-1">
+                                                <input type="number" class="form-control qtyinput" name="qty_min[0]"
+                                                    min="0" required value="<%= shipments[0].qty_min %>" />
+                                                <span class="input-group-text" id="unittype">ชิ้น</span>
+                                                <div class="invalid-feedback">
+                                                    กรุณากรอกปริมาณ
+                                                </div>
+                                            </div>
+                                            <span class="text-danger ms-1">*</span>
+                                            <span class="form-label mt-1 ms-2" for="inlineFormSelectPref"
+                                                style="width: 60px;">ขึ้นไป</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex">
+                                            <span class="form-label mt-1" for="inlineFormSelectPref"
+                                                style="width: 70px;">ค่าขนส่ง</span>
+                                            <div class="input-group">
+                                                <input type="number" class="form-control priceinput" name="price[0]"
+                                                    min="0" required value="<%= shipments[0].price %>" />
+                                                <span class="input-group-text" id="unittype">฿</span>
+                                                <div class="invalid-feedback">
+                                                    กรุณากรอกค่าขนส่ง
+                                                </div>
+                                            </div>
+                                            <span class="text-danger ms-1">*</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="addPrice ms-2 btn btn-secondary"
+                                            data-target="PriceRow-0">
+                                            <i class="fa-solid fa-plus"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <% for( let i = 1; i < shipments.length ; i++ ) { %>
+                                <tr id="<%= shipments[i].shipment_price_id %>">
+                                    <td>
+                                        <div class="d-flex">
+                                            <input type="hidden" name="sp_id[<%= i %>]"
+                                                value="<%= shipments[i].shipment_price_id %>">
+                                            <span class="form-label mt-1" for="inlineFormSelectPref"
+                                                style="width: 80px;">เมื่อซื้อถึง</span>
+                                            <div class="input-group mx-1">
+                                                <input type="number" class="form-control qtyinput"
+                                                    name="qty_min[<%= i %>]" min="0" required
+                                                    value="<%= shipments[i].qty_min %>" />
+                                                <span class="input-group-text" id="unittype">ชิ้น</span>
+                                                <div class="invalid-feedback">
+                                                    กรุณากรอกปริมาณ
+                                                </div>
+                                            </div>
+                                            <span class="text-danger ms-1">*</span>
+                                            <span class="form-label mt-1 ms-2" for="inlineFormSelectPref"
+                                                style="width: 60px;">ขึ้นไป</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex">
+                                            <span class="form-label mt-1" for="inlineFormSelectPref"
+                                                style="width: 70px;">ค่าขนส่ง</span>
+                                            <div class="input-group">
+                                                <input type="number" class="form-control priceinput"
+                                                    name="price[<%= i %>]" min="0" required
+                                                    value="<%= shipments[i].price %>" />
+                                                <span class="input-group-text" id="unittype">฿</span>
+                                                <div class="invalid-feedback">
+                                                    กรุณากรอกค่าขนส่ง
+                                                </div>
+                                            </div>
+                                            <span class="text-danger ms-1">*</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="ms-2 btn btn-danger existRow"
+                                            data-mdb-toggle="modal" data-mdb-target="#deleteRow"
+                                            data-id="<%= shipments[i].shipment_price_id %>">
+                                            <i class="fa-solid fa-trash" style="color: #ffffff;"></i></button>
+                                    </td>
+                                </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                        <% } %>
+                    </div>
+                    <button type="submit" class="btn btn-primary">บันทึก</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="deleteRow" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">ลบระดับราคา</h5>
+                    <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        <p class="fs-5">ต้องการลบใช่หรือไม่ ? หากลบแล้วข้อมูลแถวนี้จะหายไปไม่สามารถนำกลับมาได้</p>
+                    </div>
+                    <input type="hidden" id="idsize" name="idsize" value="" />
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary " data-mdb-dismiss="modal">ยกเลิก</button>
+                        <button type="button" id="removeExist" class="btn btn-danger">ยืนยัน</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script src="/js/validateBs.js"></script>
+<script>
+    let count = 0;
+    $('.addPrice').prop('disabled', count >= 4);
+
+    $(document).ready(function () {
+        $('input[name="shipment_type"]').change(function () {
+            let form = `  <table class="table table-bordered w-75 mt-3" id="shipmentPrice">
+                            <thead>
+                                <tr>
+                                    <td colspan="3">
+                                        <div class="d-flex">
+                                            <label class="form-label mt-1 me-2" style="width: 100px;">ค่าขนส่งเริ่มต้น
+                                                :</label>
+                                            <div class="input-group w-25">
+                                                <input type="number" class="form-control qtyinput" name="start_price"
+                                                    min="0" value="<%= shipments[0].start_price %>" required />
+                                                <span class="input-group-text" id="unittype">฿</span>
+                                                <div class="invalid-feedback">
+                                                    กรุณากรอกค่าขนส่งเริ่มต้น
+                                                </div>
+                                            </div>
+                                            <span class="text-danger ms-1">*</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </thead>
+                            <tbody id="pricerow">
+                                <tr>
+                                    <td>
+                                        <div class="d-flex">
+                                            <input type="hidden" name="sp_id[0]"
+                                                value="<%= shipments[0].shipment_price_id %>">
+                                            <span class="form-label mt-1" for="inlineFormSelectPref"
+                                                style="width: 80px;">เมื่อซื้อถึง</span>
+                                            <div class="input-group mx-1">
+                                                <input type="number" class="form-control qtyinput" name="qty_min[0]"
+                                                    min="0" required value="<%= shipments[0].qty_min %>" />
+                                                <span class="input-group-text" id="unittype">ชิ้น</span>
+                                                <div class="invalid-feedback">
+                                                    กรุณากรอกปริมาณ
+                                                </div>
+                                            </div>
+                                            <span class="text-danger ms-1">*</span>
+                                            <span class="form-label mt-1 ms-2" for="inlineFormSelectPref"
+                                                style="width: 60px;">ขึ้นไป</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex">
+                                            <span class="form-label mt-1" for="inlineFormSelectPref"
+                                                style="width: 70px;">ค่าขนส่ง</span>
+                                            <div class="input-group">
+                                                <input type="number" class="form-control priceinput" name="price[0]"
+                                                    min="0" required value="<%= shipments[0].price %>" />
+                                                <span class="input-group-text" id="unittype">฿</span>
+                                                <div class="invalid-feedback">
+                                                    กรุณากรอกค่าขนส่ง
+                                                </div>
+                                            </div>
+                                            <span class="text-danger ms-1">*</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="addPrice ms-2 btn btn-secondary"
+                                            data-target="PriceRow-0">
+                                            <i class="fa-solid fa-plus"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <% for( let i = 1; i < shipments.length ; i++ ) { %>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex">
+                                            <input type="hidden" name="sp_id[<%= i %>]"
+                                                value="<%= shipments[i].shipment_price_id %>">
+                                            <span class="form-label mt-1" for="inlineFormSelectPref"
+                                                style="width: 80px;">เมื่อซื้อถึง</span>
+                                            <div class="input-group mx-1">
+                                                <input type="number" class="form-control qtyinput"
+                                                    name="qty_min[<%= i %>]" min="0" required
+                                                    value="<%= shipments[i].qty_min %>" />
+                                                <span class="input-group-text" id="unittype">ชิ้น</span>
+                                                <div class="invalid-feedback">
+                                                    กรุณากรอกปริมาณ
+                                                </div>
+                                            </div>
+                                            <span class="text-danger ms-1">*</span>
+                                            <span class="form-label mt-1 ms-2" for="inlineFormSelectPref"
+                                                style="width: 60px;">ขึ้นไป</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex">
+                                            <span class="form-label mt-1" for="inlineFormSelectPref"
+                                                style="width: 70px;">ค่าขนส่ง</span>
+                                            <div class="input-group">
+                                                <input type="number" class="form-control priceinput"
+                                                    name="price[<%= i %>]" min="0" required
+                                                    value="<%= shipments[i].price %>" />
+                                                <span class="input-group-text" id="unittype">฿</span>
+                                                <div class="invalid-feedback">
+                                                    กรุณากรอกค่าขนส่ง
+                                                </div>
+                                            </div>
+                                            <span class="text-danger ms-1">*</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="ms-2 btn btn-danger removerow"><i class="fa-solid fa-trash" style="color: #ffffff;"></i></button>
+                                    </td>
+                                </tr>
+                                <% } %>
+                            </tbody>
+                        </table>`
+            if ($(this).val() == 'free') {
+                $('#shipmentPrice').remove()
+
+            } else if ($(this).val() == 'qty') {
+                $('.priceTable').append(form)
+            }
+        });
+    });
+
+    $(document).on('click', '.addPrice', function () {
+        if (count < 4) {
+            count++;
+            var newrow = `
+            <tr>
+                            <td>
+                                <div class="d-flex">
+                                    <span class="form-label mt-1" for="inlineFormSelectPref"
+                                        style="width: 80px;">เมื่อซื้อถึง</span>
+                                    <div class="input-group">
+                                        <input type="number" id="minAmount" class="form-control" name="new_qty_min[${count}]"
+                                            min="0" required />
+                                        <span class="input-group-text" id="unittype">ชิ้น</span>
+                                           <div class="invalid-feedback">
+                                                    กรุณากรอกปริมาณ
+                                                </div>
+                                    </div>
+                                    <span class="text-danger ms-1">*</span>
+                                    <span class="form-label mt-1 ms-2" for="inlineFormSelectPref"
+                                        style="width: 60px;">ขึ้นไป</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex">
+                                    <span class="form-label mt-1" for="inlineFormSelectPref"
+                                        style="width: 70px;">ค่าขนส่ง</span>
+                                    <div class="input-group">
+                                        <input type="number" id="minAmount" class="form-control" name="new_price[${count}]"
+                                            min="0" required />
+                                        <span class="input-group-text" id="unittype">฿</span>
+                                        <div class="invalid-feedback">
+                                                    กรุณากรอกค่าขนส่ง
+                                                </div>
+                                    </div>
+                                    <span class="text-danger ms-1">*</span>
+                                </div>
+                            </td>
+                            <td>
+                                <button type="button" class="ms-2 btn btn-danger removerow"><i class="fa-solid fa-trash" style="color: #ffffff;"></i></button>
+                            </td>
+                        </tr>
+          `;
+            $('#pricerow').append(newrow);
+            document.querySelectorAll('.form-outline').forEach((formOutline) => {
+                new mdb.Input(formOutline).init();
+            });
+            $('.addPrice').prop('disabled', count >= 4);
+        }
+    });
+
+
+    $(document).on('click', '.removerow', function () {
+        $(this).closest('tr').remove();
+        count--
+        if (count < 4) {
+            $('.addPrice').prop('disabled', false);
+        }
+    });
+
+    $(document).on("click", ".existRow", function () {
+            var id = $(this).data("id");
+            $('#removeExist').click(function () {
+                $.ajax({
+                    url: '/deleteShipmentPrice/' + id,
+                    type: 'DELETE',
+                    success: function () {
+                        $(`#${id}`).remove();
+                        $('#deleteRow').modal('hide');
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'สำเร็จ',
+                            text: 'ลบข้อมูลสำเร็จแล้ว',
+                        });
+                    },
+                    error: function (xhr, status, error) {
+                        $('#deleteRow').modal('hide');
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'มีบางอย่างผิดพลาด...',
+                            text: 'กรุณาลองใหม่ภายหลัง',
+                        });
+                    }
+                });
+            });
+        });
+</script>

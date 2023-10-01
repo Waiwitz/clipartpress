@@ -1,0 +1,134 @@
+<%- include('../../partials/admin-nav') %>
+
+<body style="background-color: #f8f8f8;">
+    <div class="mb-5 secondHead-admin">
+        <div class="secondHead-content">
+            <h1>ค่าจัดส่ง</h1>
+        </div>
+    </div>
+    <div style="padding-bottom: 150px;"></div>
+
+    <div class="box-admin">
+        <% if(success_msg != "") { %>
+        <% success_msg.forEach((item) => { %>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <strong><%- item %></strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <% }); %>
+        <% }else if(errors != "") {%>
+        <% errors.forEach((item) => { %>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong><%- item %></strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <% }); %>
+        <% } %>
+        <div class="card shadow-5-strong" id="bankSection" style="width: 100%; margin: auto;">
+            <div class="card-body">
+                <a href="/admin/shipment/addshipment">
+                    <button type="button" class="btn btn-secondary mb-3 fs-6" data-mdb-toggle="modal"
+                        data-mdb-target="#addBank">
+                        <i class="fa-solid fa-plus"></i>
+                        เพิ่มค่าจัดส่ง
+                    </button>
+                </a>
+                <table class="table align-middle mb-0 bg-white tb" id="table">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>#</th>
+                            <th>ชื่อการจัดส่ง</th>
+                            <th>ประเภท</th>
+                            <th>สถาะนะ</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <% shipments.forEach((shipment, index) => { %>
+                        <tr>
+                            <td>
+                                <%= index + 1 %>
+                            </td>
+                            <td>
+                                <%= shipment.shipment_name %>
+                            </td>
+                            <td>
+                                <% let type; %>
+                                <% if (shipment.shipment_type == 'qty') { %>
+                                <% type = 'คิดตามปริมาณ' %>
+                                <% } else { %>
+                                <% type = 'ฟรี' %>
+                                <% } %>
+                                <%= type %>
+                            </td>
+                            <td>
+                                <% let status; %>
+                                <% if (shipment.status == 1) { %>
+                                <% status = 'เปิดใช้งาน' %>
+                                <% } else { %>
+                                <% status = 'ปิด' %>
+                                <% } %>
+                                <%= status %>
+                            </td>
+                            <td>
+                                <a href="/admin/shipment/editshipment/<%= shipment.shipment_id %>">
+                                    <button class="btn btn-warning btn-sm edit" data-mdb-toggle="modal"
+                                        data-mdb-target="#updateModal">
+                                        แก้ไข
+                                    </button>
+                                </a>
+                                <button type="button" class="btn btn-danger btn-sm delete" data-mdb-toggle="modal"
+                                    data-mdb-target="#deleteModal" data-id="<%= shipment.shipment_id %>"
+                                    data-name="<%= shipment.shipment_name %>">
+                                    ลบ
+                                </button>
+                            </td>
+                        </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">ลบประเภท</h5>
+                    <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="/deleteshipment/" id="deleteShipment" method="post">
+                        <div>
+                            <p class="">ต้องการลบขนส่ง <b id="NameWarning"></b> ใช่หรือไม่ ?</p>
+                        </div>
+                        <input type="hidden" id="id" name="promotion_id" value="" readonly />
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary " data-mdb-dismiss="modal">ยกเลิก</button>
+                            <button type="submit" class="btn btn-danger">ยืนยัน</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script>
+    $(document).ready(function () {
+        $('.table').DataTable({
+            order: [
+                [0, 'desc']
+            ],
+        });
+
+        $('.delete').click(function () {
+            const id = $(this).data('id')
+            const name = $(this).data('name')
+            $('#deleteShipment').attr('action', '/deleteshipment/' + id)
+            $('#NameWarning').text(name)
+        })
+    })
+</script>

@@ -9,7 +9,6 @@ const login = (req, res) => {
     try {
         const username = req.body.username;
         const password = req.body.password;
-        const remember = req.body.rememberMe;
         if (!username || !password) {
             return res.render('pages/login', {
                 errors: ['กรุณากรอกอีเมลและรหัสผ่าน']
@@ -19,15 +18,16 @@ const login = (req, res) => {
             .then(async ([row]) => {
                 // if (err) throw (err)
                 if (!row[0] || row[0].deleted_at !== null) {
-                    console.log("User does not exist");
-                    // res.status(404).json({
-                    //     message: 'User not found'
-                    // });
                     return res.render('pages/login', {
                         errors: ['ไม่มีผู้ใช้ชื่อนี้']
                     });
                 }
 
+                if (row[0].verified == 0) {
+                    return res.render('pages/login', {
+                        warnings: ['คุณยังไม่ได้ยืนยันอีเมล สามารถยืนยันอีเมลได้จากลิงค์ที่ระบบส่งไป']
+                    });
+                }
                 await bcrypt.compare(password, row[0].password).then(compare_result => {
                         console.log(compare_result)
                         if (compare_result) {
@@ -43,6 +43,7 @@ const login = (req, res) => {
                             req.session.lineid = row[0].lineid;
                             req.session.picture = row[0].picture;
                             req.session.role = row[0].user_role;
+                            req.session.verified = row[0].verified;
                             const id = row[0].user_id;
                             const role = row[0].user_role;
                             console.log(role)
@@ -59,12 +60,12 @@ const login = (req, res) => {
                             } else {
                                 res.status(200).redirect("/");
                             }
-
-                            if (remember) {
-                                req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000;
-                            } else {
-                                req.session.cookie.expires = false; 
-                            }
+  
+                            // if (remember) {
+                            //     req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000;
+                            // } else {
+                            //     req.session.cookie.expires = false; 
+                            // }
 
                         } else {
                             res.render('pages/login', {
