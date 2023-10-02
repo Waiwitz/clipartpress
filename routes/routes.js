@@ -34,7 +34,7 @@ let Routes = (app) => {
     // })); 
     router.get('/', (req, res) => {
         res.render('pages/index', {
-            currentMenu: 'หน้าแรก',
+            currentMenu: 'หน้าแรก', 
             Title: 'Clipart Press',
         });
     });
