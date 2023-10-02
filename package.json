@@ -10,6 +10,7 @@
   "author": "waiwit",
   "license": "ISC",
   "dependencies": {
+    "@npmcli/arborist": "^7.1.0",
     "@pdftron/pdfjs-express": "^8.7.4",
     "axios": "^1.5.1",
     "bcrypt": "^5.1.0",
