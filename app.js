@@ -12,11 +12,12 @@ const morgan = require('morgan')
 const path = require('path');
 const fs = require('fs');
 const banklist = require('./public/js/banklist.js')
-
+const cors = require('cors');
 // socket.io
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
 
+app.use(cors());
 // const server = require('http').createServer(app, (req, res) => {
 //     const canvas = new fabric.Canvas(null, { width: 300, height: 300 });
 //     const rect = new fabric.Rect({ width: 20, height: 50, fill: '#ff0000' });
@@ -91,14 +92,22 @@ app.use(function (req, res, next) {
     res.locals.message = ''
     res.locals.money = money;
     res.locals.banklist = banklist;
+
+    // if (req.session.user_id !== null) {
+    //     dbConnection.promise().query(`SELECT COUNT(*) as cartCount, p.* FROM cart c JOIN product p ON p.product_id = c.product_id WHERE c.user_id = ${req.session.user_id} AND c.deleted_at IS NULL AND p.deleted_at IS NULL`)
+    //         .then(([result]) => {
+    //             res.locals.cartCount = result[0].cartCount;
+    //         })
+    // }
     next();
 });
 
 app.use(function (req, res, next) {
     if (req.session.user_id !== null) {
-        dbConnection.query(`SELECT COUNT(*) as cartCount, p.* FROM cart c JOIN product p ON p.product_id = c.product_id WHERE c.user_id = ${req.session.user_id} AND c.deleted_at IS NULL AND p.deleted_at IS NULL`)
+        dbConnection.promise().query(`SELECT cart_id FROM cart WHERE user_id = ${req.session.user_id} AND deleted_at IS NULL`)
             .then(([result]) => {
-                res.locals.cartCount = result[0].cartCount;
+                res.locals.cartCount = result.length;
+                console.log('sssssssasdasd ' + result.length);
                 next();
             })
             .catch(err => {

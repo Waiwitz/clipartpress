@@ -9,12 +9,12 @@ const {
 let identify = async (req, res) => {
     const email = req.body.email;
     try {
-        await dbConnection.query('SELECT * FROM users WHERE email = ?', [email])
+        await dbConnection.promise().query('SELECT * FROM users WHERE email = ?', [email])
             .then(async ([row]) => {
                 if (row.length > 0) {
                     const token = crypto.randomBytes(20).toString('hex');
                     const exp = new Date(Date.now() + 3600000); // Token expires in 1 hour
-                    await dbConnection.query('UPDATE users SET reset_token = ?, reset_token_exp = ? WHERE email = ?', [token, exp, email]).then(([row]) => {
+                    await dbConnection.promise().query('UPDATE users SET reset_token = ?, reset_token_exp = ? WHERE email = ?', [token, exp, email]).then(([row]) => {
                         // Send password reset email
                         const transporter = nodemailer.createTransport({
                             service: 'gmail',
@@ -62,13 +62,13 @@ let reset = async (req, res) => {
     const token = req.query.token;
     // console.log(token);
     try {
-        await dbConnection.query('SELECT * FROM users WHERE reset_token = ? AND reset_token_exp > ?', [token, new Date()])
+        await dbConnection.promise().query('SELECT * FROM users WHERE reset_token = ? AND reset_token_exp > ?', [token, new Date()])
             .then(async ([row]) => {
                 if (row.length > 0) {
                     const email = row[0].email;
                     const newPassword = bcryptjs.hashSync(password, 10);
                     if (confirmPw === password) {
-                        await dbConnection.query('UPDATE users SET password = ?,  reset_token = NULL, reset_token_exp = NULL WHERE email = ?', [newPassword, email]);
+                         dbConnection.query('UPDATE users SET password = ?,  reset_token = NULL, reset_token_exp = NULL WHERE email = ?', [newPassword, email]);
                         res.redirect(`/success-reset-password?token=${token}`);
                     } else {
                         req.flash("error_msg", 'อีเมลไม่ตรงกัน กรุณาลองอีกครั้ง');

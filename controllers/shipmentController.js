@@ -18,14 +18,14 @@ const addShipment = (req, res) => {
     }
     try {
         if (shipment_type == 'qty') {
-            dbConnection.query('INSERT INTO shipments SET shipment_name = ?, shipment_type = ?, start_price = ?, status = ?', [shipment_name, shipment_type, start_price, status]).then(([shipment]) => {
+            dbConnection.promise().query('INSERT INTO shipments SET shipment_name = ?, shipment_type = ?, start_price = ?, status = ?', [shipment_name, shipment_type, start_price, status]).then(([shipment]) => {
                 const shipmentId = shipment.insertId;
                 for (let i = 0; i < qty_min.length; i++) {
                     dbConnection.query('INSERT INTO shipments_price SET qty_min = ?, price = ?, shipment_id = ?', [qty_min[i], price[i], shipmentId]);
                 }
             })
         } else if (shipment_type == 'free') {
-            dbConnection.query('INSERT INTO shipments SET shipment_name = ?, shipment_type = ?, start_price = ?, status = ?', [shipment_name, shipment_type, start_price, status], (error) => {
+            dbConnection.promise().query('INSERT INTO shipments SET shipment_name = ?, shipment_type = ?, start_price = ?, status = ?', [shipment_name, shipment_type, start_price, status], (error) => {
                 if (error) throw error
             })
         }
@@ -62,7 +62,7 @@ const updateShipment = (req, res) => {
     try {
 
         if (shipment_type == 'qty') {
-            dbConnection.query('UPDATE shipments SET shipment_name = ?, shipment_type = ?, start_price = ?, status = ? WHERE shipment_id = ?', [shipment_name, shipment_type, start_price, status, shipmentId]).then(() => {
+            dbConnection.promise().query('UPDATE shipments SET shipment_name = ?, shipment_type = ?, start_price = ?, status = ? WHERE shipment_id = ?', [shipment_name, shipment_type, start_price, status, shipmentId]).then(() => {
                 for (let i = 0; i < sp_id.length; i++) {
                     dbConnection.query('UPDATE shipments_price SET qty_min = ?, price = ? WHERE shipment_price_id = ?', [qty_min[i], price[i], sp_id[i]]);
                 }
@@ -74,7 +74,7 @@ const updateShipment = (req, res) => {
                 }
             })
         } else if (shipment_type == 'free') {
-            dbConnection.query('UPDATE shipments SET shipment_name = ?, shipment_type = ?, start_price = ?, status = ? WHERE shipment_id = ?', [shipment_name, shipment_type, start_price, status, shipmentId], (error) => {
+            dbConnection.promise().query('UPDATE shipments SET shipment_name = ?, shipment_type = ?, start_price = ?, status = ? WHERE shipment_id = ?', [shipment_name, shipment_type, start_price, status, shipmentId], (error) => {
                 if (error) throw error
             })
         }
@@ -90,7 +90,7 @@ const updateShipment = (req, res) => {
 
 const deleteShipment = (req, res) => {
     const id = req.params.id;
-    dbConnection.query('UPDATE shipments SET deleted_at = NOW() WHERE shipment_id = ?', id , (error) => {
+    dbConnection.promise().query('UPDATE shipments SET deleted_at = NOW() WHERE shipment_id = ?', id , (error) => {
         if (error) {
             console.log(error);
             req.flash('errors', 'มีข้อผิดพลาดเกิดขึ้น');
@@ -105,8 +105,10 @@ const deletePrice = (req, res) => {
     const id = req.params.id;
     dbConnection.query('UPDATE shipments_price SET deleted_at = NOW() WHERE shipment_price_id = ?', id , (error) => {
         if (error) throw error
-    })
-    res.sendStatus(200)
+    }) 
+    res.json({
+        message: 'Data deleted'
+    });
 }
 module.exports = {
     addShipment: addShipment,

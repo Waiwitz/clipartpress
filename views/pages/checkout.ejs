@@ -22,6 +22,7 @@
         line-height: 62px !important;
     }
 </style>
+
 <body style="background-color: #f8f8f8;">
 
     <!-- <div class="banner shadow-5-strong">
@@ -57,6 +58,7 @@
             <% let qty; %>
             <% let price; %>
             <% let SumPrice = 0; %>
+            <% let SumQty = 0; %>
             <% if(cartsItem.length > 0) { %>
             <div class="d-flex flex-wrap">
                 <div class="col-8 overflow-y-scroll" style="height: 700px;">
@@ -111,6 +113,7 @@
                                     <% }) %>
                                     <% }  %>
                                     <% SumPrice += price %>
+                                    <% SumQty += qty; %>
                                     <h5>จำนวน</h5>
                                     <%- textQty %>
                                 </div>
@@ -140,6 +143,8 @@
                                     <%= data.address %> <%= data.province %> <%= data.postcode %>
                                 </span> <br>
                                 <span id="ad-tel"><%= data.telephone%></span>
+                                <% } else { %>
+                                    <b class="alert-warning p-1 m-auto">ยังไม่เลือกที่อยู่หลัก</b>
                                 <% } %>
                                 <% }) %>
                                 <% } else { %>
@@ -151,14 +156,20 @@
                             <div class="px-4 pt-3 mb-0">
                                 <b class="fs-5">การชำระเงิน</b>
                             </div>
-                     
+
                             <div class="card-body py-2">
                                 <select id="paymentMethod">
                                     <% promptpay.forEach((promptpay) => { %>
-                                    <option value="<%= promptpay.promptpay_id %>" data-imagesrc="/assets/img/logoBank/promptpay.png">Qr Code promptpay</option>
+                                    <option value="<%= promptpay.promptpay_id %>"
+                                        data-imagesrc="/assets/img/logoBank/promptpay.png">Qr Code promptpay</option>
                                     <% }) %>
                                     <% for( let i = 0; i < banks.length; i++ ) { %>
-                                        <option value="<%= banks[i].bank_id %>" data-imagesrc="/assets/img/logoBank/<%= banks[i].bank %>.png"><%= banks[i].bank == banklist[i].en ? `${banklist[i].th}` : '' %></option>
+                                    <option value="<%= banks[i].bank_id %>"
+                                        data-imagesrc="/assets/img/logoBank/<%= banks[i].bank %>.png">
+                                        <% banklist.forEach((list) => { %>
+                                        <%= banks[i].bank == list.en ? list.th : '' %>
+                                        <% }) %>
+                                    </option>
                                     <% } %>
                                 </select>
                             </div>
@@ -167,11 +178,15 @@
                             <div class="px-4 pt-3 mb-0">
                                 <b class="fs-5">การจัดส่ง</b>
                             </div>
-                     
+
                             <div class="card-body py-2">
-                                <select class="form-select" id="shipment">
-                                    <% shipments.forEach((shipments) => { %>
-                                    <option value="<%= shipments.shipment_id %>" data-imagesrc="/assets/img/logoBank/promptpay.png"><%= shipments.shipment_name %></option>
+                                <select class="form-select" id="shipment" name="shipment">
+                                    <% shipments.forEach((shipment) => { %>
+
+                                    <option value="<%= shipment.shipment_id %>" data-id="<%= shipment.shipment_id %>"
+                                        data-startprice="<%= shipment.start_price %>"
+                                        data-stype="<%= shipment.shipment_type %>"><%= shipment.shipment_name %>
+                                    </option>
                                     <% }) %>
                                 </select>
                             </div>
@@ -190,7 +205,7 @@
                                     </div>
                                     <div class="my-2 d-flex justify-content-between">
                                         <span>ค่าส่ง</span>
-                                        <span>
+                                        <span id="shipment-show">
                                             <% let ship = shipments[0].start_price; %>
                                             <%= ship %>
                                         </span>
@@ -218,10 +233,10 @@
                                 <div class="my-2 d-flex justify-content-between">
                                     <b>ยอดที่ต้องชำระ</b>
                                     <div class="d-flex">
-                                        <input type="hidden" id="sumPrice" value="<%= SumPrice + ship + vat %>" hidden>
+                                        <input type="hidden" id="sumPrice" value="<%= SumPrice + vat %>" hidden>
                                         <span class="fw-bold me-2" id="totalPrice">
-                                            <% sumTotal = SumPrice + ship + vat %>
-                                            <%=money.format(SumPrice + ship + vat) %>
+                                            <% sumTotal = SumPrice + vat %>
+                                            <%=money.format(SumPrice + vat) %>
                                         </span>
                                         <span class="fw-bold" id="newPrice">
                                         </span>
@@ -615,10 +630,17 @@
     </div>`
                 $('body').append(loading)
                 setTimeout(() => {
-                    $('#ad-name').text(name);
-                    $('#ad-info').text(address + ' ' + province + ' ' + postcode);
-                    $('#ad-tel').text(telephone);
+                    let text = `   <b id="ad-name">${name}</b> <br>
+                                <span class="card-text" id="ad-info">
+                                    ${address} ${province} ${postcode}
+                                </span> <br>
+                                <span id="ad-tel">${telephone}</span>`
+                    // $('#ad-name').text(name);
+                    // $('#ad-info').text(address + ' ' + province + ' ' + postcode);
+                    // $('#ad-tel').text(telephone);
+                    $('#show-address').empty().append(text)
                     $('.backdrop').remove();
+                    
                 }, 800);
             });
 
@@ -751,6 +773,39 @@
             });
             $('#paymentMethod .dd-selected-value').attr('name', 'paymentMethod')
 
+
+            $('select#shipment').on('change', function () {
+                var id = $(this).find(':selected').data('id')
+                var type = $(this).find(':selected').data('stype');
+                var startprice = $(this).find(':selected').data('startprice');
+                var originalPrice = $('#sumPrice').val();
+                var qty = `<%- SumQty %>`
+                const shipmentPrice = JSON.parse(`<%- JSON.stringify(shipmentsPrice)  %>`)
+
+                shipmentPrice.forEach((rows) => {
+                    if (rows.shipment_id === id) {
+                        var newprice = parseFloat(originalPrice) + parseFloat(rows.price);
+                        if (type == 'free') {
+                            $('#shipment-show').text('ฟรี')
+                            $('#totalPrice').empty().replaceWith(
+                                `<b class="fw-bold me-2" id="totalPrice">${THmoney.format(originalPrice)}</b>`
+                            );
+                        } else {
+                            if (qty < rows.qty_min) {
+                                $('#shipment-show').text(THmoney.format(startprice))
+                                $('#totalPrice').empty().replaceWith(
+                                    `<b class="fw-bold me-2" id="totalPrice">${THmoney.format(newprice)}</b>`
+                                );
+                            } else if (qty >= rows.qty_min) {
+                                $('#shipment-show').text(THmoney.format(rows.price))
+                                $('#totalPrice').empty().replaceWith(
+                                    `<b class="fw-bold me-2" id="totalPrice">${THmoney.format(newprice)}</b>`
+                                );
+                            }
+                        }
+                    }
+                });
+            }).change()
         });
     </script>
 </body>

@@ -94,7 +94,7 @@ let Routes = (app) => {
     // ผู้ใช้ ************************************************************************
     // แก้ไขโปรไฟล์
     router.get('/userprofile', verifyToken, (req, res) => {
-        dbConnection.query('SELECT * FROM users WHERE user_id =?', [req.session.user_id]).then(([data]) => {
+        dbConnection.promise().query('SELECT * FROM users WHERE user_id =?', [req.session.user_id]).then(([data]) => {
             // console.log(data)
             res.render('pages/userprofile', {
                 currentMenu: 'โปรไฟล์',
@@ -107,7 +107,7 @@ let Routes = (app) => {
 
     // ที่อยู่ 
     router.get('/address', verifyToken, (req, res) => {
-        dbConnection.query('SELECT * FROM address WHERE user_id = ? AND deleted_at is NULL ORDER BY address.default_address DESC', [req.session.user_id]).then(([data]) => {
+        dbConnection.promise().query('SELECT * FROM address WHERE user_id = ? AND deleted_at is NULL ORDER BY address.default_address DESC', [req.session.user_id]).then(([data]) => {
             res.render('pages/address', {
                 currentMenu: 'ที่อยู่',
                 address: data,
@@ -131,10 +131,10 @@ let Routes = (app) => {
 
     // หน้าสินค้าทั้งหมด
     router.get('/product/all/', (req, res) => {
-        dbConnection.query('SELECT pm.*, p.*, phm.* FROM promotions pm JOIN product_has_promotion phm ON phm.promo_id = pm.promo_id ' +
+        dbConnection.promise().query('SELECT pm.*, p.*, phm.* FROM promotions pm JOIN product_has_promotion phm ON phm.promo_id = pm.promo_id ' +
             'JOIN product p ON p.product_id = phm.product_id WHERE pm.deleted_at IS null AND phm.deleted_at IS null').then(([promotions]) => {
-            dbConnection.query('SELECT s.*, q.* FROM pricingTiers_size s JOIN pricingTiers_qty q ON q.product_id = s.product_id WHERE s.deleted_at IS null || q.deleted_at IS null').then(([priceTiers]) => {
-                dbConnection.query('SELECT * FROM product WHERE deleted_at is null')
+            dbConnection.promise().query('SELECT s.*, q.* FROM pricingTiers_size s JOIN pricingTiers_qty q ON q.product_id = s.product_id WHERE s.deleted_at IS null || q.deleted_at IS null').then(([priceTiers]) => {
+                dbConnection.promise().query('SELECT * FROM product WHERE deleted_at is null')
                     .then(([products]) => {
                         res.render('pages/product', {
                             currentMenu: "สินค้า",
@@ -170,9 +170,9 @@ let Routes = (app) => {
     //SELECT o.*, po.* FROM options o JOIN product_options po ON JSON_SEARCH(po.option_id, 'all', CAST(o.option_id AS CHAR)) IS NOT NULL WHERE po.product_id = ${productId}
     router.get('/product/item/:id', async (req, res) => {
         const productId = req.params.id;
-        await dbConnection.query(`SELECT * FROM product WHERE product_id = ${productId}`)
+        await dbConnection.promise().query(`SELECT * FROM product WHERE product_id = ${productId}`)
             .then(async ([row]) => {
-                await dbConnection.query(`SELECT po.* , o.* FROM options o JOIN product_options po ON po.option_id = o.option_id WHERE po.product_id = ${productId} AND po.deleted_at IS NULL`, )
+                await dbConnection.promise().query(`SELECT po.* , o.* FROM options o JOIN product_options po ON po.option_id = o.option_id WHERE po.product_id = ${productId} AND po.deleted_at IS NULL`, )
                     .then(([rows]) => {
                         // const product = {
                         //     product_id: rows.product_id,
@@ -194,10 +194,10 @@ let Routes = (app) => {
                                 // Add other option properties as needed
                             };
                         });
-                        dbConnection.query('SELECT * FROM pricingTiers_size WHERE product_id = ?', [productId]).then(([sizeTiers]) => {
-                            dbConnection.query('SELECT * FROM pricingTiers_qty WHERE product_id = ?', [productId])
+                        dbConnection.promise().query('SELECT * FROM pricingTiers_size WHERE product_id = ?', [productId]).then(([sizeTiers]) => {
+                            dbConnection.promise().query('SELECT * FROM pricingTiers_qty WHERE product_id = ?', [productId])
                                 .then(([qtyTiers]) => {
-                                    dbConnection.query('SELECT pm.*, p.*, phm.* FROM promotions pm JOIN product_has_promotion phm ON phm.promo_id = pm.promo_id ' +
+                                    dbConnection.promise().query('SELECT pm.*, p.*, phm.* FROM promotions pm JOIN product_has_promotion phm ON phm.promo_id = pm.promo_id ' +
                                             'JOIN product p ON p.product_id = phm.product_id WHERE pm.deleted_at IS null AND phm.deleted_at IS null AND phm.product_id = ?', productId)
                                         .then(([promotions]) => {
                                             res.render('pages/product_detail', {
@@ -222,10 +222,10 @@ let Routes = (app) => {
         // `JOIN options_has_selected ohs ON ohs.selected_option_id = sp.selected_option_id ` +
         // `JOIN options o ON o.option_id = ohs.option_id JOIN product p ON p.product_id = c.product_id ` +
         // `WHERE c.user_id = '${req.session.user_id}' AND c.deleted_at IS NULL`
-        dbConnection.query(`SELECT c.*, p.*, cd.*, cso.*, o.* FROM cart c JOIN product p ON p.product_id = c.product_id JOIN cart_detail cd ON cd.cart_detail_id = c.cart_detail_id ` +
+        dbConnection.promise().query(`SELECT c.*, p.*, cd.*, cso.*, o.* FROM cart c JOIN product p ON p.product_id = c.product_id JOIN cart_detail cd ON cd.cart_detail_id = c.cart_detail_id ` +
                 `JOIN cart_selected_options cso ON cso.cart_detail_id = cd.cart_detail_id JOIN options o ON o.option_id = cso.option_id WHERE c.user_id = '${req.session.user_id}' AND c.deleted_at IS NULL`)
             .then(([rows]) => {
-                dbConnection.query('SELECT pm.*, p.*, phm.* FROM promotions pm JOIN product_has_promotion phm ON phm.promo_id = pm.promo_id ' +
+                dbConnection.promise().query('SELECT pm.*, p.*, phm.* FROM promotions pm JOIN product_has_promotion phm ON phm.promo_id = pm.promo_id ' +
                         'JOIN product p ON p.product_id = phm.product_id WHERE pm.deleted_at IS null AND phm.deleted_at IS null')
                     .then(([promotions]) => {
                         const cartsItem = [];
@@ -274,9 +274,9 @@ let Routes = (app) => {
     router.get('/getCoupon', (req, res) => {
         const data = {};
         // 'SELECT cp.*, cu.* FROM coupon cp JOIN users_use_coupon cu ON cu.coupon_id = cp.coupon_id'
-        dbConnection.query('SELECT * FROM coupon WHERE deleted_at is null').then(([coupons]) => {
+        dbConnection.promise().query('SELECT * FROM coupon WHERE deleted_at is null').then(([coupons]) => {
             data.coupons = coupons;
-            dbConnection.query('SELECT c.*, o.* FROM coupon c JOIN orders o ON o.coupon_id = c.coupon_id').then(([coupons_used]) => {
+            dbConnection.promise().query('SELECT c.*, o.* FROM coupon c JOIN orders o ON o.coupon_id = c.coupon_id').then(([coupons_used]) => {
                 data.coupons_used = coupons_used;
                 try {
                     res.json(data)
@@ -290,9 +290,9 @@ let Routes = (app) => {
     router.get('/editproduct-cart/:productid/:cartid', async (req, res) => {
         const productId = req.params.productid;
         const cartid = req.params.cartid;
-        await dbConnection.query(`SELECT * FROM product WHERE product_id = ${productId}`)
+        await dbConnection.promise().query(`SELECT * FROM product WHERE product_id = ${productId}`)
             .then(async ([row]) => {
-                await dbConnection.query(`SELECT po.* , o.* FROM options o JOIN product_options po ON po.option_id = o.option_id WHERE po.product_id = ${productId} AND po.deleted_at IS NULL`, )
+                await dbConnection.promise().query(`SELECT po.* , o.* FROM options o JOIN product_options po ON po.option_id = o.option_id WHERE po.product_id = ${productId} AND po.deleted_at IS NULL`, )
                     .then(([rows]) => {
 
                         const flattenedRows = rows.flat();
@@ -308,13 +308,13 @@ let Routes = (app) => {
                         });
 
 
-                        dbConnection.query('SELECT * FROM pricingTiers_size WHERE product_id = ?', [productId]).then(([sizeTiers]) => {
-                            dbConnection.query('SELECT * FROM pricingTiers_qty WHERE product_id = ?', [productId])
+                        dbConnection.promise().query('SELECT * FROM pricingTiers_size WHERE product_id = ?', [productId]).then(([sizeTiers]) => {
+                            dbConnection.promise().query('SELECT * FROM pricingTiers_qty WHERE product_id = ?', [productId])
                                 .then(([qtyTiers]) => {
-                                    dbConnection.query('SELECT pm.*, p.*, phm.* FROM promotions pm JOIN product_has_promotion phm ON phm.promo_id = pm.promo_id ' +
+                                    dbConnection.promise().query('SELECT pm.*, p.*, phm.* FROM promotions pm JOIN product_has_promotion phm ON phm.promo_id = pm.promo_id ' +
                                             'JOIN product p ON p.product_id = phm.product_id WHERE pm.deleted_at IS null AND phm.deleted_at IS null AND phm.product_id = ?', productId)
                                         .then(([promotions]) => {
-                                            dbConnection.query('SELECT o.*, cso.*, cd.*, c.* FROM options o JOIN cart_selected_options cso ON cso.option_id = o.option_id ' +
+                                            dbConnection.promise().query('SELECT o.*, cso.*, cd.*, c.* FROM options o JOIN cart_selected_options cso ON cso.option_id = o.option_id ' +
                                                     'JOIN cart_detail cd ON cd.cart_detail_id = cso.cart_detail_id JOIN cart c ON c.cart_detail_id = cd.cart_detail_id WHERE c.cart_id = ? AND c.product_id = ? AND c.user_id = ?', [cartid, productId, req.session.user_id])
                                                 .then(([rows]) => {
                                                     const cartsItem = [];
@@ -375,13 +375,13 @@ let Routes = (app) => {
     router.post('/deleteCart', cart.deleteCart)
 
     router.get('/checkout', async (req, res) => {
-        await dbConnection.query(`SELECT c.*, p.*, cd.*, cso.*, o.* FROM cart c JOIN product p ON p.product_id = c.product_id JOIN cart_detail cd ON cd.cart_detail_id = c.cart_detail_id ` +
+        await dbConnection.promise().query(`SELECT c.*, p.*, cd.*, cso.*, o.* FROM cart c JOIN product p ON p.product_id = c.product_id JOIN cart_detail cd ON cd.cart_detail_id = c.cart_detail_id ` +
                 `JOIN cart_selected_options cso ON cso.cart_detail_id = cd.cart_detail_id JOIN options o ON o.option_id = cso.option_id WHERE c.user_id = '${req.session.user_id}' AND c.deleted_at IS NULL`)
             .then(async ([rows]) => {
-                await dbConnection.query('SELECT pm.*, p.*, phm.* FROM promotions pm JOIN product_has_promotion phm ON phm.promo_id = pm.promo_id ' +
+                await dbConnection.promise().query('SELECT pm.*, p.*, phm.* FROM promotions pm JOIN product_has_promotion phm ON phm.promo_id = pm.promo_id ' +
                         'JOIN product p ON p.product_id = phm.product_id WHERE pm.deleted_at IS null AND phm.deleted_at IS null')
                     .then(async ([promotions]) => {
-                        await dbConnection.query('SELECT * FROM address WHERE user_id = ? AND deleted_at is NULL ORDER BY address.default_address DESC', [req.session.user_id]).then(async ([address]) => {
+                        await dbConnection.promise().query('SELECT * FROM address WHERE user_id = ? AND deleted_at is NULL ORDER BY address.default_address DESC', [req.session.user_id]).then(async ([address]) => {
                             const cartsItem = [];
                             rows.forEach((row) => {
                                 // Check if the cart item already exists in cartsItem array
@@ -413,19 +413,22 @@ let Routes = (app) => {
                                     cartsItem.push(cartItem);
                                 }
                             });
-                            await dbConnection.query('SELECT * FROM shipments WHERE deleted_at IS NULL').then(async ([shipments]) => {
-                                await dbConnection.query('SELECT * FROM bank WHERE deleted_at IS NULL').then(async ([banks]) => {
-                                    await dbConnection.query('SELECT * FROM promptpay WHERE status = 1').then(async ([promptpay]) => {
-                                        res.render('pages/checkout', {
-                                            currentMenu: "เช็คเอาท์",
-                                            cartsItem: cartsItem,
-                                            // options: options,
-                                            currentLink: "",
-                                            address: address,
-                                            promotions: promotions,
-                                            shipments: shipments,
-                                            banks: banks,
-                                            promptpay: promptpay,
+                            await dbConnection.promise().query('SELECT s.*, sp.* FROM shipments s JOIN shipments_price sp ON sp.shipment_id = s.shipment_id WHERE sp.deleted_at IS NULL').then(async ([shipmentsPrice]) => {
+                                await dbConnection.promise().query('SELECT * FROM shipments WHERE deleted_at IS NULL').then(async ([shipments]) => {
+                                    await dbConnection.promise().query('SELECT * FROM bank WHERE deleted_at IS NULL').then(async ([banks]) => {
+                                        await dbConnection.promise().query('SELECT * FROM promptpay WHERE status = 1').then(async ([promptpay]) => {
+                                            res.render('pages/checkout', {
+                                                currentMenu: "เช็คเอาท์",
+                                                cartsItem: cartsItem,
+                                                // options: options,
+                                                currentLink: "",
+                                                address: address,
+                                                promotions: promotions,
+                                                shipments: shipments,
+                                                shipmentsPrice: shipmentsPrice,
+                                                banks: banks,
+                                                promptpay: promptpay,
+                                            })
                                         })
                                     })
                                 })
@@ -475,7 +478,7 @@ let Routes = (app) => {
     })
 
     router.get('/admin/product-list', (req, res) => {
-        dbConnection.query('SELECT * FROM product WHERE deleted_at is NULL ORDER BY product_id ASC').then(([data]) => {
+        dbConnection.promise().query('SELECT * FROM product WHERE deleted_at is NULL ORDER BY product_id ASC').then(([data]) => {
             // console.log(data)
             res.render('pages/admin/product-list', {
                 products: data,
@@ -486,7 +489,7 @@ let Routes = (app) => {
 
     // เพิ่มสินค้า 
     router.get('/admin/addproduct', async (req, res) => {
-        dbConnection.query('SELECT * FROM options WHERE deleted_at is NULL').then(([rows]) => {
+        dbConnection.promise().query('SELECT * FROM options WHERE deleted_at is NULL').then(([rows]) => {
             res.render('pages/admin/addproduct', {
                 currentLink: "addproduct",
                 options: rows,
@@ -497,11 +500,11 @@ let Routes = (app) => {
 
     router.get('/admin/product/edit/:id', async (req, res) => {
         const productId = req.params.id;
-        dbConnection.query('SELECT * FROM product WHERE product_id = ?', productId).then(([product]) => {
-            dbConnection.query('SELECT * FROM pricingTiers_size WHERE product_id = ? AND deleted_at IS NULL', productId).then(([sizeTier]) => {
-                dbConnection.query('SELECT * FROM pricingTiers_qty WHERE product_id = ? AND deleted_at IS NULL', productId).then(([qtyTier]) => {
-                    dbConnection.query('SELECT po.* , o.* FROM options o JOIN product_options po ON po.option_id = o.option_id WHERE po.product_id = ? AND po.deleted_at IS NULL', productId).then(([op]) => {
-                        dbConnection.query('SELECT * FROM options WHERE deleted_at is NULL').then(([options]) => {
+        dbConnection.promise().query('SELECT * FROM product WHERE product_id = ?', productId).then(([product]) => {
+            dbConnection.promise().query('SELECT * FROM pricingTiers_size WHERE product_id = ? AND deleted_at IS NULL', productId).then(([sizeTier]) => {
+                dbConnection.promise().query('SELECT * FROM pricingTiers_qty WHERE product_id = ? AND deleted_at IS NULL', productId).then(([qtyTier]) => {
+                    dbConnection.promise().query('SELECT po.* , o.* FROM options o JOIN product_options po ON po.option_id = o.option_id WHERE po.product_id = ? AND po.deleted_at IS NULL', productId).then(([op]) => {
+                        dbConnection.promise().query('SELECT * FROM options WHERE deleted_at is NULL').then(([options]) => {
 
                             // rows.forEach((row) => {
                             //     // Check if a size with the same id already exists in sizes
@@ -548,8 +551,8 @@ let Routes = (app) => {
 
     //หน้าจัดการตัวเลือกวัสดุ 
     router.get('/admin/options', (req, res) => {
-        dbConnection.query('SELECT * FROM options WHERE deleted_at IS NULL ORDER BY option_id ASC').then(([option]) => {
-            dbConnection.query('SELECT * FROM product WHERE deleted_at is NULL').then(([product]) => {
+        dbConnection.promise().query('SELECT * FROM options WHERE deleted_at IS NULL ORDER BY option_id ASC').then(([option]) => {
+            dbConnection.promise().query('SELECT * FROM product WHERE deleted_at is NULL').then(([product]) => {
                 res.render('pages/admin/optionValue', {
                     products: product,
                     options: option,
@@ -560,7 +563,7 @@ let Routes = (app) => {
     });
 
     router.get('/admin/options/addoption', (req, res) => {
-        dbConnection.query('SELECT * FROM product WHERE deleted_at is NULL').then(([rows]) => {
+        dbConnection.promise().query('SELECT * FROM product WHERE deleted_at is NULL').then(([rows]) => {
             res.render('pages/admin/addOption', {
                 currentLink: "option",
                 products: rows
@@ -581,8 +584,8 @@ let Routes = (app) => {
 
     // discount
     router.get('/admin/promotion', (req, res) => {
-        dbConnection.query('SELECT * FROM promotions WHERE deleted_at IS null').then(([promotions]) => {
-            dbConnection.query('SELECT pm.*, p.*, phm.* FROM promotions pm JOIN product_has_promotion phm ON phm.promo_id = pm.promo_id ' +
+        dbConnection.promise().query('SELECT * FROM promotions WHERE deleted_at IS null').then(([promotions]) => {
+            dbConnection.promise().query('SELECT pm.*, p.*, phm.* FROM promotions pm JOIN product_has_promotion phm ON phm.promo_id = pm.promo_id ' +
                 'JOIN product p ON p.product_id = phm.product_id WHERE p.deleted_at IS null AND phm.deleted_at IS null').then(([rows]) => {
 
                 const promos = [];
@@ -616,8 +619,8 @@ let Routes = (app) => {
     })
 
     router.get('/admin/promotion/addpromotion', (req, res) => {
-        dbConnection.query('SELECT * FROM product WHERE deleted_at IS NULL').then(([products]) => {
-            dbConnection.query('SELECT pm.*, p.*, phm.* FROM promotions pm JOIN product_has_promotion phm ON phm.promo_id = pm.promo_id ' +
+        dbConnection.promise().query('SELECT * FROM product WHERE deleted_at IS NULL').then(([products]) => {
+            dbConnection.promise().query('SELECT pm.*, p.*, phm.* FROM promotions pm JOIN product_has_promotion phm ON phm.promo_id = pm.promo_id ' +
                 'JOIN product p ON p.product_id = phm.product_id ').then(([rows]) => {
                 res.render('pages/admin/addPromotion', {
                     currentLink: "promotion",
@@ -632,11 +635,11 @@ let Routes = (app) => {
 
     router.get('/admin/promotion/edit/:id', async (req, res) => {
         const id = req.params.id;
-        dbConnection.query('SELECT pm.*, p.*, phm.* FROM promotions pm JOIN product_has_promotion phm ON phm.promo_id = pm.promo_id ' +
+        dbConnection.promise().query('SELECT pm.*, p.*, phm.* FROM promotions pm JOIN product_has_promotion phm ON phm.promo_id = pm.promo_id ' +
                 'JOIN product p ON p.product_id = phm.product_id WHERE pm.promo_id = ? AND phm.deleted_at IS null', id)
             .then(([rows]) => {
-                dbConnection.query('SELECT * FROM promotions WHERE promo_id = ?', id).then(([promo]) => {
-                    dbConnection.query('SELECT * FROM product WHERE deleted_at IS NULL').then(([products]) => {
+                dbConnection.promise().query('SELECT * FROM promotions WHERE promo_id = ?', id).then(([promo]) => {
+                    dbConnection.promise().query('SELECT * FROM product WHERE deleted_at IS NULL').then(([products]) => {
                         if (promo[0].deleted_at !== null) {
                             req.flash("errors", 'ไม่มีข้อมูลโปรโมชั่นนี้');
                             res.redirect('/admin/promotion')
@@ -656,7 +659,7 @@ let Routes = (app) => {
     router.post('/deletePromotion', promotionController.deletePromotion);
 
     router.get('/admin/coupon', (req, res) => {
-        dbConnection.query('SELECT * FROM coupon WHERE deleted_at IS NULL').then(([rows]) => {
+        dbConnection.promise().query('SELECT * FROM coupon WHERE deleted_at IS NULL').then(([rows]) => {
             res.render('pages/admin/coupon', {
                 currentLink: "coupon",
                 coupons: rows
@@ -669,7 +672,7 @@ let Routes = (app) => {
 
 
     router.get('/admin/shipment', (req, res) => {
-        dbConnection.query('SELECT * FROM shipments WHERE deleted_at IS NULL').then(([rows]) => {
+        dbConnection.promise().query('SELECT * FROM shipments WHERE deleted_at IS NULL').then(([rows]) => {
             res.render('pages/admin/shipment', {
                 currentLink: "shipment",
                 shipments: rows
@@ -683,7 +686,7 @@ let Routes = (app) => {
     })
     router.get('/admin/shipment/editshipment/:id', (req, res) => {
         const id = req.params.id;
-        dbConnection.query('SELECT s.*, sp.* FROM shipments s INNER JOIN shipments_price sp ON sp.shipment_id = s.shipment_id WHERE s.shipment_id = ? AND sp.deleted_at IS NULL', id).then(([rows]) => {
+        dbConnection.promise().query('SELECT s.*, sp.* FROM shipments s INNER JOIN shipments_price sp ON sp.shipment_id = s.shipment_id WHERE s.shipment_id = ? AND sp.deleted_at IS NULL', id).then(([rows]) => {
             res.render('pages/admin/editShipment', {
                 currentLink: "shipment",
                 shipments: rows
@@ -697,7 +700,7 @@ let Routes = (app) => {
 
 
     router.get('/admin/payment_method', (req, res) => {
-        dbConnection.query('SELECT * FROM bank WHERE deleted_at IS NULL').then(([rows]) => {
+        dbConnection.promise().query('SELECT * FROM bank WHERE deleted_at IS NULL').then(([rows]) => {
             const decryptedBanks = [];
             rows.forEach((row) => {
                 const key = Buffer.from('ef045d157e2df86220ee67ac37132a604f51477fef58fdaac52ed312d97a1538', 'hex');
@@ -715,7 +718,7 @@ let Routes = (app) => {
                 decryptedBanks.push(bank);
             });
 
-            dbConnection.query('SELECT * FROM promptpay').then(([pp]) => {
+            dbConnection.promise().query('SELECT * FROM promptpay').then(([pp]) => {
                 const key = Buffer.from('a83662c9b5b271e4b9ca58ec4ae7f429dc65500ac7754712a1ac75037affe7b8', 'hex');
                 const iv = Buffer.from('cfe4c9b8b0518d92cc03130106322533', 'hex');
                 const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
@@ -778,7 +781,7 @@ let Routes = (app) => {
     router.post('/savePromptPay', paymentController.promptpay)
     // จัดการ user 
     router.get('/admin/member', (req, res) => {
-        dbConnection.query('SELECT * FROM users WHERE deleted_at IS NULL AND user_role = 0').then(([rows]) => {
+        dbConnection.promise().query('SELECT * FROM users WHERE deleted_at IS NULL AND user_role = 0').then(([rows]) => {
             // console.log(data)
             res.render('pages/admin/member', {
                 user: rows,
@@ -802,16 +805,16 @@ let Routes = (app) => {
     //   });
 
     router.get('/chat-history', (req, res) => {
-        dbConnection.query('SELECT * FROM chats WHERE sender_id = ? OR recipient_id = ? ORDER BY created_at ASC', [req.session.user_id, req.session.user_id]).then(([rows]) => {
+        dbConnection.promise().query('SELECT * FROM chats WHERE sender_id = ? OR recipient_id = ? ORDER BY created_at ASC', [req.session.user_id, req.session.user_id]).then(([rows]) => {
             res.json(rows);
-        })
+        }) 
     })
 
     router.get('/admin/chat-history', (req, res) => {
         const {
             userId
         } = req.query;
-        dbConnection.query('SELECT * FROM chats WHERE sender_id = ? OR recipient_id = ? ORDER BY created_at ASC', [userId, userId]).then(([rows]) => {
+        dbConnection.promise().query('SELECT * FROM chats WHERE sender_id = ? OR recipient_id = ? ORDER BY created_at ASC', [userId, userId]).then(([rows]) => {
             res.json(rows);
         })
     })
@@ -827,8 +830,8 @@ let Routes = (app) => {
 
     router.get('/admin/chat/*', (req, res) => {
         const id = req.params[0];
-        dbConnection.query('SELECT DISTINCT u.* FROM users u INNER JOIN chats c ON u.user_id = c.sender_id WHERE c.recipient_id = "admin" AND u.deleted_at is NULL AND u.user_role = 0').then(([users]) => {
-            dbConnection.query('SELECT * FROM chats WHERE sender_id = ? OR recipient_id = ? ORDER BY created_at ASC', [id, id]).then(([messages]) => {
+        dbConnection.promise().query('SELECT DISTINCT u.* FROM users u INNER JOIN chats c ON u.user_id = c.sender_id WHERE c.recipient_id = "admin" AND u.deleted_at is NULL AND u.user_role = 0').then(([users]) => {
+            dbConnection.promise().query('SELECT * FROM chats WHERE sender_id = ? OR recipient_id = ? ORDER BY created_at ASC', [id, id]).then(([messages]) => {
                 res.render('pages/admin/adminChat', {
                     currentLink: "chat",
                     users: users,

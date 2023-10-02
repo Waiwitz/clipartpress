@@ -1,4 +1,3 @@
-
 const dbConnection = require("../config/database");
 const multer = require('multer');
 const path = require('path');
@@ -29,10 +28,10 @@ const insertCart = async (req, res) => {
     const selectedData = [size, artwork, price, quantity];
 
     try {
-        await dbConnection.query("INSERT INTO cart_detail SET size = ?, design_file = ?, price = ?, quantity = ?", selectedData)
+        await dbConnection.promise().query("INSERT INTO cart_detail SET size = ?, design_file = ?, price = ?, quantity = ?", selectedData)
             .then(async ([row]) => {
                 const cart_detail_id = row.insertId;
-                await dbConnection.query("INSERT INTO cart SET user_id = ?, product_id = ?, cart_detail_id = ?", [userId, productId, cart_detail_id], (error) => {
+                dbConnection.query("INSERT INTO cart SET user_id = ?, product_id = ?, cart_detail_id = ?", [userId, productId, cart_detail_id], (error) => {
                     if (error) throw error;
                 });
                 for (let i = 0; i < options.length; i++) {
@@ -77,7 +76,7 @@ const updateCart = async (req, res) => {
             if (error) throw error;
         })
         for (const option of options) {
-             dbConnection.query('UPDATE cart_selected_options SET option_id = ? WHERE cart_detail_id = ?', [option, cartId], (error) => {
+            dbConnection.query('UPDATE cart_selected_options SET option_id = ? WHERE cart_detail_id = ?', [option, cartId], (error) => {
                 if (error) throw error;
             })
         }
@@ -93,7 +92,7 @@ const updateCart = async (req, res) => {
 const deleteCart = async (req, res) => {
     const id = req.body.id
     try {
-        await dbConnection.query("UPDATE cart SET deleted_at = CURRENT_TIMESTAMP WHERE cart_id = ?", [id]);
+        dbConnection.query("UPDATE cart SET deleted_at = CURRENT_TIMESTAMP WHERE cart_id = ?", [id]);
         req.flash("success_msg", 'ลบสินค้าออกจากตระกร้าแล้ว');
         return res.redirect("/cart");
     } catch (error) {

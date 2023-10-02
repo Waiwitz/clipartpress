@@ -12,7 +12,7 @@ const path = require('path');
 
 let validate = [
     check("username", "กรุณากรอกชื่อผู้ใช้").not().isEmpty().custom((value) => {
-        return dbConnection.query("SELECT * FROM users WHERE username = ?", [value])
+        return dbConnection.promise().query("SELECT * FROM users WHERE username = ?", [value])
             .then(([rows]) => {
                 if (rows.length > 0) {
                     return Promise.reject('ชื่อนี้ถูกใช้งานแล้ว')
@@ -22,7 +22,7 @@ let validate = [
     }),
     check("email", "อีเมลนี้ไม่สามารถใช้ได้").isEmail().custom((value) => {
         // generate verification token
-        return dbConnection.query("SELECT * FROM users WHERE email = ?", [value]) // เช็คอีเมลใน database
+        return dbConnection.promise().query("SELECT * FROM users WHERE email = ?", [value]) // เช็คอีเมลใน database
             .then(([rows]) => {
                 if (rows.length > 0) {
                     return Promise.reject('อีเมลนี้ถูกใช้งานแล้ว')
@@ -77,17 +77,17 @@ const updateProfile = async (req, res) => {
     if (req.file) {
         profilePicturePath = req.file.path.replace('public', '');
         query = 'UPDATE users SET username = ?, email = ?, picture = ? ,name = ?, telephone = ? WHERE user_id = ?'
+        req.session.picture = profilePicturePath;
     } else {
         query = 'UPDATE users SET username = ?, email = ? ,name = ?, telephone = ? WHERE user_id = ?'
-    }
+    } 
 
 
     try {
         const data = [username, email, profilePicturePath, name, telephone, req.session.user_id];
-        await dbConnection.query(query, data);
+         dbConnection.query(query, data);
         // return res.render('pages/userprofile', { success_msg: ['แก้ไขโปรไฟล์สำเร็จ'] });
         req.flash("success_msg", 'แก้ไขโปรไฟล์สำเร็จ');
-        req.session.picture = profilePicturePath;
         return res.redirect("/userprofile");
 
     } catch (err) {
@@ -106,7 +106,7 @@ const addAddress = async (req, res) => {
         });
         req.flash("errors", errorsArr);
         return res.redirect("/address");
-    } 
+    }
     const {
         name,
         address,
@@ -116,16 +116,16 @@ const addAddress = async (req, res) => {
         df_address
     } = req.body;
     try {
-        dbConnection.query('SELECT * FROM address WHERE user_id = ? AND deleted_at is null', req.session.user_id)
+        dbConnection.promise().query('SELECT * FROM address WHERE user_id = ? AND deleted_at is null', req.session.user_id)
             .then(async ([rows]) => {
                 if (rows <= 0) {
-                    await dbConnection.query("INSERT INTO address SET name = ?, address = ?, province = ?, postcode = ?, telephone = ?, user_id = ?, default_address = 1", [name, address, province, zipcode, telephone, req.session.user_id]);
-                } else  {
+                    dbConnection.query("INSERT INTO address SET name = ?, address = ?, province = ?, postcode = ?, telephone = ?, user_id = ?, default_address = 1", [name, address, province, zipcode, telephone, req.session.user_id]);
+                } else {
                     if (df_address == '1') {
-                        await dbConnection.query("UPDATE address SET default_address = 0 WHERE user_id = ?", req.session.user_id);
-                        await dbConnection.query("INSERT INTO address SET name = ?, address = ?, province = ?, postcode = ?, telephone = ?, user_id = ?, default_address = 1", [name, address, province, zipcode, telephone, req.session.user_id]);
+                        dbConnection.query("UPDATE address SET default_address = 0 WHERE user_id = ?", req.session.user_id);
+                        dbConnection.query("INSERT INTO address SET name = ?, address = ?, province = ?, postcode = ?, telephone = ?, user_id = ?, default_address = 1", [name, address, province, zipcode, telephone, req.session.user_id]);
                     } else if (df_address == '' || df_address == null) {
-                        await dbConnection.query("INSERT INTO address SET name = ?, address = ?, province = ?, postcode = ?, telephone = ?, user_id = ?, default_address = 0", [name, address, province, zipcode, telephone, req.session.user_id]);
+                        dbConnection.query("INSERT INTO address SET name = ?, address = ?, province = ?, postcode = ?, telephone = ?, user_id = ?, default_address = 0", [name, address, province, zipcode, telephone, req.session.user_id]);
                     }
                 }
             })
@@ -149,13 +149,13 @@ const editAddress = async (req, res) => {
     } = req.body;
     try {
         if (df_address == '1') {
-            await dbConnection.query("UPDATE address SET default_address = 0 WHERE user_id = ?", req.session.user_id).then(async () => {
-                await dbConnection.query("UPDATE address SET name = ?, address = ?, province = ?, postcode = ?, telephone = ?, default_address = 1 WHERE address_id = ?", [new_name, new_address, new_province, new_zipcode, new_tel, id], (error) => {
+            await dbConnection.promise().query("UPDATE address SET default_address = 0 WHERE user_id = ?", req.session.user_id).then(async () => {
+                dbConnection.promise().query("UPDATE address SET name = ?, address = ?, province = ?, postcode = ?, telephone = ?, default_address = 1 WHERE address_id = ?", [new_name, new_address, new_province, new_zipcode, new_tel, id], (error) => {
                     if (error) throw error;
                 });
             })
         } else if (df_address == '' || df_address == null) {
-            await dbConnection.query("UPDATE address SET name = ?, address = ?, province = ?, postcode = ?, telephone = ?, default_address = 0 WHERE address_id = ?", [new_name, new_address, new_province, new_zipcode, new_tel, id], (error) => {
+            dbConnection.promise().query("UPDATE address SET name = ?, address = ?, province = ?, postcode = ?, telephone = ?, default_address = 0 WHERE address_id = ?", [new_name, new_address, new_province, new_zipcode, new_tel, id], (error) => {
                 if (error) throw error;
             });
         }
@@ -172,7 +172,7 @@ const editAddress = async (req, res) => {
 const deleteAddress = async (req, res) => {
     const id = req.body.addressID;
     try {
-        await dbConnection.query("UPDATE address SET deleted_at = CURRENT_TIMESTAMP WHERE address_id = ?", [id]);
+        dbConnection.query("UPDATE address SET deleted_at = CURRENT_TIMESTAMP WHERE address_id = ?", [id]);
         req.flash("success_msg", 'ลบที่อยู่สำเร็จ');
         return res.redirect("/address");
     } catch (error) {
@@ -198,7 +198,7 @@ const changepassword = async (req, res) => {
 
     let data = bcrypt.hashSync(newPassword, 10)
     try {
-        await dbConnection.query("SELECT * FROM users WHERE user_id = ?", [req.session.user_id])
+        await dbConnection.promise().query("SELECT * FROM users WHERE user_id = ?", [req.session.user_id])
             .then(async ([row]) => {
                 await bcrypt.compare(currentPassword, row[0].password).then(compare_result => {
                     console.log(compare_result)

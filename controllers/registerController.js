@@ -28,7 +28,7 @@ const transporter = nodemailer.createTransport({
 //  ดักช่อง Input
 let validateReg = [
     check("username", "กรุณากรอกชื่อผู้ใช้").not().isEmpty().custom((value) => {
-        return dbConnection.query("SELECT * FROM users WHERE username = ?", [value])
+        return dbConnection.promise().query("SELECT * FROM users WHERE username = ?", [value])
             .then(([rows]) => {
                 if (rows.length > 0) {
                     return Promise.reject('ชื่อผู้ใช้นี้ถูกใช้งานแล้ว')
@@ -38,7 +38,7 @@ let validateReg = [
     }),
     check("email", "อีเมลนี้ไม่สามารถใช้ได้").isEmail().custom((value) => {
         // generate verification token
-        return dbConnection.query("SELECT * FROM users WHERE email = ?", [value]) // เช็คอีเมลใน database
+        return dbConnection.promise().query("SELECT * FROM users WHERE email = ?", [value]) // เช็คอีเมลใน database
             .then(([rows]) => {
                 if (rows.length > 0) {
                     return Promise.reject('อีเมลนี้ถูกใช้งานแล้ว')
@@ -56,7 +56,7 @@ let validateReg = [
         return value === req.body.password
     }),
     check("name", "กรุณากรอกชื่อ").not().isEmpty().custom((value) => {
-        return dbConnection.query("SELECT * FROM users WHERE name = ?", [value])
+        return dbConnection.promise().query("SELECT * FROM users WHERE name = ?", [value])
             .then(([rows]) => {
                 if (rows.length > 0) {
                     return Promise.reject('มีชื่อบุลคลนี้ในระบบแล้ว')
@@ -65,7 +65,7 @@ let validateReg = [
             });
     }),
     check("telephone", "กรุณากรอกหมายเลขโทรศัพท์").not().isEmpty().custom((value) => {
-        return dbConnection.query("SELECT * FROM users WHERE telephone = ?", [value])
+        return dbConnection.promise().query("SELECT * FROM users WHERE telephone = ?", [value])
             .then(([rows]) => {
                 if (rows.length > 0) {
                     return Promise.reject('มีคนใช้เบอร์โทรศัพท์นี้แล้ว')
@@ -153,7 +153,7 @@ const verify = async (req, res) => {
     const token = req.query.token;
     try {
         // check if email and token match a user in the database
-        const [rows] = await dbConnection.query('SELECT * FROM users WHERE email = ? AND token = ?', [email, token]);
+        const [rows] =  dbConnection.query('SELECT * FROM users WHERE email = ? AND token = ?', [email, token]);
         if (rows.length === 0) {
             // email and token don't match, send error message
             res.status(400).send('Invalid verification link');
@@ -161,7 +161,7 @@ const verify = async (req, res) => {
         }
 
         // update user's status to "verified"
-        await dbConnection.query('UPDATE users SET verified = true WHERE email = ?', [email]);
+         dbConnection.query('UPDATE users SET verified = true WHERE email = ?', [email]);
 
         // send success message
         res.status(200).send('Email address verified');

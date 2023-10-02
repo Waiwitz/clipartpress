@@ -128,8 +128,7 @@ const updateOption = async (req, res) => {
         // await dbConnection.query(query, data, (error) => {
         //     if (error) throw error;
         // });
-        await dbConnection.query(query, data).then(async ([]) => {
-        })
+        dbConnection.query(query, data);
         req.flash("success_msg", 'แก้ไขสำเร็จ');
         return res.redirect("/admin/options");
     } catch (error) {
@@ -141,7 +140,7 @@ const updateOption = async (req, res) => {
 const deleteOption = async (req, res) => {
     const id = req.body.option_id;
     try {
-        await dbConnection.query("UPDATE options SET deleted_at = CURRENT_TIMESTAMP WHERE option_id = ?", [id]);
+        dbConnection.query("UPDATE options SET deleted_at = CURRENT_TIMESTAMP WHERE option_id = ?", [id]);
         req.flash("success_msg", 'ลบตัวเลือกสินค้าสำเร็จ');
         return res.redirect("/admin/options");
     } catch (error) {

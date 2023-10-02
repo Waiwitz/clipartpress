@@ -42,7 +42,7 @@ const addProduct = async (req, res) => {
     const options = req.body.option;
 
     try {
-        await dbConnection.query('INSERT INTO product SET productName = ?, categories = ?, status = ?, picture = ?, description = ?', [product_name, categories, status, productPic, product_description])
+        await dbConnection.promise().query('INSERT INTO product SET productName = ?, categories = ?, status = ?, picture = ?, description = ?', [product_name, categories, status, productPic, product_description])
             .then(async ([row]) => {
                 const productId = row.insertId;
                 for (let i = 0; i < width.length; i++) {
@@ -52,7 +52,7 @@ const addProduct = async (req, res) => {
                         size_price: sizePrice[i],
                         product_id: productId
                     }
-                    await dbConnection.query("INSERT INTO pricingTiers_size SET ?", [sizes], (error) => {
+                    dbConnection.promise().query("INSERT INTO pricingTiers_size SET ?", [sizes], (error) => {
                         if (error) throw error;
                     })
                 }
@@ -63,7 +63,7 @@ const addProduct = async (req, res) => {
                         qty_price: qtyPrice[j],
                         product_id: productId
                     }
-                    await dbConnection.query("INSERT INTO pricingTiers_qty SET ?", [qtys], (error) => {
+                    dbConnection.promise().query("INSERT INTO pricingTiers_qty SET ?", [qtys], (error) => {
                         if (error) throw error;
                     })
                 }
@@ -105,7 +105,7 @@ const addProduct = async (req, res) => {
                             option_id: options[o][j],
                             product_id: productId,
                         };
-                        await dbConnection.query('INSERT INTO product_options SET ?', options_product, (error, results, fields) => {
+                        dbConnection.promise().query('INSERT INTO product_options SET ?', options_product, (error, results, fields) => {
                             if (error) throw error;
                         });
                     }
@@ -166,23 +166,19 @@ const updateProduct = async (req, res) => {
     }
 
     try {
-        await dbConnection.query(queryProduct, arrProduct)
-            .then(async ([row]) => {
+        await dbConnection.promise().query(queryProduct, arrProduct)
+            .then(async () => {
                 for (let i = 0; i < sizeId.length; i++) {
                     const sizes = {
                         width: width[i],
                         height: height[i],
                         size_price: sizePrice[i]
                     }
-                    if (sizeId[i] == '') {
-                        await dbConnection.query("INSERT INTO pricingTiers_size SET width = ?, height = ?, size_price = ?, product_id = ?", [width[i], height[i], sizePrice[i], productId], (error) => {
-                            if (error) throw error;
-                        })
-                    } else {
-                        await dbConnection.query(`UPDATE pricingTiers_size SET ? WHERE tierSize_id = ${sizeId[i]} AND product_id = ${productId}`, [sizes], (error) => {
-                            if (error) throw error;
-                        })
-                    }
+
+                    dbConnection.promise().query(`UPDATE pricingTiers_size SET ? WHERE tierSize_id = ${sizeId[i]} AND product_id = ${productId}`, [sizes], (error) => {
+                        if (error) throw error;
+                    })
+
                 }
 
                 for (let j = 0; j < qtyId.length; j++) {
@@ -190,17 +186,9 @@ const updateProduct = async (req, res) => {
                         quantity: qty[j],
                         qty_price: qtyPrice[j]
                     }
-
-                    console.log(qtys);
-                    if (qtyId[j] == '' || qtyId[j] == null) {
-                        await dbConnection.query("INSERT INTO pricingTiers_qty SET quantity = ?, qty_price = ?, product_id = ?", [qty[j], qtyPrice[j], productId], (error) => {
-                            if (error) throw error;
-                        })
-                    } else {
-                        await dbConnection.query(`UPDATE pricingTiers_qty SET ? WHERE tierQty_id = ${qtyId[j]} AND product_id = ${productId}`, [qtys], (error) => {
-                            if (error) throw error;
-                        })
-                    }
+                    dbConnection.promise().query(`UPDATE pricingTiers_qty SET ? WHERE tierQty_id = ${qtyId[j]} AND product_id = ${productId}`, [qtys], (error) => {
+                        if (error) throw error;
+                    })
                 }
 
                 // for (let i = 0; i < sizeId.length; i++) {
@@ -215,52 +203,45 @@ const updateProduct = async (req, res) => {
 
                 // }
 
-                // if ('newWidth' in req.body) {
-                //     for (let ns = 0; ns < newWidth.length; i++) {
-                //         const sizes = {
-                //             width: newWidth[ns][0],
-                //             height: newHeight[ns][0],
-                //             size_price: newSizePrice[ns][0],
-                //             product_id: productId
-                //         }
-                //         await dbConnection.query("INSERT INTO pricingTiers_size SET ?", [sizes], (error) => {
-                //             if (error) throw error;
-                //         })
-                //     }
-                // }
+                if ('newWidth' in req.body) {
+                    console.log(newWidth.length);
+                    for (let ns = 0; ns < newWidth.length; ns++) {
+                        const sizes = {
+                            width: newWidth[ns],
+                            height: newHeight[ns],
+                            size_price: newSizePrice[ns],
+                            product_id: productId,
+                        }
+                        dbConnection.query("INSERT INTO pricingTiers_size SET ?", [sizes], (error) => {
+                            if (error) throw error;
+                        })
+                    }
+                }
 
-                // for (let j = 0; j < qtyId.length; j++) {
-                //     const qtys = {
-                //         quantity: qty[j][0],
-                //         qty_price: qtyPrice[j][0]
-                //     }
-                //     await dbConnection.query(`UPDATE pricingTiers_qty SET ? WHERE tierQty_id = ${qtyId[j][0]} AND product_id = ${productId}`, [qtys], (error) => {
-                //         if (error) throw error;
-                //     })
-                // }
-                // if ('newQty' in req.body) {
-                //     for (let nq = 0; nq < newQty.length; i++) {
-                //         const sizes = {
-                //             quantity: newQty[nq][0],
-                //             qty_price: newQtyPrice[nq][0],
-                //             product_id: productId
-                //         }
-                //         await dbConnection.query("INSERT INTO pricingTiers_qty SET ?", [sizes], (error) => {
-                //             if (error) throw error;
-                //         })
-                //     }
-                // }
+                if ('newQty' in req.body) {
+                    for (let nq = 0; nq < newQty.length; nq++) {
+                        const qtys = {
+                            quantity: newQty[nq],
+                            qty_price: newQtyPrice[nq],
+                            product_id: productId,
 
-                await dbConnection.query('SELECT * FROM product_options WHERE product_id = ?', [productId]).then(async ([rows]) => {
+                        }
+                        dbConnection.query("INSERT INTO pricingTiers_qty SET ?", [qtys], (error) => {
+                            if (error) throw error;
+                        })
+                    }
+                }
+
+                await dbConnection.promise().query('SELECT * FROM product_options WHERE product_id = ?', [productId]).then(async ([rows]) => {
                     for (let i = 0; i < option_type.length; i++) {
                         for (let j = 0; j < options[i].length; j++) {
                             const option_id = options[i][j]
                             const exist = rows.some(record => record.option_id == option_id && record.product_id == productId);
                             // console.log(exist);
                             if (exist) {
-                                await dbConnection.query('UPDATE product_options SET deleted_at = NULL WHERE option_id = ? AND product_id = ?', [options[i][j], productId]);
+                                dbConnection.promise().query('UPDATE product_options SET deleted_at = NULL WHERE option_id = ? AND product_id = ?', [options[i][j], productId]);
                             } else {
-                                await dbConnection.query('INSERT INTO product_options SET option_id = ?, product_id = ?', [options[i][j], productId], (error) => {
+                                dbConnection.promise().query('INSERT INTO product_options SET option_id = ?, product_id = ?', [options[i][j], productId], (error) => {
                                     if (error) throw error;
                                 });
                             }
@@ -278,7 +259,7 @@ const updateProduct = async (req, res) => {
                     const existNoncheck = oId.filter(rowId => !optionIds.includes(rowId));
                     console.log(existNoncheck);
                     for (const uncheck of existNoncheck) {
-                        await dbConnection.query('UPDATE product_options SET deleted_at = NOW() WHERE option_id = ? AND product_id = ?', [uncheck, productId], (error) => {
+                        dbConnection.promise().query('UPDATE product_options SET deleted_at = NOW() WHERE option_id = ? AND product_id = ?', [uncheck, productId], (error) => {
                             if (error) throw error;
                         });
                     }
@@ -508,7 +489,7 @@ const updateProduct = async (req, res) => {
 const deleteProduct = async (req, res) => {
     const id = req.body.product_id;
     try {
-        await dbConnection.query("UPDATE product SET deleted_at = CURRENT_TIMESTAMP WHERE product_id = ?", [id]);
+        dbConnection.query("UPDATE product SET deleted_at = CURRENT_TIMESTAMP WHERE product_id = ?", [id]);
         req.flash("success_msg", 'ลบสินค้าสำเร็จ');
         return res.redirect("/admin/product-list");
     } catch (error) {
@@ -522,19 +503,20 @@ const deleteQt = (req, res) => {
     const id = req.params.id;
     dbConnection.query('UPDATE pricingTiers_qty SET deleted_at = CURRENT_TIMESTAMP WHERE tierQty_id = ?', [id], (err, results) => {
         if (err) throw err;
-        res.sendStatus(404);
     });
-    res.sendStatus(200);
+    res.json({
+        message: 'Data deleted'
+    });
 }
 
 const deleteSize = (req, res) => {
     const id = req.params.id;
     dbConnection.query('UPDATE pricingTiers_size SET deleted_at = CURRENT_TIMESTAMP WHERE tierSize_id = ?', [id], (err, results) => {
         if (err) throw err;
-        res.sendStatus(404);
     });
-    res.sendStatus(200);
-
+    res.json({
+        message: 'Data deleted'
+    });
 }
 
 
@@ -542,7 +524,7 @@ const deleteSize = (req, res) => {
 const deleteUser = async (req, res) => {
     const id = req.body.user_id;
     try {
-        await dbConnection.query("UPDATE users SET deleted_at = CURRENT_TIMESTAMP WHERE user_id = ?", [id]);
+        dbConnection.query("UPDATE users SET deleted_at = CURRENT_TIMESTAMP WHERE user_id = ?", [id]);
         req.flash("success_msg", 'ลบผู้ใช้สำเร็จ');
         return res.redirect("/admin/member");
     } catch (error) {

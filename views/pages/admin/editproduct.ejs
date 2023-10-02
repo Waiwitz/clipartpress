@@ -382,6 +382,8 @@
 
         var sizeTierCount = 0;
         var qtyTierCount = 0;
+        var news = -1;
+        var newq = -1;
         var img = 0
 
         $("#discount").on("change", function () {
@@ -401,11 +403,12 @@
         $(document).on('click', '#addSizeTier', function () {
             if (sizeTierCount < 9) {
                 sizeTierCount++;
+                news++;
                 var newSzieRow = `
             <div class="d-flex mb-2 sizeTierRow" style="height: 36px;">
                                                     <div class="me-2">
                                                         <div class="form-outline" style="width: 85px;">
-                                                            <input type="number" class="form-control" name="width[${sizeTierCount}][]"
+                                                            <input type="number" class="form-control" name="newWidth[${news}][]"
                                                                 required>
                                                             <label class="form-label">กว้าง<span
                                                                     class="text-danger ms-2">*</span></label>
@@ -414,7 +417,7 @@
                                                     <span class="p-1 ">X</span>
                                                     <div class="ms-2">
                                                         <div class="form-outline" style="width: 85px;">
-                                                            <input type="number" class="form-control" name="height[${sizeTierCount}][]"
+                                                            <input type="number" class="form-control" name="newHeight[${news}][]"
                                                                 required step="0.01" min="0">
                                                             <label class="form-label">ยาว<span
                                                                     class="text-danger ms-2">*</span></label>
@@ -422,7 +425,7 @@
                                                     </div>
                                                     <div class="ms-2">
                                                         <div class="form-outline" style="width: 85px;">
-                                                            <input type="number" class="form-control" name="sizePrice[${sizeTierCount}][]"
+                                                            <input type="number" class="form-control" name="newSizePrice[${news}][]"
                                                                 required step="0.01" min="0">
                                                             <label class="form-label">ราคา<span
                                                                     class="text-danger ms-2">*</span></label>
@@ -444,15 +447,16 @@
         $(document).on('click', '.addPrice', function () {
             if (qtyTierCount < 9) {
                 qtyTierCount++
+                newq ++
                 // var count = $(this).closest('.tier').index('.tier');
                 var form = `
           <div class="d-flex mb-2 qtyTierRow">
               <div class="form-outline me-2" style="width: 85px; height: 36px;">
-                  <input type="number" class="form-control p-1" name="qty[${qtyTierCount}][]" required style="height: 36px;" step="0.01" min="0">
+                  <input type="number" class="form-control p-1" name="newQty[${newq}][]" required style="height: 36px;" step="0.01" min="0">
                   <label class="form-label">จำนวน<span class="text-danger ms-2">*</span></label>
               </div>
               <div class="form-outline" style="width: 85px; height: 36px;">
-                  <input type="number" class="form-control p-1" name="qtyPrice[${qtyTierCount}][]" required step="0.01" min="0">
+                  <input type="number" class="form-control p-1" name="newQtyPrice[${newq}][]" required step="0.01" min="0">
                   <label class="form-label">ราคา<span class="text-danger ms-2">*</span></label>
               </div>
               <button type="button" class="ms-2 btn btn-danger remove-price"><i class="fa-solid fa-trash" style="color: #ffffff;"></i></button>

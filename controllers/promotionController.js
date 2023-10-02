@@ -15,7 +15,7 @@ const addPromotion = async (req, res) => {
     const note = req.body.note.trim();
     var promotion = [promoName, promoType, typeValue, condition, conditionValue, status, start, end, note]
 
-    await dbConnection.query('INSERT INTO promotions SET promo_name = ?, promo_type = ?, type_value = ?, promo_condition = ?, min_reach = ?, status = ?, start_date = ?, end_date = ?, note = ?', promotion)
+    await dbConnection.promise().query('INSERT INTO promotions SET promo_name = ?, promo_type = ?, type_value = ?, promo_condition = ?, min_reach = ?, status = ?, start_date = ?, end_date = ?, note = ?', promotion)
         .then(async ([result]) => {
             const id = result.insertId
             for (let i = 0; i < product.length; i++) {
@@ -23,7 +23,7 @@ const addPromotion = async (req, res) => {
                     promo_id: id,
                     product_id: product[i]
                 }
-                await dbConnection.query('INSERT INTO product_has_promotion SET ?', products, (error) => {
+                dbConnection.promise().query('INSERT INTO product_has_promotion SET ?', products, (error) => {
                     if (error) throw error;
                 })
             }
@@ -49,20 +49,20 @@ const updatePromotion = async (req, res) => {
     const note = req.body.note.trim();
     var promotion = [promoName, promoType, typeValue, condition, conditionValue, status, start, end, note, id]
 
-    await dbConnection.query('UPDATE promotions SET  promo_name = ?, promo_type = ?, type_value = ?, promo_condition = ?, min_reach = ?,' +
+    dbConnection.promise().query('UPDATE promotions SET  promo_name = ?, promo_type = ?, type_value = ?, promo_condition = ?, min_reach = ?,' +
         ' status = ?, start_date = ?, end_date = ?, note = ? WHERE promo_id = ?', promotion, (error, rows) => {
             if (error) {
                 req.flash("errors", error);
                 return res.redirect("/admin/promotion");
             }
         })
-    await dbConnection.query('SELECT * FROM product_has_promotion WHERE promo_id = ?', [id]).then(async ([rows]) => {
+    dbConnection.promise().query('SELECT * FROM product_has_promotion WHERE promo_id = ?', [id]).then(async ([rows]) => {
         for (let i = 0; i < product.length; i++) {
             const exist = rows.some(record => record.product_id == product[i] && record.promo_id == id);
             if (exist) {
-                await dbConnection.query('UPDATE product_has_promotion SET deleted_at = NULL WHERE promo_id = ? AND product_id = ?', [id, product[i]]);
+                dbConnection.promise().query('UPDATE product_has_promotion SET deleted_at = NULL WHERE promo_id = ? AND product_id = ?', [id, product[i]]);
             } else {
-                await dbConnection.query('INSERT INTO product_has_promotion (promo_id, product_id) VALUES (?, ?)', [id, product[i]], (error) => {
+                dbConnection.promise().query('INSERT INTO product_has_promotion (promo_id, product_id) VALUES (?, ?)', [id, product[i]], (error) => {
                     if (error) throw error;
                 });
             }
@@ -80,7 +80,7 @@ const updatePromotion = async (req, res) => {
         console.log(existNoncheck);
 
         for (const uncheck of existNoncheck) {
-            await dbConnection.query('UPDATE product_has_promotion SET deleted_at = NOW() WHERE promo_id = ? AND product_id = ?', [id, uncheck], (error) => {
+            dbConnection.promise().query('UPDATE product_has_promotion SET deleted_at = NOW() WHERE promo_id = ? AND product_id = ?', [id, uncheck], (error) => {
                 if (error) throw error;
             });
         }
@@ -96,10 +96,10 @@ const updatePromotion = async (req, res) => {
 const deletePromotion = (req, res) => {
     const id = req.body.promotion_id;
     try {
-        dbConnection.query('UPDATE promotions SET deleted_at = NOW() WHERE promo_id = ?', id, (error) => {
+        dbConnection.promise().query('UPDATE promotions SET deleted_at = NOW() WHERE promo_id = ?', id, (error) => {
             if (error) throw error;
         });
-        dbConnection.query('UPDATE product_has_promotion SET deleted_at = NOW() WHERE promo_id = ?', id, (error) => {
+        dbConnection.promise().query('UPDATE product_has_promotion SET deleted_at = NOW() WHERE promo_id = ?', id, (error) => {
             if (error) throw error;
         });
         req.flash("success_msg", 'ลบโปรโมชั่นสำเร็จแล้ว')
