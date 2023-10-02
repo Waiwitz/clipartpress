@@ -4,7 +4,7 @@ const app = express();
 require("dotenv").config();
 const dbConnection = require("./config/database");
 const cookieParser = require('cookie-parser');
-const bodyParser = require('body-parser');
+const bodyParser = require('body-parser');  
 const connectFlash = require('connect-flash');
 const session = require('express-session');
 const router = require('./routes/routes');
@@ -17,7 +17,7 @@ const cors = require('cors');
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
 
-app.use(cors());
+app.use(cors()); 
 // const server = require('http').createServer(app, (req, res) => {
 //     const canvas = new fabric.Canvas(null, { width: 300, height: 300 });
 //     const rect = new fabric.Rect({ width: 20, height: 50, fill: '#ff0000' });
@@ -230,7 +230,7 @@ io.of("/admin/chat/*").on("connection", (socket) => {
 //     })
 
 // });
-
+ 
 router(app)
 // app.use("/", require("./routes"));
 const port = 3000
