@@ -1136,3 +1136,22 @@ input.cart-cb {
     margin-top: 40vh;
     overflow: hidden;
 }
+
+/*  เปลี่ยนธนาคาร */
+.payment-radio {
+    opacity: 0;
+    width: 200%;
+    height: 200%;
+    transform: translateY(-150px) translateX(-50px);
+    z-index: 100;
+    cursor: pointer;
+}
+
+.form-select-payment:hover {
+    transition: 0.1s ease-in;
+    border: 5px solid #005698 !important;
+}
+
+.form-select-payment.active {
+    border: 3px solid #005698 !important;
+}

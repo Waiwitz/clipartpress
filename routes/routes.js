@@ -20,6 +20,9 @@ const orderController = require('../controllers/orderController');
 const paymentController = require('../controllers/paymentController');
 const shipmentController = require('../controllers/shipmentController');
 
+const QRCode = require('qrcode')
+const generatePayload = require('promptpay-qr')
+
 let Routes = (app) => {
 
     router.get('/successfulreset', (req, res) => {
@@ -34,7 +37,7 @@ let Routes = (app) => {
     // })); 
     router.get('/', (req, res) => {
         res.render('pages/index', {
-            currentMenu: 'หน้าแรก', 
+            currentMenu: 'หน้าแรก',
             Title: 'Clipart Press',
         });
     });
@@ -438,7 +441,7 @@ let Routes = (app) => {
             });
     });
 
-    router.get('/placeOrder/:userid', orderController.placeOrder)
+    router.post('/placeOrder', orderController.placeOrder)
     router.get('/myorder', (req, res) => {
         res.render('pages/myorder', {
             currentMenu: 'รายการที่สั่ง',
@@ -446,13 +449,179 @@ let Routes = (app) => {
             currentLink: "myorder"
         });
     })
-    router.get('/invoices', (req, res) => {
-        res.render('pages/invoices', {
-            currentMenu: 'รายการที่สั่ง',
-            Title: 'Clipart Press || รายการที่สั่ง',
-            currentLink: "myorder"
-        });
+    router.get('/myorder/invoices/:id', async (req, res) => {
+        const order_id = req.params.id;
+        await dbConnection.promise().query('SELECT ors.*, opd.*, p.* ,opo.*, o.* FROM orders ors JOIN order_product_detail opd ON opd.order_id = ors.order_id JOIN product p ON p.product_id = opd.product_id ' +
+            'JOIN order_product_options opo ON opo.opd_id = opd.opd_id JOIN options o ON o.option_id = opo.option_id WHERE ors.order_id = ?', order_id).then(async ([orders]) => {
+            const orderItem = [];
+
+            orders.forEach((rows) => {
+                const existingOrder = orderItem.find((item) => item.order_id === rows.order_id);
+                if (existingOrder) {
+                    // Check if 'order_detail' exists on the existing order, and initialize it if not
+                    if (!existingOrder.order_detail) {
+                        existingOrder.order_detail = [];
+                    }
+
+                    // Check if there's an existing order detail with the same opd_id
+                    const existingOrderDetail = existingOrder.order_detail.find(
+                        (detail) => detail.opd_id === rows.opd_id
+                    );
+
+                    if (existingOrderDetail) {
+                        // If an existing order detail with the same opd_id is found,
+                        // add the option to that existing detail
+                        existingOrderDetail.options.push({
+                            option_id: rows.option_id,
+                            option_name: rows.option_name,
+                            option_type: rows.option_type,
+                        });
+                    } else {
+                        // If no existing order detail with the same opd_id is found,
+                        // create a new order detail and add it to the existing order
+                        existingOrder.order_detail.push({
+                            opd_id: rows.opd_id,
+                            size: rows.size,
+                            design_file: rows.design_file,
+                            price: rows.price,
+                            quantity: rows.quantity,
+                            product_id: rows.product_id,
+                            productName: rows.productName,
+                            picture: rows.picture,
+                            options: [{
+                                option_id: rows.option_id,
+                                option_name: rows.option_name,
+                                option_type: rows.option_type,
+                            }, ],
+                        });
+                    }
+                } else {
+                    const item = {
+                        order_id: rows.order_id,
+                        order_date: rows.order_date,
+                        shipment_price: rows.shipment_price,
+                        order_status: rows.order_status,
+                        coupon_id: rows.coupon_id,
+                        address_id: rows.address_id,
+                        shipment_id: rows.shipment_id,
+                        user_id: rows.user_id,
+                        order_detail: [{
+                            opd_id: rows.opd_id,
+                            size: rows.size,
+                            design_file: rows.design_file,
+                            price: rows.price,
+                            quantity: rows.quantity,
+                            product_id: rows.product_id,
+                            productName: rows.productName,
+                            picture: rows.picture,
+                            options: [{
+                                option_id: rows.option_id,
+                                option_name: rows.option_name,
+                                option_type: rows.option_type,
+                            }, ],
+                        }, ],
+                    };
+                    orderItem.push(item);
+                }
+            });
+
+            await dbConnection.promise().query('SELECT addr.*, ors.address_id FROM address addr JOIN orders ors ON addr.address_id = ors.address_id WHERE ors.order_id = ?', order_id).then(async ([address]) => {
+                await dbConnection.promise().query('SELECT pm.*, ors.order_id FROM payment pm JOIN orders ors ON pm.order_id = ors.order_id WHERE ors.order_id = ?', order_id).then(async ([payment]) => {
+                    await dbConnection.promise().query('SELECT sh.*, ors.shipment_id FROM shipments sh JOIN orders ors ON sh.shipment_id = ors.shipment_id WHERE ors.order_id = ?', order_id).then(async ([shipment]) => {
+                        await dbConnection.promise().query('SELECT c.*, ors.coupon_id FROM coupon c JOIN orders ors ON c.coupon_id = ors.coupon_id').then(async ([coupon]) => {
+                            await dbConnection.promise().query('SELECT * FROM promptpay').then(async ([promptpay]) => {
+                                await dbConnection.promise().query('SELECT * FROM bank WHERE deleted_at IS NULL').then(([banks]) => {
+                                    if (orderItem.length === 0) { //|| orderItem[0].user_id !== req.session.user_id
+                                        res.redirect('/')
+                                    } else {
+                                        const keyBank = Buffer.from('ef045d157e2df86220ee67ac37132a604f51477fef58fdaac52ed312d97a1538', 'hex');
+                                        const ivBank = Buffer.from('72d78a8a792f98f086bd892600e3638a', 'hex');
+                                        const decipherBank = crypto.createDecipheriv('aes-256-cbc', keyBank, ivBank);
+                                        let banknumber = '';
+                                        var bankArr = [];
+                                        banks.forEach((bank) => {
+                                            if (bank.bank_id === payment[0].payment_method_id) {
+                                                banknumber = decipherBank.update(bank.number, 'hex', 'utf8');
+                                                banknumber += decipherBank.final('utf8')
+                                                let bankSelect = {
+                                                    bank_id: bank.bank_id,
+                                                    bank: bank.bank, 
+                                                    number: banknumber,
+                                                    name: bank.name,
+                                                };
+                                                bankArr.push(bankSelect)
+                                            }
+                                        });
+                                        const keypp = Buffer.from('a83662c9b5b271e4b9ca58ec4ae7f429dc65500ac7754712a1ac75037affe7b8', 'hex');
+                                        const ivpp = Buffer.from('cfe4c9b8b0518d92cc03130106322533', 'hex');
+                                        const decipherpp = crypto.createDecipheriv('aes-256-cbc', keypp, ivpp);
+                                        let number = '0123456789';
+                                        if (promptpay.length > 0) {
+                                            number = decipherpp.update(promptpay[0].number, 'hex', 'utf8');
+                                            number += decipherpp.final('utf8');
+                                        }
+                                        var SumPrice = 0
+                                        var finalPrice = 0
+                                        orderItem[0].order_detail.forEach((order) => {
+                                            SumPrice += order.price
+                                        })
+                                        var vat = SumPrice * 7 / 100;
+                                        let imgQr;
+                                        if (orderItem[0].coupon_id !== null) {
+                                            coupon.forEach((c) => {
+                                                if (c.coupon_type == 'value') {
+                                                    finalPrice = (SumPrice + vat + orderItem[0].shipment_price) - c.discount_value;
+                                                } else if (c.coupon_type == 'percent') {
+                                                    finalPrice = (SumPrice + vat + orderItem[0].shipment_price) - ((SumPrice + vat + shipment_price) * c.discount_value / 100);
+                                                }
+                                                coupon = c.coupon_id
+                                            });
+                                        } else {
+                                            finalPrice = (SumPrice + vat + orderItem[0].shipment_price);
+                                        }
+
+                                        const amount = parseFloat(finalPrice)
+                                        const payload = generatePayload(number, {
+                                            amount
+                                        });
+                                        const options = {
+                                            color: {
+                                                dark: '#000',
+                                                light: '#fff'
+                                            }
+                                        }
+                                        QRCode.toDataURL(payload, options, (err, url) => {
+                                            if (err) {
+                                                console.log('generate fail')
+                                                return;
+                                            }
+                                            imgQr = url;
+                                            res.render('pages/invoices', {
+                                                currentMenu: 'รายการที่สั่ง',
+                                                Title: 'Clipart Press || รายการที่สั่ง',
+                                                currentLink: "myorder",
+                                                orders: orderItem,
+                                                address: address,
+                                                payment: payment,
+                                                shipment: shipment,
+                                                coupon: coupon,
+                                                qrcode: imgQr,
+                                                promptpay: promptpay,
+                                                banks: banks,
+                                                bankSelect: bankArr
+                                            });
+                                        })
+                                    }
+                                })
+                            })
+                        })
+                    })
+                })
+            })
+
+        })
     })
+    router.post('/changepayment/:oid/:mid', orderController.changePayment)
     router.get('/example', (req, res) => {
         res.render('pages/example', {
             currentMenu: 'ตัวอย่างงาน',
@@ -807,7 +976,7 @@ let Routes = (app) => {
     router.get('/chat-history', (req, res) => {
         dbConnection.promise().query('SELECT * FROM chats WHERE sender_id = ? OR recipient_id = ? ORDER BY created_at ASC', [req.session.user_id, req.session.user_id]).then(([rows]) => {
             res.json(rows);
-        }) 
+        })
     })
 
     router.get('/admin/chat-history', (req, res) => {

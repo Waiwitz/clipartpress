@@ -9,7 +9,7 @@ const connectFlash = require('connect-flash');
 const session = require('express-session'); 
 const router = require('./routes/routes');
 const morgan = require('morgan')
-const path = require('path');
+const path = require('path'); 
 const fs = require('fs');
 const banklist = require('./public/js/banklist.js')
 const cors = require('cors');
@@ -103,11 +103,10 @@ app.use(function (req, res, next) {
 });
 
 app.use(function (req, res, next) {
-    if (req.session.user_id !== null) {
+    if (req.session.user_id !== null) { 
         dbConnection.promise().query(`SELECT cart_id FROM cart WHERE user_id = ${req.session.user_id} AND deleted_at IS NULL`)
             .then(([result]) => {
                 res.locals.cartCount = result.length;
-                console.log('sssssssasdasd ' + result.length);
                 next();
             })
             .catch(err => {

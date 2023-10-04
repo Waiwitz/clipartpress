@@ -87,16 +87,17 @@ const promptpay = (req, res) => {
         getStatus = '0';
     } else {
         getStatus = '1';
-    }
+    } 
     data = [number, promptPayType, name, getStatus]
 
     dbConnection.query(`INSERT INTO promptpay(promptpay_id, number, promptpay_type, name, status) VALUES( 1 , ? , ? , ? , ? ) ON DUPLICATE KEY UPDATE number = VALUES(number), promptpay_type = VALUES(promptpay_type), name = VALUES(name), status = VALUES(status);
     `, data, (err) => {
         if (err) throw err;
-        res.sendStatus(404);
     })
 
-    res.sendStatus(200);
+    res.json({
+        message: 'Data deleted'
+    });
     // fs.readFile(filePath, 'utf8', (err, data) => {
     //     if (err) {
     //         console.error(err);
