@@ -71,7 +71,11 @@
                             </td>
                             <td>
                                 <% if(coupon.status === 1) { %>
-                                เปิดใช้งาน
+                                <% if (new Date() >= coupon.start_date && new Date() <= coupon.end_date) { %>
+                                    เปิดใช้งาน
+                                <% } else { %>
+                                หมดอายุ
+                                <% } %>
                                 <% }else { %>
                                 ปิด
                                 <% } %>
@@ -89,7 +93,8 @@
                                     แก้ไข
                                 </button>
                                 <button type="button" class="btn btn-danger btn-sm delete" data-mdb-toggle="modal"
-                                    data-mdb-target="#deleteModal" data-coupon-id="<%= coupon.coupon_id %>" data-name="<%= coupon.coupon_name %>">
+                                    data-mdb-target="#deleteModal" data-coupon-id="<%= coupon.coupon_id %>"
+                                    data-name="<%= coupon.coupon_name %>">
                                     ลบ
                                 </button>
                             </td>
@@ -387,7 +392,7 @@
         $('#newRandomCode').click(function () {
             $('#newCouponCode').val(generateCouponCode(6));
         })
-        
+
         $('input[type=radio][name=couponType]').change(function () {
             if (this.value == 'percent') {
                 $('#unittype').text('%')

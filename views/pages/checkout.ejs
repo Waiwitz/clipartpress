@@ -1,28 +1,5 @@
 <%- include('../partials/header') %>
 
-<style>
-    .dd-selected-image,
-    .dd-option-image {
-        margin: 0.85em 0.5em;
-        width: 35px !important;
-        height: 35px !important;
-    }
-
-    .dd-selected,
-    .dd-option {
-        padding: 0;
-        height: 60px;
-    }
-
-    .dd-option-text {
-        line-height: 0;
-    }
-
-    label.dd-selected-text {
-        line-height: 62px !important;
-    }
-</style>
-
 <body style="background-color: #f8f8f8;">
 
     <!-- <div class="banner shadow-5-strong">
@@ -39,7 +16,7 @@
     </div> -->
     <% let sumTotal = 0 %>
 
-    <form action="/placeOrder/<%= session.user_id %>" method="post">
+    <form action="/placeOrder/" method="post">
         <input type="hidden" name="product_id" value="<%= JSON.stringify(cartsItem.product_id) %>">
         <div class="container-lg mt-5 mb-5 p-auto">
             <% if(success_msg != "") { %>
@@ -89,25 +66,34 @@
                                     <% if (findPromo) { %>
                                     <%  promotions.forEach((promo) => { %>
                                     <%  let min_reach = promo.min_reach;%>
+                                    <% if (new Date() >= promo.start_date && new Date() <= promo.end_date) { %>
+                                    <!-- แถมเมื่อยอดถึง -->
                                     <% if (promo.promo_type == 'giveaway' && promo.promo_condition == 'value') { %>
                                     <% if (item.price >= promo.min_reach) {%>
                                     <% qty = item.quantity + promo.type_value%>
                                     <% textQty = `<b>${qty}</b><br><s>${item.quantity}</s>` %>
                                     <% } %>
+
+                                    <!-- แถมเมื่อชิ้นถึง -->
                                     <% } else if (promo.promo_type == 'giveaway' && promo.promo_condition == 'qty') { %>
                                     <% if (item.quantity >= promo.min_reach) {%>
                                     <% qty = item.quantity + promo.type_value%>
                                     <% textQty = `<b>${qty}</b><br><s>${item.quantity}</s>` %>
                                     <% } %>
+
+                                    <!-- ลดเมื่อยอดถึง -->
                                     <%  }else if (promo.promo_type == 'discount' && promo.promo_condition == 'value') { %>
                                     <% if (item.price >= promo.min_reach) {%>
                                     <% price = item.price - (item.price * promo.type_value / 100)%>
                                     <% textPrice = `<b>${money.format(price)}</b><br><s>${money.format(item.price)}</s>` %>
                                     <% } %>
+
+                                    <!-- ลดเมื่อชิ้นถึง -->
                                     <% } else if (promo.promo_type == 'discount' && promo.promo_condition == 'qty') { %>
                                     <% if (item.quantity >= promo.min_reach) {%>
                                     <% price = item.price - (item.price * promo.type_value / 100) %>
                                     <% textPrice = `<b>${money.format(price)}</b><br><s>${money.format(item.price)}</s>` %>
+                                    <% } %>
                                     <% } %>
                                     <% } %>
                                     <% }) %>
@@ -144,7 +130,7 @@
                                 </span> <br>
                                 <span id="ad-tel"><%= data.telephone%></span>
                                 <% } else { %>
-                                    <b class="alert-warning p-1 m-auto">ยังไม่เลือกที่อยู่หลัก</b>
+                                <b class="alert-warning p-1 m-auto">ยังไม่เลือกที่อยู่หลัก</b>
                                 <% } %>
                                 <% }) %>
                                 <% } else { %>
@@ -158,11 +144,11 @@
                             </div>
 
                             <div class="card-body py-2">
-                                <select id="paymentMethod">
-                                    <% promptpay.forEach((promptpay) => { %>
-                                    <option value="<%= promptpay.promptpay_id %>"
+                                <select id="paymentMethod" name="paymentMethod">
+                                    <% if(promptpay.length > 0 && promptpay[0].status === 1) { %>
+                                    <option value="0"
                                         data-imagesrc="/assets/img/logoBank/promptpay.png">Qr Code promptpay</option>
-                                    <% }) %>
+                                    <% } %>
                                     <% for( let i = 0; i < banks.length; i++ ) { %>
                                     <option value="<%= banks[i].bank_id %>"
                                         data-imagesrc="/assets/img/logoBank/<%= banks[i].bank %>.png">
@@ -221,7 +207,7 @@
                                 <div class="border-bottom mb-2">
                                     <div class="d-flex mb-2">
                                         <div class="form-outline me-1 " id="coupon-outline">
-                                            <input type="text" id="coupon" name="coupon_code" class="form-control" />
+                                            <input type="text" id="coupon" name="couponCode" class="form-control" />
                                             <label class="form-label" for="coupon">คูปอง</label>
                                         </div>
                                         <button class="btn btn-primary" id="applyCode"
@@ -245,10 +231,10 @@
                             </div>
                         </div>
                         <div class="card-footer sticky-bottom bg-white">
-                            <!-- <button type="submit" class="btn btn-primary w-100 fs-5">สั่งซื้อและชำระเงิน</button> -->
-                            <a href="/invoices">
+                            <button type="submit" class="btn btn-primary w-100 fs-5">สั่งซื้อและชำระเงิน</button>
+                            <!-- <a href="/invoices">
                                 <button type="button" class="btn btn-primary w-100 fs-5">สั่งซื้อและชำระเงิน</button>
-                            </a>
+                            </a> -->
                         </div>
                     </div>
                 </div>
@@ -278,7 +264,7 @@
                             <div class="card-header d-flex justify-content-between">
                                 <% if (data.default_address == "1") {%>
                                 <div>
-                                    <input class="form-check-input" type="radio" name="selectAddress"
+                                    <input class="form-check-input" type="radio" name="selectAddress" value="<%= data.address_id %>"
                                         <%= data.default_address == "1" ? 'checked' : '' %> data-name="<%= data.name %>"
                                         data-address="<%= data.address %>" data-province="<%= data.province %>"
                                         data-postcode="<%= data.postcode %>" data-telephone="<%= data.telephone%>" />
@@ -287,7 +273,7 @@
                                 </div>
                                 <% } else {%>
                                 <div>
-                                    <input class="form-check-input" type="radio" name="selectAddress"
+                                    <input class="form-check-input" type="radio" name="selectAddress" value="<%= data.address_id %>"
                                         data-name="<%= data.name %>" data-address="<%= data.address %>"
                                         data-province="<%= data.province %>" data-postcode="<%= data.postcode %>"
                                         data-telephone="<%= data.telephone%>" />
@@ -492,6 +478,7 @@
             new mdb.Input(formOutline).init();
         });
         $(document).ready(function () {
+            let newprice = 0;
             const couponReq = () => {
                 const code_input = $('#coupon').val();
                 $('#applyCode').prop('disabled', true)
@@ -521,51 +508,67 @@
                             $('#coupon').prop('disabled', false)
 
                             if (findCode) {
-                                console.log('เจอ');
-                                var totalPrice = $('#sumPrice').val();
-                                let detail = ``;
-                                let newPrice = 0;
-                                console.log(totalPrice);
-                                if (findCode.coupon_type == 'percent') {
-                                    detail = `ส่วนลด ${findCode.discount_value} %`
-                                    newPrice = totalPrice - (totalPrice * findCode
-                                        .discount_value /
-                                        100);
-                                } else if (findCode.coupon_type == 'value') {
-                                    detail = `ส่วนลด ${findCode.discount_value} บาท`
-                                    newPrice = totalPrice - findCode.discount_value
-                                }
-                                let updateOldPrice =
-                                    `<s class="fw-bold me-2" id="totalPrice">${THmoney.format(totalPrice)}</s>`
 
-                                if (totalPrice >= findCode.min_amount) {
-                                    $('#coupon-detail').empty().append(detail);
-                                    $('#totalPrice').empty().replaceWith(
-                                        updateOldPrice);
-                                    $('#newPrice').empty().append(THmoney.format(
-                                        newPrice));
-                                    // $('.form-outline').addClass('border-success')
-                                } else if (coupon_amount.lenght >= findCode
-                                    .coupon_amount) {
-                                    $('#coupon-detail').empty().append(detail +
-                                        '|| คูปองนี้ไม่เหลือแล้ว');
-                                    $('#totalPrice').empty().replaceWith(
-                                        `<b class="fw-bold me-2" id="totalPrice">${THmoney.format(totalPrice)}</b>`
-                                    );
-                                    $('#newPrice').empty()
-                                } else if (user_limit.lenght >= findCode
-                                    .user_limitUse) {
-                                    $('#coupon-detail').empty().append(detail +
-                                        '|| คุณได้ใช้คูปองนี้ครบจำนวนครั้งแล้ว');
-                                    $('#totalPrice').empty().replaceWith(
-                                        `<b class="fw-bold me-2" id="totalPrice">${THmoney.format(totalPrice)}</b>`
-                                    );
-                                    $('#newPrice').empty()
+                                const start_date = new Date(findCode.start_date);
+                                const end_date = new Date(findCode.end_date);
+                                const currentDate = new Date();
+                                currentDate.setMinutes(currentDate.getMinutes() -
+                                    currentDate.getTimezoneOffset());
+                                const expired = currentDate >= start_date &&
+                                    currentDate <=
+                                    end_date;
+                                    
+                                if (expired) {
+                                    console.log('เจอ');
+                                    let detail = ``;
+                                    let calPrice = 0;
+                                    if (findCode.coupon_type == 'percent') {
+                                        detail = `ส่วนลด ${findCode.discount_value} %`
+                                        calPrice = newprice - (totalPrice * findCode
+                                            .discount_value /
+                                            100);
+                                    } else if (findCode.coupon_type == 'value') {
+                                        detail = `ส่วนลด ${findCode.discount_value} บาท`
+                                        calPrice = newprice - findCode.discount_value
+                                    }
+                                    let updateOldPrice =
+                                        `<s class="fw-bold me-2" id="totalPrice">${THmoney.format(newprice)}</s>`
+
+                                    if (newprice >= findCode.min_amount) {
+                                        $('#coupon-detail').empty().append(detail);
+                                        $('#totalPrice').empty().replaceWith(
+                                            updateOldPrice);
+                                        $('#newPrice').empty().append(THmoney.format(
+                                            calPrice));
+                                        // $('.form-outline').addClass('was-validate')
+                                    } else if (coupon_amount.lenght >= findCode
+                                        .coupon_amount) {
+                                        $('#coupon-detail').empty().append(detail +
+                                            '|| คูปองนี้ไม่เหลือแล้ว');
+                                        $('#totalPrice').empty().replaceWith(
+                                            `<b class="fw-bold me-2" id="totalPrice">${THmoney.format(newprice)}</b>`
+                                        );
+                                        $('#newPrice').empty()
+                                    } else if (user_limit.lenght >= findCode
+                                        .user_limitUse) {
+                                        $('#coupon-detail').empty().append(detail +
+                                            '|| คุณได้ใช้คูปองนี้ครบจำนวนครั้งแล้ว');
+                                        $('#totalPrice').empty().replaceWith(
+                                            `<b class="fw-bold me-2" id="totalPrice">${THmoney.format(newprice)}</b>`
+                                        );
+                                        $('#newPrice').empty()
+                                    } else {
+                                        $('#coupon-detail').empty().append(detail +
+                                            '|| ไม่ผ่านไม่เงื่อนไข');
+                                        $('#totalPrice').empty().replaceWith(
+                                            `<b class="fw-bold me-2" id="totalPrice">${THmoney.format(newprice)}</b>`
+                                        );
+                                        $('#newPrice').empty()
+                                    }
                                 } else {
-                                    $('#coupon-detail').empty().append(detail +
-                                        '|| ไม่ผ่านไม่เงื่อนไข');
+                                    $('#coupon-detail').empty().append('โค้ดหมดอายุ');
                                     $('#totalPrice').empty().replaceWith(
-                                        `<b class="fw-bold me-2" id="totalPrice">${THmoney.format(totalPrice)}</b>`
+                                        `<b class="fw-bold me-2" id="totalPrice">${THmoney.format(newprice)}</b>`
                                     );
                                     $('#newPrice').empty()
                                 }
@@ -640,7 +643,7 @@
                     // $('#ad-tel').text(telephone);
                     $('#show-address').empty().append(text)
                     $('.backdrop').remove();
-                    
+
                 }, 800);
             });
 
@@ -773,7 +776,6 @@
             });
             $('#paymentMethod .dd-selected-value').attr('name', 'paymentMethod')
 
-
             $('select#shipment').on('change', function () {
                 var id = $(this).find(':selected').data('id')
                 var type = $(this).find(':selected').data('stype');
@@ -784,7 +786,6 @@
 
                 shipmentPrice.forEach((rows) => {
                     if (rows.shipment_id === id) {
-                        var newprice = parseFloat(originalPrice) + parseFloat(rows.price);
                         if (type == 'free') {
                             $('#shipment-show').text('ฟรี')
                             $('#totalPrice').empty().replaceWith(
@@ -792,11 +793,13 @@
                             );
                         } else {
                             if (qty < rows.qty_min) {
+                                newprice = parseFloat(originalPrice) + parseFloat(startprice);
                                 $('#shipment-show').text(THmoney.format(startprice))
                                 $('#totalPrice').empty().replaceWith(
                                     `<b class="fw-bold me-2" id="totalPrice">${THmoney.format(newprice)}</b>`
                                 );
                             } else if (qty >= rows.qty_min) {
+                                newprice = parseFloat(originalPrice) + parseFloat(rows.price);
                                 $('#shipment-show').text(THmoney.format(rows.price))
                                 $('#totalPrice').empty().replaceWith(
                                     `<b class="fw-bold me-2" id="totalPrice">${THmoney.format(newprice)}</b>`
