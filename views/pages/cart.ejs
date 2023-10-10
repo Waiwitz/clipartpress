@@ -38,6 +38,7 @@
         <% let qty; %>
         <% let price; %>
         <% let SumPrice = 0; %>
+        <% let SumQty = 0; %>
         <% if(cartsItem.length > 0) { %>
         <div class="d-flex flex-wrap">
             <div class="col">
@@ -68,30 +69,40 @@
                                 <% if (findPromo) { %>
                                 <%  promotions.forEach((promo) => { %>
                                 <%  let min_reach = promo.min_reach;%>
+                                <% if (new Date() >= promo.start_date && new Date() <= promo.end_date) { %>
+                                <!-- แถมเมื่อยอดถึง -->
                                 <% if (promo.promo_type == 'giveaway' && promo.promo_condition == 'value') { %>
                                 <% if (item.price >= promo.min_reach) {%>
                                 <% qty = item.quantity + promo.type_value%>
                                 <% textQty = `<b>${qty}</b><br><s>${item.quantity}</s>` %>
                                 <% } %>
+
+                                <!-- แถมเมื่อชิ้นถึง -->
                                 <% } else if (promo.promo_type == 'giveaway' && promo.promo_condition == 'qty') { %>
                                 <% if (item.quantity >= promo.min_reach) {%>
                                 <% qty = item.quantity + promo.type_value%>
                                 <% textQty = `<b>${qty}</b><br><s>${item.quantity}</s>` %>
                                 <% } %>
+
+                                <!-- ลดเมื่อยอดถึง -->
                                 <%  }else if (promo.promo_type == 'discount' && promo.promo_condition == 'value') { %>
                                 <% if (item.price >= promo.min_reach) {%>
                                 <% price = item.price - (item.price * promo.type_value / 100)%>
                                 <% textPrice = `<b>${money.format(price)}</b><br><s>${money.format(item.price)}</s>` %>
                                 <% } %>
+
+                                <!-- ลดเมื่อชิ้นถึง -->
                                 <% } else if (promo.promo_type == 'discount' && promo.promo_condition == 'qty') { %>
                                 <% if (item.quantity >= promo.min_reach) {%>
                                 <% price = item.price - (item.price * promo.type_value / 100) %>
                                 <% textPrice = `<b>${money.format(price)}</b><br><s>${money.format(item.price)}</s>` %>
                                 <% } %>
                                 <% } %>
+                                <% } %>
                                 <% }) %>
                                 <% }  %>
                                 <% SumPrice += price %>
+                                <% SumQty += qty; %>
                                 <h5>จำนวน</h5>
                                 <%- textQty %>
                             </div>

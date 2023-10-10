@@ -16,33 +16,59 @@
         display: block !important;
     }
 
+    .itemlist {
+        justify-content: center;
+    }
+
+    .itemlist .card {
+        width: 205px;
+        height: 320px;
+        transition: 0.2s ease-in;
+    }
+
+    .product_list_card {
+        height: 200px;
+    }
+    .itemlist .price ,  .itemlist .des  {
+        display: none;
+    }
+
     .cate-select-group {
         width: 100%;
     }
 
+    .myorder-tab span {
+        display: none;
+    }
 }
 
 
 .bottom-price {
     display: none;
 }
-@media only screen and (max-width: 749px) {
+
+@media only screen and (max-width: 680px) {
 
     .order-item .col,
     .order-item .col-7 {
         /* width: 100% !important; */
     }
 
-    
-    #right-price {
+    .option-detail {
         display: none;
     }
 
-    .bottom-price {
-        display: block ;
+    .itemlist .card {
+        width: 165px;
+        transition: 0.2s ease-in;
     }
 
-    .myorder-tab span {
-        display: none;
+    .allproduct-preview {
+        width: 8em;
+        margin: 10px !important;
+    }
+
+    .chat-windows {
+        width: 320px;
     }
 }

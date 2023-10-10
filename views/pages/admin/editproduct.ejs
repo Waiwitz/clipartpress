@@ -138,14 +138,14 @@
                                                         value="<%= sizeTier[0].tierSize_id %>">
                                                     <div class="me-2">
                                                         <div class="form-outline" style="width: 85px;">
-                                                            <input type="number" class="form-control" name="width[0][]"
+                                                            <input type="number" class="form-control" name="unit[0][]"
                                                                 required step="0.01" min="0"
-                                                                value="<%= sizeTier[0].width %>">
-                                                            <label class="form-label">กว้าง<span
+                                                                value="<%= sizeTier[0].size_unit %>">
+                                                            <label class="form-label">ค่าขนาด<span
                                                                     class="text-danger ms-2">*</span></label>
                                                         </div>
                                                     </div>
-                                                    <span class="p-1 ">X</span>
+                                                    <!-- <span class="p-1 ">X</span>
                                                     <div class="ms-2">
                                                         <div class="form-outline" style="width: 85px;">
                                                             <input type="number" class="form-control" name="height[0][]"
@@ -154,7 +154,7 @@
                                                             <label class="form-label">ยาว<span
                                                                     class="text-danger ms-2">*</span></label>
                                                         </div>
-                                                    </div>
+                                                    </div> -->
                                                     <div class="ms-2">
                                                         <div class="form-outline" style="width: 85px;">
                                                             <input type="number" class="form-control"
@@ -176,14 +176,14 @@
                                                     <div class="me-2">
                                                         <div class="form-outline" style="width: 85px;">
                                                             <input type="number" class="form-control"
-                                                                name="width[<%= i %>][]" required step="0.01" min="0"
-                                                                value="<%= sizeTier[i].width %>">
-                                                            <label class="form-label">กว้าง<span
+                                                                name="unit[<%= i %>][]" required step="0.01" min="0"
+                                                                value="<%= sizeTier[i].size_unit %>">
+                                                            <label class="form-label">ค่าขนาด<span
                                                                     class="text-danger ms-2">*</span></label>
                                                         </div>
                                                     </div>
-                                                    <span class="p-1 ">X</span>
-                                                    <div class="ms-2">
+                                                    <!-- <span class="p-1 ">X</span> -->
+                                                    <!-- <div class="ms-2">
                                                         <div class="form-outline" style="width: 85px;">
                                                             <input type="number" class="form-control"
                                                                 name="height[<%= i %>][]" required step="0.01" min="0"
@@ -191,7 +191,7 @@
                                                             <label class="form-label">ยาว<span
                                                                     class="text-danger ms-2">*</span></label>
                                                         </div>
-                                                    </div>
+                                                    </div> -->
                                                     <div class="ms-2">
                                                         <div class="form-outline" style="width: 85px;">
                                                             <input type="number" class="form-control"
@@ -408,18 +408,9 @@
             <div class="d-flex mb-2 sizeTierRow" style="height: 36px;">
                                                     <div class="me-2">
                                                         <div class="form-outline" style="width: 85px;">
-                                                            <input type="number" class="form-control" name="newWidth[${news}][]"
+                                                            <input type="number" class="form-control" name="newUnit[${news}][]"
                                                                 required>
                                                             <label class="form-label">กว้าง<span
-                                                                    class="text-danger ms-2">*</span></label>
-                                                        </div>
-                                                    </div>
-                                                    <span class="p-1 ">X</span>
-                                                    <div class="ms-2">
-                                                        <div class="form-outline" style="width: 85px;">
-                                                            <input type="number" class="form-control" name="newHeight[${news}][]"
-                                                                required step="0.01" min="0">
-                                                            <label class="form-label">ยาว<span
                                                                     class="text-danger ms-2">*</span></label>
                                                         </div>
                                                     </div>

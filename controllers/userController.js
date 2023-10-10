@@ -233,6 +233,17 @@ const upload_profile = multer({
     storage: storage_profile
 });
 
+const deleteUser = async (req, res) => {
+    const id = req.body.user_id;
+    try {
+        dbConnection.query("UPDATE users SET deleted_at = CURRENT_TIMESTAMP WHERE user_id = ?", [id]);
+        req.flash("success_msg", 'ลบผู้ใช้สำเร็จ');
+        return res.redirect("/admin/member");
+    } catch (error) {
+        req.flash("errors", error.message);
+        return res.redirect("/admin/member");
+    }
+}
 
 
 
@@ -245,5 +256,6 @@ module.exports = {
     deleteAddress: deleteAddress,
     validatePassword: validatePassword,
     changepassword: changepassword,
-    upload_profile: upload_profile
+    upload_profile: upload_profile,
+    deleteUser: deleteUser
 }

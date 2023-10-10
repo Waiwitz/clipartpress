@@ -1,5 +1,5 @@
 <%- include('../partials/head') %>
-<!-- <div class="navtoptap shadow-5-strong" style="z-index: 10;">
+<div class="navtoptap shadow-5-strong" style="z-index: 10;">
   <div class="text-end flag-lang container-lg d-flex justify-content-end">
     <div class="dropdown nav-item me-5 my-auto mt-2">
       <a class="dropdown-toggle d-flex align-items-center hidden-arrow mini-profile" href="#"
@@ -16,7 +16,7 @@
       </ul>
     </div>
   </div>
-</div> -->
+</div>
 <nav class="nav-admin navbar-light" style="z-index: 10 !important;">
   <!-- <div class="align-self-center me-4" id="mini-nav-btn">
     <i class="fas fa-bars fs-4"></i>
@@ -41,19 +41,19 @@
         </a>
       </li> -->
 
-      <li class="nav-item ripple <%= currentLink == 'order' || currentLink == "option" ? 'shadow-4-strong' : " "%> "
+      <li class="nav-item ripple <%= currentLink == 'order' || currentLink == "payment" ? 'shadow-4-strong' : " "%> "
         data-mdb-ripple-color="light">
         <div class="admin-navlink admin-dropdown" id="sale-btn" data-mdb-toggle="collapse" data-mdb-target="#sale">
           <i class="fas fa-coins"></i>
           <span class="align-self-center">การขาย</span>
           <i class="fas fa-caret-down text-end"></i>
         </div>
-        <div class="collapse <%= currentLink == 'order' || currentLink == "option" ? 'show' : " "%>" id="sale">
+        <div class="collapse <%= currentLink == 'order' || currentLink == "payment" ? 'show' : " "%>" id="sale">
           <a class="admin-navlink <%= currentLink == 'order' ? 'admin-nav-active' : " "%>" href="/admin/orders">
-            <span class="ms-5 align-self-center">คำสั่งซื้อ</span>
+            <span class="ms-5 align-self-center">ออเดอร์</span>
           </a>
-          <a class="admin-navlink <%= currentLink == 'allproduct' ? 'admin-nav-active' : " "%>"
-            href="/admin/product-list">
+          <a class="admin-navlink <%= currentLink == 'payment' ? 'admin-nav-active' : " "%>"
+            href="/admin/payment">
             <span class="ms-5 align-self-center">แจ้งชำระเงิน</span>
           </a>
         </div>
@@ -83,7 +83,7 @@
           <span class="align-self-center">สินค้า</span>
           <i class="fas fa-caret-down text-end"></i>
         </div>
-        <div class="collapse <%= currentLink == 'allproduct' || currentLink == "option" ? 'show' : " "%>" id="product">
+        <div class="collapse <%= currentLink == "option" ? 'show' : " "%>" id="product">
           <a class="admin-navlink <%= currentLink == 'option' ? 'admin-nav-active' : " "%>" href="/admin/options">
             <span class="ms-5 align-self-center">ออฟชั่นสินค้า</span>
           </a>

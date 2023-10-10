@@ -1,4 +1,34 @@
 <%- include('../partials/header') %>
+<style>
+    .dd-selected-image,
+    .dd-option-image {
+        margin: 0.85em 0.5em;
+        width: 35px !important;
+        height: 35px !important;
+    }
+
+    .dd-selected,
+    .dd-option {
+        padding: 0;
+        height: 60px;
+    }
+
+    .dd-option-text {
+        line-height: 0;
+    }
+
+    label.dd-selected-text {
+        line-height: 62px !important;
+    }
+
+    .nav-space {
+        height: 60px;
+    }
+
+    .navbar-brand img {
+        width: 60px;
+    }
+</style>
 
 <body style="background-color: #f8f8f8;">
 
@@ -145,16 +175,15 @@
 
                             <div class="card-body py-2">
                                 <select id="paymentMethod" name="paymentMethod">
-                                    <% if(promptpay.length > 0 && promptpay[0].status === 1) { %>
-                                    <option value="0"
-                                        data-imagesrc="/assets/img/logoBank/promptpay.png">Qr Code promptpay</option>
-                                    <% } %>
-                                    <% for( let i = 0; i < banks.length; i++ ) { %>
-                                    <option value="<%= banks[i].bank_id %>"
-                                        data-imagesrc="/assets/img/logoBank/<%= banks[i].bank %>.png">
-                                        <% banklist.forEach((list) => { %>
-                                        <%= banks[i].bank == list.en ? list.th : '' %>
-                                        <% }) %>
+                                    <% for( let i = 0; i < payment_method.length; i++ ) { %>
+                                    <% const bankname = banklist.find(row => row.en == payment_method[i].method_name) %>
+                                    <option value="<%= payment_method[i].payment_method_id %>"
+                                        data-imagesrc="/assets/img/logoBank/<%= payment_method[i].method_name %>.png">
+                                        <% if (bankname) { %>
+                                        <h6><%= bankname.th %></h6>
+                                        <% } else { %>
+                                        <h6>Qr-code พร้อมเพย์</h6>
+                                        <% } %>
                                     </option>
                                     <% } %>
                                 </select>
@@ -264,7 +293,8 @@
                             <div class="card-header d-flex justify-content-between">
                                 <% if (data.default_address == "1") {%>
                                 <div>
-                                    <input class="form-check-input" type="radio" name="selectAddress" value="<%= data.address_id %>"
+                                    <input class="form-check-input" type="radio" name="selectAddress"
+                                        value="<%= data.address_id %>"
                                         <%= data.default_address == "1" ? 'checked' : '' %> data-name="<%= data.name %>"
                                         data-address="<%= data.address %>" data-province="<%= data.province %>"
                                         data-postcode="<%= data.postcode %>" data-telephone="<%= data.telephone%>" />
@@ -273,10 +303,10 @@
                                 </div>
                                 <% } else {%>
                                 <div>
-                                    <input class="form-check-input" type="radio" name="selectAddress" value="<%= data.address_id %>"
-                                        data-name="<%= data.name %>" data-address="<%= data.address %>"
-                                        data-province="<%= data.province %>" data-postcode="<%= data.postcode %>"
-                                        data-telephone="<%= data.telephone%>" />
+                                    <input class="form-check-input" type="radio" name="selectAddress"
+                                        value="<%= data.address_id %>" data-name="<%= data.name %>"
+                                        data-address="<%= data.address %>" data-province="<%= data.province %>"
+                                        data-postcode="<%= data.postcode %>" data-telephone="<%= data.telephone%>" />
                                     <b class="card-title d-inline me-2 mt-2"><%= data.name %></b>
                                     <span></span>
                                 </div>
@@ -494,21 +524,20 @@
                     method: 'GET',
                     success: (data) => {
                         const coupons = data.coupons;
-                        const used = data.coupons_used;
+                        const orders = data.orders
                         const findCode = coupons.find(row => code_input === row.coupon_code);
-                        let coupon_amount;
-                        const user_limit = used.filter(row => row.user_id === session.user_id);;
-                        coupons.forEach((coupon) => {
-                            coupon_amount = used.filter(row => row.coupon_id === coupon
-                                .coupon_id);
-                        });
+                        const coupon_amount = orders.filter(row => row.coupon_id === findCode
+                            .coupon_id);
+                        const user_limit = orders.filter(row => row.user_id ==
+                            `<%= session.user_id %>` && row.coupon_id === findCode.coupon_id
+                        );
+
                         console.log(findCode);
                         setTimeout(function () {
                             $('#applyCode').prop('disabled', false)
                             $('#coupon').prop('disabled', false)
 
                             if (findCode) {
-
                                 const start_date = new Date(findCode.start_date);
                                 const end_date = new Date(findCode.end_date);
                                 const currentDate = new Date();
@@ -517,7 +546,7 @@
                                 const expired = currentDate >= start_date &&
                                     currentDate <=
                                     end_date;
-                                    
+
                                 if (expired) {
                                     console.log('เจอ');
                                     let detail = ``;
@@ -534,25 +563,22 @@
                                     let updateOldPrice =
                                         `<s class="fw-bold me-2" id="totalPrice">${THmoney.format(newprice)}</s>`
 
-                                    if (newprice >= findCode.min_amount) {
+                                    if (newprice >= findCode.min_amount && coupon_amount
+                                        .length < findCode.coupon_amount && user_limit
+                                        .length < findCode
+                                        .user_limitUse) {
                                         $('#coupon-detail').empty().append(detail);
                                         $('#totalPrice').empty().replaceWith(
                                             updateOldPrice);
                                         $('#newPrice').empty().append(THmoney.format(
                                             calPrice));
                                         // $('.form-outline').addClass('was-validate')
-                                    } else if (coupon_amount.lenght >= findCode
-                                        .coupon_amount) {
-                                        $('#coupon-detail').empty().append(detail +
-                                            '|| คูปองนี้ไม่เหลือแล้ว');
-                                        $('#totalPrice').empty().replaceWith(
-                                            `<b class="fw-bold me-2" id="totalPrice">${THmoney.format(newprice)}</b>`
-                                        );
-                                        $('#newPrice').empty()
-                                    } else if (user_limit.lenght >= findCode
+                                    } else if (coupon_amount.length >= findCode
+                                        .coupon_amount || user_limit.length >= findCode
                                         .user_limitUse) {
                                         $('#coupon-detail').empty().append(detail +
-                                            '|| คุณได้ใช้คูปองนี้ครบจำนวนครั้งแล้ว');
+                                            '|| คุณได้ใช้คูปองครบโควต้าหรือจำนวนคูปองครบโควต้าแล้ว'
+                                        );
                                         $('#totalPrice').empty().replaceWith(
                                             `<b class="fw-bold me-2" id="totalPrice">${THmoney.format(newprice)}</b>`
                                         );

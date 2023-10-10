@@ -28,8 +28,8 @@
           <a class="nav-link <%= currentMenu == 'หน้าแรก' ? 'active' : ''%>" aria-current="page" href="/">หน้าแรก</a>
         </li>
         <li class="nav-item me-2 mt-2 dropdown ">
-          <a class="nav-link <%= currentMenu == 'สินค้า' ? 'active' : ''%>" href="/product/all"><span
-              class="">สินค้า</span></a>
+          <a class="nav-link <%= currentMenu == 'สินค้า' ? 'active' : ''%>" href="/product/all">
+            สินค้า</a>
           <!-- <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
             <li><a class="dropdown-item" href="#">Action</a></li>
             <li><a class="dropdown-item" href="#">Another action</a></li>
@@ -40,9 +40,9 @@
         <li class="nav-item me-2 mt-2">
           <a class="nav-link <%= currentMenu == 'รายการที่สั่ง' ? 'active' : ''%>" href="/myorder">รายการที่สั่ง</a>
         </li>
-        <li class="nav-item me-2 mt-2">
+        <!-- <li class="nav-item me-2 mt-2">
           <a class="nav-link" href="/example">ตัวอย่างงาน</a>
-        </li>
+        </li> -->
         <li class="nav-item me-2 mt-2">
           <a class="nav-link" href="/contact">ติดต่อเรา</a>
         </li>
@@ -81,10 +81,10 @@
           <a class="nav-link" href="/cart">
             <!-- <span class="badge badge-pill bg-danger">1</span> -->
             <span><i class="fas fa-shopping-cart">
-              <% if(cartCount > 0) { %> 
+                <% if(cartCount > 0) { %>
                 <span class="badge rounded-pill badge-notification bg-danger"><%= cartCount %></span>
-              <% } %>
-            </i>
+                <% } %>
+              </i>
             </span>
           </a>
           <% } %>
@@ -92,7 +92,7 @@
         <li class="dropdown nav-item me-5 my-auto">
           <a class="dropdown-toggle d-flex align-items-center hidden-arrow mini-profile" href="#"
             id="navbarDropdownMenuAvatar" role="button" data-mdb-toggle="dropdown" aria-expanded="false">
-            <img src="<%= session.picture %>" alt="profile" class="w-100 h-100"/>
+            <img src="<%= session.picture %>" alt="profile" class="w-100 h-100" />
           </a>
           <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuAvatar">
             <li>
@@ -135,6 +135,4 @@
       $('#navbarSupportedContent').hide();
     }
   })
-
-  
 </script>

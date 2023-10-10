@@ -21,7 +21,9 @@ const paymentController = require('../controllers/paymentController');
 const shipmentController = require('../controllers/shipmentController');
 
 const QRCode = require('qrcode')
-const generatePayload = require('promptpay-qr')
+const generatePayload = require('promptpay-qr');
+const { Chart } = require('chart.js');
+
 
 let Routes = (app) => {
 
@@ -35,6 +37,23 @@ let Routes = (app) => {
     // router.get('/',loginController.checkLoggedIn,(req, res) => res.render('pages/index', {
     //     title: 'หน้าแรก', username: req.session.username
     // })); 
+    router.get('/', (req, res) => {
+        dbConnection.promise().query('SELECT pm.*, p.*, phm.* FROM promotions pm JOIN product_has_promotion phm ON phm.promo_id = pm.promo_id ' +
+            'JOIN product p ON p.product_id = phm.product_id WHERE pm.deleted_at IS null AND phm.deleted_at IS null AND now() < pm.end_date ').then(([promotions]) => {
+            dbConnection.promise().query('SELECT s.*, q.* FROM pricingTiers_size s JOIN pricingTiers_qty q ON q.product_id = s.product_id WHERE s.deleted_at IS null || q.deleted_at IS null').then(([priceTiers]) => {
+                dbConnection.promise().query('SELECT * FROM product WHERE deleted_at is null')
+                    .then(([products]) => {
+                        res.render('pages/index', {
+                            currentMenu: 'หน้าแรก',
+                            Title: 'Clipart Press',
+                            products: products,
+                            promotions: promotions,
+                            priceTiers: priceTiers
+                        });
+                    })
+            })
+        })
+    });
     router.get('/', (req, res) => {
         res.render('pages/index', {
             currentMenu: 'หน้าแรก',
@@ -127,7 +146,7 @@ let Routes = (app) => {
         res.render('pages/changepw', {
             currentMenu: 'เปลี่ยนรหัสผ่าน',
             currentLink: "changepw"
-        })
+        });
     });
     router.post("/changepassword", userController.validatePassword, userController.changepassword)
 
@@ -135,7 +154,7 @@ let Routes = (app) => {
     // หน้าสินค้าทั้งหมด
     router.get('/product/all/', (req, res) => {
         dbConnection.promise().query('SELECT pm.*, p.*, phm.* FROM promotions pm JOIN product_has_promotion phm ON phm.promo_id = pm.promo_id ' +
-            'JOIN product p ON p.product_id = phm.product_id WHERE pm.deleted_at IS null AND phm.deleted_at IS null').then(([promotions]) => {
+            'JOIN product p ON p.product_id = phm.product_id WHERE pm.deleted_at IS null AND phm.deleted_at IS null AND now() < pm.end_date ').then(([promotions]) => {
             dbConnection.promise().query('SELECT s.*, q.* FROM pricingTiers_size s JOIN pricingTiers_qty q ON q.product_id = s.product_id WHERE s.deleted_at IS null || q.deleted_at IS null').then(([priceTiers]) => {
                 dbConnection.promise().query('SELECT * FROM product WHERE deleted_at is null')
                     .then(([products]) => {
@@ -201,7 +220,7 @@ let Routes = (app) => {
                             dbConnection.promise().query('SELECT * FROM pricingTiers_qty WHERE product_id = ?', [productId])
                                 .then(([qtyTiers]) => {
                                     dbConnection.promise().query('SELECT pm.*, p.*, phm.* FROM promotions pm JOIN product_has_promotion phm ON phm.promo_id = pm.promo_id ' +
-                                            'JOIN product p ON p.product_id = phm.product_id WHERE pm.deleted_at IS null AND phm.deleted_at IS null AND phm.product_id = ?', productId)
+                                            'JOIN product p ON p.product_id = phm.product_id WHERE pm.deleted_at IS null AND phm.deleted_at IS null AND phm.product_id = ? AND now() < pm.end_date ', productId)
                                         .then(([promotions]) => {
                                             res.render('pages/product_detail', {
                                                 currentMenu: "",
@@ -279,8 +298,8 @@ let Routes = (app) => {
         // 'SELECT cp.*, cu.* FROM coupon cp JOIN users_use_coupon cu ON cu.coupon_id = cp.coupon_id'
         dbConnection.promise().query('SELECT * FROM coupon WHERE deleted_at is null').then(([coupons]) => {
             data.coupons = coupons;
-            dbConnection.promise().query('SELECT c.*, o.* FROM coupon c JOIN orders o ON o.coupon_id = c.coupon_id').then(([coupons_used]) => {
-                data.coupons_used = coupons_used;
+            dbConnection.promise().query('SELECT * FROM orders WHERE order_status != "cancel"').then(([coupons_used]) => {
+                data.orders = coupons_used;
                 try {
                     res.json(data)
                 } catch (error) {
@@ -315,7 +334,7 @@ let Routes = (app) => {
                             dbConnection.promise().query('SELECT * FROM pricingTiers_qty WHERE product_id = ?', [productId])
                                 .then(([qtyTiers]) => {
                                     dbConnection.promise().query('SELECT pm.*, p.*, phm.* FROM promotions pm JOIN product_has_promotion phm ON phm.promo_id = pm.promo_id ' +
-                                            'JOIN product p ON p.product_id = phm.product_id WHERE pm.deleted_at IS null AND phm.deleted_at IS null AND phm.product_id = ?', productId)
+                                            'JOIN product p ON p.product_id = phm.product_id WHERE pm.deleted_at IS null AND phm.deleted_at IS null AND phm.product_id = ? AND now() < pm.end_date ', productId)
                                         .then(([promotions]) => {
                                             dbConnection.promise().query('SELECT o.*, cso.*, cd.*, c.* FROM options o JOIN cart_selected_options cso ON cso.option_id = o.option_id ' +
                                                     'JOIN cart_detail cd ON cd.cart_detail_id = cso.cart_detail_id JOIN cart c ON c.cart_detail_id = cd.cart_detail_id WHERE c.cart_id = ? AND c.product_id = ? AND c.user_id = ?', [cartid, productId, req.session.user_id])
@@ -418,20 +437,17 @@ let Routes = (app) => {
                             });
                             await dbConnection.promise().query('SELECT s.*, sp.* FROM shipments s JOIN shipments_price sp ON sp.shipment_id = s.shipment_id WHERE sp.deleted_at IS NULL').then(async ([shipmentsPrice]) => {
                                 await dbConnection.promise().query('SELECT * FROM shipments WHERE deleted_at IS NULL').then(async ([shipments]) => {
-                                    await dbConnection.promise().query('SELECT * FROM bank WHERE deleted_at IS NULL').then(async ([banks]) => {
-                                        await dbConnection.promise().query('SELECT * FROM promptpay WHERE status = 1').then(async ([promptpay]) => {
-                                            res.render('pages/checkout', {
-                                                currentMenu: "เช็คเอาท์",
-                                                cartsItem: cartsItem,
-                                                // options: options,
-                                                currentLink: "",
-                                                address: address,
-                                                promotions: promotions,
-                                                shipments: shipments,
-                                                shipmentsPrice: shipmentsPrice,
-                                                banks: banks,
-                                                promptpay: promptpay,
-                                            })
+                                    await dbConnection.promise().query('SELECT * FROM payment_method WHERE deleted_at is null').then(async ([payment_method]) => {
+                                        res.render('pages/checkout', {
+                                            currentMenu: "เช็คเอาท์",
+                                            cartsItem: cartsItem,
+                                            // options: options,
+                                            currentLink: "",
+                                            address: address,
+                                            promotions: promotions,
+                                            shipments: shipments,
+                                            shipmentsPrice: shipmentsPrice,
+                                            payment_method: payment_method,
                                         })
                                     })
                                 })
@@ -440,45 +456,287 @@ let Routes = (app) => {
                     });
             });
     });
-
     router.post('/placeOrder', orderController.placeOrder)
-    router.get('/myorder', (req, res) => {
-        res.render('pages/myorder', {
-            currentMenu: 'รายการที่สั่ง',
-            Title: 'Clipart Press || รายการที่สั่ง',
-            currentLink: "myorder"
-        });
-    })
-    router.get('/myorder/invoices/:id', async (req, res) => {
-        const order_id = req.params.id;
-        await dbConnection.promise().query('SELECT ors.*, opd.*, p.* ,opo.*, o.* FROM orders ors JOIN order_product_detail opd ON opd.order_id = ors.order_id JOIN product p ON p.product_id = opd.product_id ' +
-            'JOIN order_product_options opo ON opo.opd_id = opd.opd_id JOIN options o ON o.option_id = opo.option_id WHERE ors.order_id = ?', order_id).then(async ([orders]) => {
-            const orderItem = [];
 
+    router.get('/myorder', verifyToken, (req, res) => {
+        dbConnection.promise().query('SELECT ors.*, opd.*, p.* ,opo.*, o.* FROM orders ors JOIN order_product_detail opd ON opd.order_id = ors.order_id JOIN product p ON p.product_id = opd.product_id ' +
+            'JOIN order_product_options opo ON opo.opd_id = opd.opd_id JOIN options o ON o.option_id = opo.option_id WHERE ors.user_id = ?', req.session.user_id).then(async ([orders]) => {
+            const orderItem = [];
             orders.forEach((rows) => {
                 const existingOrder = orderItem.find((item) => item.order_id === rows.order_id);
                 if (existingOrder) {
-                    // Check if 'order_detail' exists on the existing order, and initialize it if not
                     if (!existingOrder.order_detail) {
                         existingOrder.order_detail = [];
                     }
-
-                    // Check if there's an existing order detail with the same opd_id
                     const existingOrderDetail = existingOrder.order_detail.find(
                         (detail) => detail.opd_id === rows.opd_id
                     );
 
                     if (existingOrderDetail) {
-                        // If an existing order detail with the same opd_id is found,
-                        // add the option to that existing detail
                         existingOrderDetail.options.push({
                             option_id: rows.option_id,
                             option_name: rows.option_name,
                             option_type: rows.option_type,
                         });
                     } else {
-                        // If no existing order detail with the same opd_id is found,
-                        // create a new order detail and add it to the existing order
+                        existingOrder.order_detail.push({
+                            opd_id: rows.opd_id,
+                            size: rows.size,
+                            design_file: rows.design_file,
+                            price: rows.price,
+                            quantity: rows.quantity,
+                            product_id: rows.product_id,
+                            productName: rows.productName,
+                            picture: rows.picture,
+                            options: [{
+                                option_id: rows.option_id,
+                                option_name: rows.option_name,
+                                option_type: rows.option_type,
+                            }, ],
+                        });
+                    }
+                } else {
+                    const item = {
+                        order_id: rows.order_id,
+                        order_date: rows.order_date,
+                        shipment_price: rows.shipment_price,
+                        order_status: rows.order_status,
+                        discount: rows.discount,
+                        coupon_id: rows.coupon_id,
+                        user_id: rows.user_id,
+                        order_detail: [{
+                            opd_id: rows.opd_id,
+                            size: rows.size,
+                            design_file: rows.design_file,
+                            price: rows.price,
+                            quantity: rows.quantity,
+                            product_id: rows.product_id,
+                            productName: rows.productName,
+                            picture: rows.picture,
+                            options: [{
+                                option_id: rows.option_id,
+                                option_name: rows.option_name,
+                                option_type: rows.option_type,
+                            }, ],
+                        }, ],
+                    };
+                    orderItem.push(item);
+                };
+            });
+            res.render('pages/myorder', {
+                currentMenu: 'รายการที่สั่ง',
+                Title: 'Clipart Press || รายการที่สั่ง',
+                currentLink: "myorder",
+                orders: orderItem,
+            });
+        });
+    });
+    router.get('/myorder/invoices/:id', async (req, res) => {
+        const order_id = req.params.id;
+        await dbConnection.promise().query('SELECT ors.*, opd.*, p.* ,opo.*, o.*, pm.* FROM orders ors JOIN order_product_detail opd ON opd.order_id = ors.order_id JOIN product p ON p.product_id = opd.product_id ' +
+            'JOIN order_product_options opo ON opo.opd_id = opd.opd_id JOIN options o ON o.option_id = opo.option_id JOIN payment_method pm ON pm.payment_method_id = ors.payment_method_id WHERE ors.order_id = ?', order_id).then(async ([orders]) => {
+            const orderItem = [];
+            await dbConnection.promise().query('SELECT co.*, ors.order_id FROM cancelOrder co JOIN orders ors ON co.order_id = ors.order_id WHERE co.order_id = ?', order_id).then(async ([cancel]) => {
+
+
+                orders.forEach((rows) => {
+                    const existingOrder = orderItem.find((item) => item.order_id === rows.order_id);
+                    if (existingOrder) {
+                        // Check if 'order_detail' exists on the existing order, and initialize it if not
+                        if (!existingOrder.order_detail) {
+                            existingOrder.order_detail = [];
+                        }
+
+                        // Check if there's an existing order detail with the same opd_id
+                        const existingOrderDetail = existingOrder.order_detail.find(
+                            (detail) => detail.opd_id === rows.opd_id
+                        );
+
+                        if (existingOrderDetail) {
+                            // If an existing order detail with the same opd_id is found,
+                            // add the option to that existing detail
+                            existingOrderDetail.options.push({
+                                option_id: rows.option_id,
+                                option_name: rows.option_name,
+                                option_type: rows.option_type,
+                            });
+                        } else {
+                            // If no existing order detail with the same opd_id is found,
+                            // create a new order detail and add it to the existing order
+                            existingOrder.order_detail.push({
+                                opd_id: rows.opd_id,
+                                size: rows.size,
+                                design_file: rows.design_file,
+                                price: rows.price,
+                                quantity: rows.quantity,
+                                product_id: rows.product_id,
+                                productName: rows.productName,
+                                picture: rows.picture,
+                                options: [{
+                                    option_id: rows.option_id,
+                                    option_name: rows.option_name,
+                                    option_type: rows.option_type,
+                                }, ],
+                            });
+                        }
+                    } else {
+                        const item = {
+                            order_id: rows.order_id,
+                            order_date: rows.order_date,
+                            shipment_price: rows.shipment_price,
+                            order_status: rows.order_status,
+                            discount: rows.discount,
+                            coupon_id: rows.coupon_id,
+                            user_id: rows.user_id,
+                            payment_method_id: rows.payment_method_id,
+                            method_type: rows.method_type,
+                            order_detail: [{
+                                opd_id: rows.opd_id,
+                                size: rows.size,
+                                design_file: rows.design_file,
+                                price: rows.price,
+                                quantity: rows.quantity,
+                                product_id: rows.product_id,
+                                productName: rows.productName,
+                                picture: rows.picture,
+                                options: [{
+                                    option_id: rows.option_id,
+                                    option_name: rows.option_name,
+                                    option_type: rows.option_type,
+                                }, ],
+                            }, ],
+                        };
+                        orderItem.push(item);
+                    }
+                });
+                await dbConnection.promise().query('SELECT pm.*, ors.order_id FROM payment pm JOIN orders ors ON pm.order_id = ors.order_id WHERE ors.order_id = ?', order_id).then(async ([payment]) => {
+                    await dbConnection.promise().query('SELECT s.*, sh.*, ors.order_id FROM ship_address s JOIN orders ors ON s.order_id = ors.order_id JOIN shipments sh ON sh.shipment_id = s.shipment_id WHERE ors.order_id = ?', order_id).then(async ([shipment]) => {
+                        await dbConnection.promise().query('SELECT c.*, ors.coupon_id FROM coupon c JOIN orders ors ON c.coupon_id = ors.coupon_id').then(async ([coupon]) => {
+                            await dbConnection.promise().query('SELECT * FROM payment_method WHERE deleted_at IS NULL').then(([payment_method]) => {
+                                if (orderItem.length === 0) { //|| orderItem[0].user_id !== req.session.user_id
+                                    res.redirect('/')
+                                } else {
+                                    const key = Buffer.from('ef045d157e2df86220ee67ac37132a604f51477fef58fdaac52ed312d97a1538', 'hex');
+                                    const iv = Buffer.from('72d78a8a792f98f086bd892600e3638a', 'hex');
+                                    const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
+                                    let number = '';
+                                    var Arr = [];
+                                    payment_method.forEach((method) => {
+                                        if (method.payment_method_id === orders[0].payment_method_id) {
+                                            number = decipher.update(method.number, 'hex', 'utf8');
+                                            number += decipher.final('utf8')
+                                            let Select = {
+                                                payment_method_id: method.payment_method_id,
+                                                method_type: method.method_type,
+                                                method_name: method.method_name,
+                                                number: number,
+                                                name: method.name,
+                                                statusPayment: method.statusPayment
+                                            };
+                                            Arr.push(Select)
+                                        }
+                                    });
+
+                                    var SumPrice = 0
+                                    var finalPrice = 0
+                                    orderItem[0].order_detail.forEach((order) => {
+                                        SumPrice += order.price
+                                    })
+                                    var vat = SumPrice * 7 / 100;
+                                    let imgQr;
+                                    // if (orderItem[0].coupon_id !== null) {
+                                    //     coupon.forEach((c) => {
+                                    //         if (c.coupon_type == 'value') {
+                                    //             finalPrice = (SumPrice + vat + orderItem[0].shipment_price) - c.discount_value;
+                                    //         } else if (c.coupon_type == 'percent') {
+                                    //             finalPrice = (SumPrice + vat + orderItem[0].shipment_price) - ((SumPrice + vat + shipment_price) * c.discount_value / 100);
+                                    //         }
+                                    //         coupon = c.coupon_id
+                                    //     });
+                                    // } else {
+                                    //     finalPrice = (SumPrice + vat + orderItem[0].shipment_price);
+                                    // }
+
+                                    const amount = parseFloat(finalPrice)
+                                    const payload = generatePayload(number, {
+                                        amount
+                                    });
+                                    const options = {
+                                        color: {
+                                            dark: '#000',
+                                            light: '#fff'
+                                        }
+                                    }
+                                    QRCode.toDataURL(payload, options, (err, url) => {
+                                        if (err) {
+                                            console.log('generate fail')
+                                            return;
+                                        }
+                                        imgQr = url;
+                                        res.render('pages/invoices', {
+                                            currentMenu: 'รายการที่สั่ง',
+                                            Title: 'Clipart Press || รายการที่สั่ง',
+                                            currentLink: "myorder",
+                                            orders: orderItem,
+                                            payment: payment,
+                                            shipment: shipment,
+                                            coupon: coupon,
+                                            qrcode: imgQr,
+                                            payment_method: payment_method,
+                                            selectmethod: Arr,
+                                            cancel: cancel,
+                                        });
+                                    });
+                                };
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    });
+    router.post('/changepayment/:oid/:mid', orderController.changePayment)
+    router.post("/uploadslip/:oid/:amount/:method", orderController.upload.single("slip"), orderController.paid);
+    router.post("/cancelorder/:oid", orderController.cancel);
+    router.get('/example', (req, res) => {
+        res.render('pages/example', {
+            currentMenu: 'ตัวอย่างงาน',
+            Title: 'Clipart Press || ตัวอย่างงาน',
+            currentLink: "example"
+        });
+    });
+
+    router.get('/contact', (req, res) => {
+        res.render('pages/contact', {
+            currentMenu: 'ติดต่อเรา',
+            Title: 'Clipart Press',
+            currentLink: "contact"
+        });
+    });
+
+    // ---------------------------------------------------------------------------------------------------
+    // แอดมิน
+    router.get('/admin/dashborad', (req, res) => {
+        dbConnection.promise().query('SELECT ors.*, opd.*, p.* ,opo.*, o.*, u.name FROM orders ors JOIN order_product_detail opd ON opd.order_id = ors.order_id JOIN product p ON p.product_id = opd.product_id ' +
+            'JOIN order_product_options opo ON opo.opd_id = opd.opd_id JOIN options o ON o.option_id = opo.option_id JOIN users u ON u.user_id = ors.user_id').then(async ([orders]) => {
+            const orderItem = [];
+            orders.forEach((rows) => {
+                const existingOrder = orderItem.find((item) => item.order_id === rows.order_id);
+                if (existingOrder) {
+                    if (!existingOrder.order_detail) {
+                        existingOrder.order_detail = [];
+                    }
+                    const existingOrderDetail = existingOrder.order_detail.find(
+                        (detail) => detail.opd_id === rows.opd_id
+                    );
+
+                    if (existingOrderDetail) {
+                        existingOrderDetail.options.push({
+                            option_id: rows.option_id,
+                            option_name: rows.option_name,
+                            option_type: rows.option_type,
+                        });
+                    } else {
                         existingOrder.order_detail.push({
                             opd_id: rows.opd_id,
                             size: rows.size,
@@ -502,9 +760,8 @@ let Routes = (app) => {
                         shipment_price: rows.shipment_price,
                         order_status: rows.order_status,
                         coupon_id: rows.coupon_id,
-                        address_id: rows.address_id,
-                        shipment_id: rows.shipment_id,
                         user_id: rows.user_id,
+                        userfullname: rows.name,
                         order_detail: [{
                             opd_id: rows.opd_id,
                             size: rows.size,
@@ -522,128 +779,18 @@ let Routes = (app) => {
                         }, ],
                     };
                     orderItem.push(item);
-                }
+                };
             });
-
-            await dbConnection.promise().query('SELECT addr.*, ors.address_id FROM address addr JOIN orders ors ON addr.address_id = ors.address_id WHERE ors.order_id = ?', order_id).then(async ([address]) => {
-                await dbConnection.promise().query('SELECT pm.*, ors.order_id FROM payment pm JOIN orders ors ON pm.order_id = ors.order_id WHERE ors.order_id = ?', order_id).then(async ([payment]) => {
-                    await dbConnection.promise().query('SELECT sh.*, ors.shipment_id FROM shipments sh JOIN orders ors ON sh.shipment_id = ors.shipment_id WHERE ors.order_id = ?', order_id).then(async ([shipment]) => {
-                        await dbConnection.promise().query('SELECT c.*, ors.coupon_id FROM coupon c JOIN orders ors ON c.coupon_id = ors.coupon_id').then(async ([coupon]) => {
-                            await dbConnection.promise().query('SELECT * FROM promptpay').then(async ([promptpay]) => {
-                                await dbConnection.promise().query('SELECT * FROM bank WHERE deleted_at IS NULL').then(([banks]) => {
-                                    if (orderItem.length === 0) { //|| orderItem[0].user_id !== req.session.user_id
-                                        res.redirect('/')
-                                    } else {
-                                        const keyBank = Buffer.from('ef045d157e2df86220ee67ac37132a604f51477fef58fdaac52ed312d97a1538', 'hex');
-                                        const ivBank = Buffer.from('72d78a8a792f98f086bd892600e3638a', 'hex');
-                                        const decipherBank = crypto.createDecipheriv('aes-256-cbc', keyBank, ivBank);
-                                        let banknumber = '';
-                                        var bankArr = [];
-                                        banks.forEach((bank) => {
-                                            if (bank.bank_id === payment[0].payment_method_id) {
-                                                banknumber = decipherBank.update(bank.number, 'hex', 'utf8');
-                                                banknumber += decipherBank.final('utf8')
-                                                let bankSelect = {
-                                                    bank_id: bank.bank_id,
-                                                    bank: bank.bank, 
-                                                    number: banknumber,
-                                                    name: bank.name,
-                                                };
-                                                bankArr.push(bankSelect)
-                                            }
-                                        });
-                                        const keypp = Buffer.from('a83662c9b5b271e4b9ca58ec4ae7f429dc65500ac7754712a1ac75037affe7b8', 'hex');
-                                        const ivpp = Buffer.from('cfe4c9b8b0518d92cc03130106322533', 'hex');
-                                        const decipherpp = crypto.createDecipheriv('aes-256-cbc', keypp, ivpp);
-                                        let number = '0123456789';
-                                        if (promptpay.length > 0) {
-                                            number = decipherpp.update(promptpay[0].number, 'hex', 'utf8');
-                                            number += decipherpp.final('utf8');
-                                        }
-                                        var SumPrice = 0
-                                        var finalPrice = 0
-                                        orderItem[0].order_detail.forEach((order) => {
-                                            SumPrice += order.price
-                                        })
-                                        var vat = SumPrice * 7 / 100;
-                                        let imgQr;
-                                        if (orderItem[0].coupon_id !== null) {
-                                            coupon.forEach((c) => {
-                                                if (c.coupon_type == 'value') {
-                                                    finalPrice = (SumPrice + vat + orderItem[0].shipment_price) - c.discount_value;
-                                                } else if (c.coupon_type == 'percent') {
-                                                    finalPrice = (SumPrice + vat + orderItem[0].shipment_price) - ((SumPrice + vat + shipment_price) * c.discount_value / 100);
-                                                }
-                                                coupon = c.coupon_id
-                                            });
-                                        } else {
-                                            finalPrice = (SumPrice + vat + orderItem[0].shipment_price);
-                                        }
-
-                                        const amount = parseFloat(finalPrice)
-                                        const payload = generatePayload(number, {
-                                            amount
-                                        });
-                                        const options = {
-                                            color: {
-                                                dark: '#000',
-                                                light: '#fff'
-                                            }
-                                        }
-                                        QRCode.toDataURL(payload, options, (err, url) => {
-                                            if (err) {
-                                                console.log('generate fail')
-                                                return;
-                                            }
-                                            imgQr = url;
-                                            res.render('pages/invoices', {
-                                                currentMenu: 'รายการที่สั่ง',
-                                                Title: 'Clipart Press || รายการที่สั่ง',
-                                                currentLink: "myorder",
-                                                orders: orderItem,
-                                                address: address,
-                                                payment: payment,
-                                                shipment: shipment,
-                                                coupon: coupon,
-                                                qrcode: imgQr,
-                                                promptpay: promptpay,
-                                                banks: banks,
-                                                bankSelect: bankArr
-                                            });
-                                        })
-                                    }
-                                })
-                            })
-                        })
-                    })
+            dbConnection.promise().query('SELECT p.*, pm.*, ors.*, u.name FROM payment p JOIN payment_method pm ON pm.payment_method_id = p.payment_method_id ' +
+                'JOIN orders ors ON ors.order_id = p.order_id JOIN users u ON u.user_id = ors.user_id').then(([payments]) => {
+                res.render('pages/admin/admin_dashborad', {
+                    currentLink: "dashborad",
+                    Title: 'Clipart Press || แดชบอร์ด',
+                    payments: payments,
+                    orders: orderItem,
                 })
-            })
-
-        })
-    })
-    router.post('/changepayment/:oid/:mid', orderController.changePayment)
-    router.get('/example', (req, res) => {
-        res.render('pages/example', {
-            currentMenu: 'ตัวอย่างงาน',
-            Title: 'Clipart Press || ตัวอย่างงาน',
-            currentLink: "example"
+            });
         });
-    });
-
-    router.get('/contact', (req, res) => {
-        res.render('pages/contact', {
-            currentMenu: 'ติดต่อเรา',
-            Title: 'Clipart Press',
-            currentLink: "contact"
-        });
-    });
-
-    // ---------------------------------------------------------------------------------------------------
-    // แอดมิน
-    router.get('/admin/dashborad', (req, res) => {
-        res.render('pages/admin/admin_dashborad', {
-            currentLink: "dashborad"
-        })
     })
 
     router.get('/admin/product-list', (req, res) => {
@@ -715,7 +862,7 @@ let Routes = (app) => {
     router.delete("/deleteSize/:id", productsController.deleteSize);
 
 
-    router.post("/deleteProduct/", adminController.deleteProduct);
+    router.post("/deleteProduct/", productsController.deleteProduct);
 
 
     //หน้าจัดการตัวเลือกวัสดุ 
@@ -746,11 +893,253 @@ let Routes = (app) => {
 
     // หน้าจัดการออเดอร์
     router.get('/admin/orders', (req, res) => {
-        res.render('pages/admin/order', {
-            currentLink: "order"
-        })
-    })
+        dbConnection.promise().query('SELECT ors.*, opd.*, p.* ,opo.*, o.*, u.name FROM orders ors JOIN order_product_detail opd ON opd.order_id = ors.order_id JOIN product p ON p.product_id = opd.product_id ' +
+            'JOIN order_product_options opo ON opo.opd_id = opd.opd_id JOIN options o ON o.option_id = opo.option_id JOIN users u ON u.user_id = ors.user_id').then(async ([orders]) => {
+            const orderItem = [];
+            orders.forEach((rows) => {
+                const existingOrder = orderItem.find((item) => item.order_id === rows.order_id);
+                if (existingOrder) {
+                    if (!existingOrder.order_detail) {
+                        existingOrder.order_detail = [];
+                    }
+                    const existingOrderDetail = existingOrder.order_detail.find(
+                        (detail) => detail.opd_id === rows.opd_id
+                    );
 
+                    if (existingOrderDetail) {
+                        existingOrderDetail.options.push({
+                            option_id: rows.option_id,
+                            option_name: rows.option_name,
+                            option_type: rows.option_type,
+                        });
+                    } else {
+                        existingOrder.order_detail.push({
+                            opd_id: rows.opd_id,
+                            size: rows.size,
+                            design_file: rows.design_file,
+                            price: rows.price,
+                            quantity: rows.quantity,
+                            product_id: rows.product_id,
+                            productName: rows.productName,
+                            picture: rows.picture,
+                            options: [{
+                                option_id: rows.option_id,
+                                option_name: rows.option_name,
+                                option_type: rows.option_type,
+                            }, ],
+                        });
+                    }
+                } else {
+                    const item = {
+                        order_id: rows.order_id,
+                        order_date: rows.order_date,
+                        shipment_price: rows.shipment_price,
+                        order_status: rows.order_status,
+                        coupon_id: rows.coupon_id,
+                        user_id: rows.user_id,
+                        userfullname: rows.name,
+                        orderdate: rows.created_at,
+                        order_detail: [{
+                            opd_id: rows.opd_id,
+                            size: rows.size,
+                            design_file: rows.design_file,
+                            price: rows.price,
+                            quantity: rows.quantity,
+                            product_id: rows.product_id,
+                            productName: rows.productName,
+                            picture: rows.picture,
+                            options: [{
+                                option_id: rows.option_id,
+                                option_name: rows.option_name,
+                                option_type: rows.option_type,
+                            }, ],
+                        }, ],
+                    };
+                    orderItem.push(item);
+                };
+            });
+            res.render('pages/admin/order', {
+                Title: 'Clipart Press || ออเดอร์',
+                currentLink: "order",
+                orders: orderItem,
+            });
+        });
+    })
+    router.post('/updateOrder/:id', orderController.updateOrder);
+    router.get('/admin/order/:id', async (req, res) => {
+        const order_id = req.params.id;
+        await dbConnection.promise().query('SELECT ors.*, opd.*, p.* ,opo.*, o.* FROM orders ors JOIN order_product_detail opd ON opd.order_id = ors.order_id JOIN product p ON p.product_id = opd.product_id ' +
+            'JOIN order_product_options opo ON opo.opd_id = opd.opd_id JOIN options o ON o.option_id = opo.option_id WHERE ors.order_id = ?', order_id).then(async ([orders]) => {
+            const orderItem = [];
+            await dbConnection.promise().query('SELECT co.*, ors.order_id FROM cancelOrder co JOIN orders ors ON co.order_id = ors.order_id WHERE co.order_id = ?', order_id).then(async ([cancel]) => {
+
+
+                orders.forEach((rows) => {
+                    const existingOrder = orderItem.find((item) => item.order_id === rows.order_id);
+                    if (existingOrder) {
+                        // Check if 'order_detail' exists on the existing order, and initialize it if not
+                        if (!existingOrder.order_detail) {
+                            existingOrder.order_detail = [];
+                        }
+
+                        // Check if there's an existing order detail with the same opd_id
+                        const existingOrderDetail = existingOrder.order_detail.find(
+                            (detail) => detail.opd_id === rows.opd_id
+                        );
+
+                        if (existingOrderDetail) {
+                            // If an existing order detail with the same opd_id is found,
+                            // add the option to that existing detail
+                            existingOrderDetail.options.push({
+                                option_id: rows.option_id,
+                                option_name: rows.option_name,
+                                option_type: rows.option_type,
+                            });
+                        } else {
+                            // If no existing order detail with the same opd_id is found,
+                            // create a new order detail and add it to the existing order
+                            existingOrder.order_detail.push({
+                                opd_id: rows.opd_id,
+                                size: rows.size,
+                                design_file: rows.design_file,
+                                price: rows.price,
+                                quantity: rows.quantity,
+                                product_id: rows.product_id,
+                                productName: rows.productName,
+                                picture: rows.picture,
+                                options: [{
+                                    option_id: rows.option_id,
+                                    option_name: rows.option_name,
+                                    option_type: rows.option_type,
+                                }, ],
+                            });
+                        }
+                    } else {
+                        const item = {
+                            order_id: rows.order_id,
+                            order_date: rows.order_date,
+                            shipment_price: rows.shipment_price,
+                            order_status: rows.order_status,
+                            discount: rows.discount,
+                            coupon_id: rows.coupon_id,
+                            user_id: rows.user_id,
+                            orderdate: rows.created_at,
+                            tracking_number: rows.tracking_number,
+                            order_detail: [{
+                                opd_id: rows.opd_id,
+                                size: rows.size,
+                                design_file: rows.design_file,
+                                price: rows.price,
+                                quantity: rows.quantity,
+                                product_id: rows.product_id,
+                                productName: rows.productName,
+                                picture: rows.picture,
+                                options: [{
+                                    option_id: rows.option_id,
+                                    option_name: rows.option_name,
+                                    option_type: rows.option_type,
+                                }, ],
+                            }, ],
+                        };
+                        orderItem.push(item);
+                    }
+                });
+
+                await dbConnection.promise().query('SELECT pm.*, ors.order_id FROM payment pm JOIN orders ors ON pm.order_id = ors.order_id WHERE ors.order_id = ?', order_id).then(async ([payment]) => {
+                    await dbConnection.promise().query('SELECT s.*, sh.*, ors.order_id FROM ship_address s JOIN orders ors ON s.order_id = ors.order_id JOIN shipments sh ON sh.shipment_id = s.shipment_id WHERE ors.order_id = ?', order_id).then(async ([shipment]) => {
+                        await dbConnection.promise().query('SELECT c.*, ors.coupon_id FROM coupon c JOIN orders ors ON c.coupon_id = ors.coupon_id').then(async ([coupon]) => {
+                            await dbConnection.promise().query('SELECT * FROM payment_method').then(async ([payment_method]) => {
+                                if (orderItem.length === 0) { //|| orderItem[0].user_id !== req.session.user_id
+                                    res.redirect('/')
+                                } else {
+                                    const key = Buffer.from('ef045d157e2df86220ee67ac37132a604f51477fef58fdaac52ed312d97a1538', 'hex');
+                                    const iv = Buffer.from('72d78a8a792f98f086bd892600e3638a', 'hex');
+                                    const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
+                                    let number = '';
+                                    var Arr = [];
+                                    payment_method.forEach((method) => {
+                                        if (method.payment_method_id === orders[0].payment_method_id) {
+                                            number = decipher.update(method.number, 'hex', 'utf8');
+                                            number += decipher.final('utf8')
+                                            let Select = {
+                                                payment_method_id: method.payment_method_id,
+                                                method_type: method.method_type,
+                                                method_name: method.method_name,
+                                                number: number,
+                                                name: method.name,
+                                            };
+                                            Arr.push(Select)
+                                        }
+                                    });
+                                    console.log(Arr);
+                                    var SumPrice = 0
+                                    var finalPrice = 0
+                                    orderItem[0].order_detail.forEach((order) => {
+                                        SumPrice += order.price
+                                    })
+                                    var vat = SumPrice * 7 / 100;
+                                    let imgQr;
+                                    // if (orderItem[0].coupon_id !== null) {
+                                    //     coupon.forEach((c) => {
+                                    //         if (c.coupon_type == 'value') {
+                                    //             finalPrice = (SumPrice + vat + orderItem[0].shipment_price) - c.discount_value;
+                                    //         } else if (c.coupon_type == 'percent') {
+                                    //             finalPrice = (SumPrice + vat + orderItem[0].shipment_price) - ((SumPrice + vat + shipment_price) * c.discount_value / 100);
+                                    //         }
+                                    //         coupon = c.coupon_id
+                                    //     });
+                                    // } else {
+                                    //     finalPrice = (SumPrice + vat + orderItem[0].shipment_price);
+                                    // }
+
+                                    const amount = parseFloat(finalPrice)
+                                    const payload = generatePayload(number, {
+                                        amount
+                                    });
+                                    const options = {
+                                        color: {
+                                            dark: '#000',
+                                            light: '#fff'
+                                        }
+                                    }
+                                    QRCode.toDataURL(payload, options, (err, url) => {
+                                        if (err) {
+                                            console.log('generate fail')
+                                            return;
+                                        }
+                                        imgQr = url;
+                                        res.render('pages/admin/orderDetail', {
+                                            Title: `Clipart Press || ออเดอร์ #${order_id}`,
+                                            currentLink: "order",
+                                            orders: orderItem,
+                                            payment: payment,
+                                            shipment: shipment,
+                                            coupon: coupon,
+                                            qrcode: imgQr,
+                                            paymentSelect: Arr,
+                                            cancel: cancel,
+                                        });
+                                    });
+                                };
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    });
+
+    router.get('/admin/payment', (req, res) => {
+        dbConnection.promise().query('SELECT p.*, pm.*, ors.*, u.name FROM payment p JOIN payment_method pm ON pm.payment_method_id = p.payment_method_id ' +
+            'JOIN orders ors ON ors.order_id = p.order_id JOIN users u ON u.user_id = ors.user_id').then(([payments]) => {
+            res.render('pages/admin/payment', {
+                Title: 'Clipart Press || แจ้งชำระเงิน',
+                currentLink: "payment",
+                payments: payments,
+            });
+        });
+    });
+    router.post('/updatePaymentStatus/:id/:status', paymentController.updatePaymentStatus);
     // discount
     router.get('/admin/promotion', (req, res) => {
         dbConnection.promise().query('SELECT * FROM promotions WHERE deleted_at IS null').then(([promotions]) => {
@@ -779,6 +1168,7 @@ let Routes = (app) => {
                 // });
 
                 res.render('pages/admin/promotion', {
+                    Title: 'Clipart Press || จัดการโปรโมชั่น',
                     currentLink: "promotion",
                     promotions: promotions,
                     product: rows,
@@ -792,6 +1182,7 @@ let Routes = (app) => {
             dbConnection.promise().query('SELECT pm.*, p.*, phm.* FROM promotions pm JOIN product_has_promotion phm ON phm.promo_id = pm.promo_id ' +
                 'JOIN product p ON p.product_id = phm.product_id ').then(([rows]) => {
                 res.render('pages/admin/addPromotion', {
+                    Title: 'Clipart Press || เพิ่มโปรโมชั่น',
                     currentLink: "promotion",
                     products: products,
                     promotions: rows
@@ -814,6 +1205,7 @@ let Routes = (app) => {
                             res.redirect('/admin/promotion')
                         } else {
                             res.render('pages/admin/editPromotion', {
+                                Title: 'Clipart Press || แก้ไขโปรโมชั่น',
                                 currentLink: "promotion",
                                 products: products,
                                 promotions: rows[0],
@@ -830,6 +1222,7 @@ let Routes = (app) => {
     router.get('/admin/coupon', (req, res) => {
         dbConnection.promise().query('SELECT * FROM coupon WHERE deleted_at IS NULL').then(([rows]) => {
             res.render('pages/admin/coupon', {
+                Title: 'Clipart Press || คูปอง',
                 currentLink: "coupon",
                 coupons: rows
             })
@@ -843,6 +1236,7 @@ let Routes = (app) => {
     router.get('/admin/shipment', (req, res) => {
         dbConnection.promise().query('SELECT * FROM shipments WHERE deleted_at IS NULL').then(([rows]) => {
             res.render('pages/admin/shipment', {
+                Title: 'Clipart Press || ขนส่ง',
                 currentLink: "shipment",
                 shipments: rows
             })
@@ -857,6 +1251,7 @@ let Routes = (app) => {
         const id = req.params.id;
         dbConnection.promise().query('SELECT s.*, sp.* FROM shipments s INNER JOIN shipments_price sp ON sp.shipment_id = s.shipment_id WHERE s.shipment_id = ? AND sp.deleted_at IS NULL', id).then(([rows]) => {
             res.render('pages/admin/editShipment', {
+                Title: 'Clipart Press || แก้ไขขนส่ง',
                 currentLink: "shipment",
                 shipments: rows
             })
@@ -869,8 +1264,8 @@ let Routes = (app) => {
 
 
     router.get('/admin/payment_method', (req, res) => {
-        dbConnection.promise().query('SELECT * FROM bank WHERE deleted_at IS NULL').then(([rows]) => {
-            const decryptedBanks = [];
+        dbConnection.promise().query('SELECT * FROM payment_method WHERE deleted_at IS NULL').then(([rows]) => {
+            const decrypted = [];
             rows.forEach((row) => {
                 const key = Buffer.from('ef045d157e2df86220ee67ac37132a604f51477fef58fdaac52ed312d97a1538', 'hex');
                 const iv = Buffer.from('72d78a8a792f98f086bd892600e3638a', 'hex');
@@ -878,79 +1273,32 @@ let Routes = (app) => {
                 const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
                 let number = decipher.update(encrypted, 'hex', 'utf8');
                 number += decipher.final('utf8');
-                const bank = {
-                    bank_id: row.bank_id,
-                    bank: row.bank,
+                let method = {
+                    payment_method_id: row.payment_method_id,
+                    method_type: row.method_type,
+                    method_name: row.method_name,
                     number: number,
                     name: row.name,
+                    statusPayment: row.status,
                 };
-                decryptedBanks.push(bank);
+                decrypted.push(method);
             });
-
-            dbConnection.promise().query('SELECT * FROM promptpay').then(([pp]) => {
-                const key = Buffer.from('a83662c9b5b271e4b9ca58ec4ae7f429dc65500ac7754712a1ac75037affe7b8', 'hex');
-                const iv = Buffer.from('cfe4c9b8b0518d92cc03130106322533', 'hex');
-                const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
-                let promptpay = pp;
-
-                if (pp.length > 0) {
-                    let ppnumber = decipher.update(pp[0].number, 'hex', 'utf8');
-                    ppnumber += decipher.final('utf8');
-                    promptpay = {
-                        promptpay_id: pp[0].promptpay_id,
-                        number: ppnumber,
-                        type: pp[0].promptpay_type,
-                        name: pp[0].name,
-                        status: pp[0].status,
-                    }
-                }
-
-
-                res.render('pages/admin/payment_method', {
-                    currentLink: "payment_method",
-                    banks: decryptedBanks,
-                    promptpay: promptpay,
-                });
-            })
-            // const filePath = path.join(__dirname, '../public/json/promptpay.json');
-            // fs.readFile(filePath, 'utf8', (err, data) => {
-            //     let arr;
-            //     if (err) {
-            //         console.error(err);
-            //         arr = [];
-            //     } else {
-            //         arr = JSON.parse(data);
-            //         const key = Buffer.from('a83662c9b5b271e4b9ca58ec4ae7f429dc65500ac7754712a1ac75037affe7b8', 'hex');
-            //         const iv = Buffer.from('cfe4c9b8b0518d92cc03130106322533', 'hex');
-            //         const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
-            //         let ppnumber = decipher.update(arr[0].number, 'hex', 'utf8');
-            //         ppnumber += decipher.final('utf8');
-            //         const promptpay = {
-            //             number: ppnumber,
-            //             name: arr[0].name,
-            //             status: arr[0].status,
-            //             type: arr[0].type,
-            //         }
-            //         res.render('pages/admin/payment_method', {
-            //             currentLink: "payment_method",
-            //             banks: decryptedBanks,
-            //             promptpay: promptpay,
-            //         });
-            //     }
-            // })
-
+            res.render('pages/admin/payment_method', {
+                Title: 'Clipart Press || การชำระเงิน',
+                currentLink: "payment_method",
+                payment_method: decrypted,
+            });
         });
     });
 
 
-    router.post('/addBank', paymentController.addBank)
-    router.post('/updateBank/:id', paymentController.editBank)
-    router.post('/deleteBank/:id', paymentController.deleteBank)
+    router.post('/addmethod', paymentController.addmethod)
+    router.post('/updatemethod/:id', paymentController.editmethod)
+    router.post('/deletemethod/:id', paymentController.deletemethod)
 
-    router.post('/savePromptPay', paymentController.promptpay)
     // จัดการ user 
     router.get('/admin/member', (req, res) => {
-        dbConnection.promise().query('SELECT * FROM users WHERE deleted_at IS NULL AND user_role = 0').then(([rows]) => {
+        dbConnection.promise().query('SELECT * FROM users WHERE user_role = 0').then(([rows]) => {
             // console.log(data)
             res.render('pages/admin/member', {
                 user: rows,
@@ -958,7 +1306,7 @@ let Routes = (app) => {
             })
         })
     });
-    router.post("/deleteUser", adminController.deleteUser);
+    router.post("/deleteUser", userController.deleteUser);
 
 
 

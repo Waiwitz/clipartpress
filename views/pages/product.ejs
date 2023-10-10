@@ -1,27 +1,15 @@
 <%- include('../partials/header') %>
 
-<style>
-  .banner {
-    background-image: url('/assets/img/Flyers-Brochure-Test-mage.jpg');
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-  }
-</style>
-
 <body class="h-100" style="background-color: rgb(248, 248, 248);">
-  <div class="banner shadow-5-strong">
-    <!-- <img class="imageFitBox" src="/assets/img/Flyers-Brochure-Test-mage.jpg" alt=""> -->
-    <div class="banner-content overlay">
-      <div>
-        <h1>สินค้างานพิมพ์</h1>
-        <ol class="breadcrumb justify-content-center bg-light shadow-5-strong">
-          <li class="breadcrumb-item"><a href="/">หน้าแรก</a></li>
-          <li class="breadcrumb-item active" aria-current="page"><%= currentMenu %></li>
-        </ol>
-      </div>
-    </div>
-  </div>
+
   <div class="container-md mt-5">
+    <div>
+      <h2>สินค้า</h2>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">หน้าแรก</a></li>
+        <li class="breadcrumb-item active">สินค้า</li>
+      </ol>
+    </div>
     <div class="mt-3">
       <div class="d-flex mb-5" id="rs-productList">
         <!-- ประเภท -->
@@ -44,18 +32,18 @@
         <div class="itemlist " id="allSection">
           <% if(products.length > 0){ %>
           <% products.forEach((product) => { %>
-          <div class="card mt-0 mb-4 <%= product.status == 0 ? 'product-refrain' : '' %> ">
+          <div class="card m-1 p-3 mb-4 <%= product.status == 0 ? 'product-refrain' : '' %> ">
             <% if (promotions.some(promo => promo.product_id === product.product_id)) { %>
             <div class="promo-sign">
               <% promotions.forEach((promo) => { %>
               <% if (promo.product_id === product.product_id) { %>
-                <%= promo.promo_name %>
+              <%= promo.promo_name %>
               <% } %>
               <% }) %>
             </div>
             <% } %>
             <a href="/product/item/<%= product.product_id %>">
-              <div class="p-3 pb-1 product_list_card" data-bs-toggle="modal" data-id="<%= product.product_id %>"
+              <div class="pb-1 product_list_card" data-bs-toggle="modal" data-id="<%= product.product_id %>"
                 data-cate="<%= product.categories %>">
                 <% if(product.status == 0) { %>
                 <div class="refrain-sign">
@@ -65,23 +53,23 @@
                 <img src="<%= product.picture %>" class="img-fluid rounded" draggable="false" />
               </div>
             </a>
-            <div class="card-body p-3">
+            <div class="card-body p-0 mt-3">
               <h5 class="card-title"><%= product.productName %></h5>
-              <p class="card-text text-truncate"><%= product.description %></p>
+              <p class="card-text text-truncate des"><%= product.description %></p>
             </div>
-            <div class="p-3">
+            <div class="price">
               <% const findPrice = priceTiers.filter(price => price.product_id === product.product_id) %>
               <% let sum = (findPrice[0].size_price + findPrice[0].qty_price) * findPrice[0].quantity %>
               <span>ราคาเริ่มต้น <%= parseFloat(sum).toFixed(0) %> บาท ต่อ <%= findPrice[0].quantity %> ชิ้น</span>
-              <a href="/product/item/<%= product.product_id %>" class="w-100 position-static ">
-                <div class="w-100 position-static mt-3 pb-4">
-                  <button
-                    class="btn btn-primary w-100 enter-product fs-6 <%= product.status == 0 ? 'refrain-button' : '' %>"
-                    data-bs-toggle="modal" data-id="<%= product.product_id %>"
-                    data-cate="<%= product.categories %>">สั่งทำ</button>
-                </div>
-              </a>
             </div>
+            <a href="/product/item/<%= product.product_id %>">
+              <div class="w-100">
+                <button
+                  class="btn btn-primary w-100 enter-product fs-6 <%= product.status == 0 ? 'refrain-button' : '' %>"
+                  data-bs-toggle="modal" data-id="<%= product.product_id %>"
+                  data-cate="<%= product.categories %>">สั่งทำ</button>
+              </div>
+            </a>
           </div>
           <% }); %>
           <% } else { %>
@@ -96,16 +84,18 @@
           <% products.forEach((product) => { %>
           <% if(product.categories === cate[i]){ %>
           <% categoryFound = true; %>
-          <div class="card mt-0 mb-4 <%= product.status == 0 ? 'product-refrain' : '' %> ">
+          <div class="card m-1 p-3 mb-4 <%= product.status == 0 ? 'product-refrain' : '' %> ">
             <% if (promotions.some(promo => promo.product_id === product.product_id)) { %>
             <div class="promo-sign">
               <% promotions.forEach((promo) => { %>
-              <span><%= promo.promo_name %></span>
+              <% if (promo.product_id === product.product_id) { %>
+              <%= promo.promo_name %>
+              <% } %>
               <% }) %>
             </div>
             <% } %>
             <a href="/product/item/<%= product.product_id %>">
-              <div class="p-3 pb-1 product_list_card" data-bs-toggle="modal" data-id="<%= product.product_id %>"
+              <div class="pb-1 product_list_card" data-bs-toggle="modal" data-id="<%= product.product_id %>"
                 data-cate="<%= product.categories %>">
                 <% if(product.status == 0) { %>
                 <div class="refrain-sign">
@@ -115,23 +105,23 @@
                 <img src="<%= product.picture %>" class="img-fluid rounded" draggable="false" />
               </div>
             </a>
-            <div class="card-body p-3">
+            <div class="card-body p-0 mt-3">
               <h5 class="card-title"><%= product.productName %></h5>
-              <p class="card-text text-truncate"><%= product.description %></p>
+              <p class="card-text text-truncate des"><%= product.description %></p>
             </div>
-            <div class="p-3">
+            <div class="price">
               <% const findPrice = priceTiers.filter(price => price.product_id === product.product_id) %>
               <% let sum = (findPrice[0].size_price + findPrice[0].qty_price) * findPrice[0].quantity %>
               <span>ราคาเริ่มต้น <%= parseFloat(sum).toFixed(0) %> บาท ต่อ <%= findPrice[0].quantity %> ชิ้น</span>
-              <a href="/product/item/<%= product.product_id %>" class="w-100 position-static ">
-                <div class="w-100 position-static mt-3 pb-4">
-                  <button
-                    class="btn btn-primary w-100 enter-product fs-6 <%= product.status == 0 ? 'refrain-button' : '' %>"
-                    data-bs-toggle="modal" data-id="<%= product.product_id %>"
-                    data-cate="<%= product.categories %>">สั่งทำ</button>
-                </div>
-              </a>
             </div>
+            <a href="/product/item/<%= product.product_id %>">
+              <div class="w-100">
+                <button
+                  class="btn btn-primary w-100 enter-product fs-6 <%= product.status == 0 ? 'refrain-button' : '' %>"
+                  data-bs-toggle="modal" data-id="<%= product.product_id %>"
+                  data-cate="<%= product.categories %>">สั่งทำ</button>
+              </div>
+            </a>
           </div>
           <% found = true; %>
           <% } %>

@@ -7,7 +7,16 @@
 }
 
 body {
-    background-color: rgb(252, 252, 252) !important;
+    background-color: rgb(250, 250, 250) !important;
+}
+
+p,
+span,
+b,
+s,
+a,
+li {
+    font-size: 17px;
 }
 
 /* Navbar */
@@ -121,22 +130,13 @@ body {
     height: 300px;
 }
 
-.homed {
-    text-align: center;
-    padding: 5em;
-}
-
-.waves {
-    width: 100%;
-    position: absolute;
-}
 
 .wrap-home-content {
     width: 100%;
-    height: 550px;
-    background-color: #f4f4f4;
+    height: fit-content;
+    background-color: #f2f2f2;
     text-align: center;
-    padding: 2em;
+    padding: 2em 0;
 }
 
 .card {
@@ -147,6 +147,49 @@ body {
 .card img {
     height: 100%;
     width: 100%;
+}
+
+.banner {
+    width: 100%;
+    height: 300px;
+    text-align: start;
+    color: white;
+    margin-bottom: 4em;
+    background-image: url('/assets/img/Flyers-Brochure-Test-mage.jpg');
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+.banner-content {
+    width: 100%;
+    height: 300px;
+    position: absolute;
+    top: 116px;
+    left: 0;
+    background: rgba(57, 57, 57, 0.653);
+    /* center overlay text */
+    display: flex;
+    align-items: center;
+    justify-content: start;
+}
+
+.allproduct-preview {
+    width: 13em;
+    height: 300px;
+    box-shadow: 0 10px 10px #0000002d;
+    transition: 0.1s ease-out;
+
+}
+
+.allproduct-preview:hover {
+    transform: translateY(10px) scale(1.1);
+    transition: 0.2s ease-in;
+}
+
+.card-img-top {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 /* Login */
@@ -218,26 +261,6 @@ footer {
     box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.389);
 }
 
-/* product */
-.banner {
-    width: 100%;
-    height: 200px;
-    text-align: center;
-    color: white;
-}
-
-.banner-content {
-    width: 100%;
-    height: 200px;
-    position: absolute;
-    top: 116px;
-    left: 0;
-    background: rgba(57, 57, 57, 0.5);
-    /* center overlay text */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
 
 .product-list {
     border: 1px solid rgb(199, 199, 199);
@@ -279,14 +302,14 @@ footer {
     display: flex;
     width: 100%;
     flex-wrap: wrap;
-    flex: 4;
+    flex: 2;
     justify-content: start;
-    margin: 0 2em;
 }
+
 
 .itemlist .card {
     width: 270px;
-    height: 450px;
+    height: 460px;
     transition: 0.2s ease-in;
 }
 
@@ -353,12 +376,15 @@ footer {
 
 .promo-sign {
     position: absolute;
-    right: 0;
     background-color: #005698;
     width: 100%;
-    height: 30px;
+    height: 40px;
     text-align: center;
     color: white;
+    border-radius: 7px;
+    border: solid 4px;
+    left: 0;
+    top: 0;
     /* border-top: 70px solid #2ea8ff;
     border-left: 70px solid transparent; */
 }
@@ -384,7 +410,7 @@ footer {
 }
 
 .profile-box {
-    /* background-color: #5771bb; */
+    background-color: #ffffff;
     width: 300px;
     /* margin: 3em 1.5em; */
     text-align: center;
@@ -489,7 +515,7 @@ footer {
     width: 100%;
     height: 50px;
     box-shadow: 0px 5px 15px #0000002d;
-    margin: 10px;
+    margin: 5px;
     padding: 10px;
     text-align: center;
     font-size: 18px;
@@ -570,7 +596,37 @@ input.cart-cb {
 }
 
 
+.order-status {
+    width: 60px;
+    height: 60px;
+    border: 4px solid #9b9b9b;
+    margin: 5px;
+}
 
+
+.order-status i {
+    font-size: 26px;
+    color: #9b9b9b;
+    margin: 0.5em auto;
+    padding-left: 5px;
+    z-index: 2;
+}
+
+.order-border-success {
+    border: 4px solid #3fa71a !important;
+}
+
+.order-icon-success {
+    color: #3fa71a !important;
+}
+
+.order-line-process {
+    position: absolute;
+    height: fit-content;
+    width: 15px;
+    border: 3px solid #9b9b9b;
+    transform: translateX(53px) translateY(-30px);
+}
 
 /* Nav admin */
 
@@ -674,7 +730,7 @@ input.cart-cb {
 /* ระบบแอดมิน */
 
 .box-admin {
-    width: 1430px;
+    width: 85vw;
     /* background-color: #5771bb; */
     margin-left: 230px;
     padding: 2em 1em 1em 3.5em;
@@ -865,6 +921,24 @@ input.cart-cb {
     border-radius: 5px;
 }
 
+.order-states-box {
+    padding: 1em;
+    height: 100px !important;
+    text-align: end;
+    transition: 0.2s ;
+
+}
+
+.order-states-box.active {
+    border-bottom: 5px solid #005698 !important;
+}
+
+.order-states-box:hover {
+    cursor: pointer;
+    transition: 0.2s ;
+    transform: translateY(5px);
+    box-shadow: 0px 5px 10px #00000042;
+}
 /* แชทฝั่งแอดมิน */
 .chat-list {
     width: 40%;
@@ -990,7 +1064,7 @@ input.cart-cb {
     color: white;
     text-align: center;
     box-shadow: 0px 5px 10px #35353568;
-    font-size: 30px;
+    font-size: 30px !important;
     cursor: pointer;
     transition: 0.2s ease-out;
 }

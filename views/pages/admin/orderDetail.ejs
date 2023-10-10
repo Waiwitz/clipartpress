@@ -1,0 +1,252 @@
+<%- include('../../partials/admin-nav') %>
+
+<body class="h-100" style="background-color: rgb(248, 248, 248);">
+    <div class="mb-5 secondHead-admin">
+        <div class="secondHead-content">
+            <h1>ออเดอร์ #<%= orders[0].order_id %></h1>
+        </div>
+    </div>
+    <div style="padding-bottom: 150px;"></div>
+    <%     function datetimeLocal(datetime) { %>
+    <%   const dt = new Date(datetime); %>
+    <%    dt.setMinutes(dt.getMinutes() - dt.getTimezoneOffset()); %>
+    <%   return dt.toISOString().slice(0, 10) + ' ' + dt.toISOString().slice(11, 16); %>
+    <%  } %>
+
+    <div class="box-admin">
+        <% if(success_msg != "") { %>
+        <% success_msg.forEach((item) => { %>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <strong><%- item %></strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <% }); %>
+        <% }else if(errors != "") {%>
+        <% errors.forEach((item) => { %>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong><%- item %></strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <% }); %>
+        <% } %>
+
+
+        <% let couponDiscount = 0; %>
+        <% if (orders[0].discount != null) { %>
+        <% couponDiscount = orders[0].discount; %>
+        <% } %>
+        <div class="col">
+            <div class="card m-0">
+                <div class=" m-3">
+                    <div class="card-header mb-3 d-flex justify-content-between">
+                        <div class="d-flex">
+                            <h4 class="m-0 me-2 d-inline">รายละเอียดรายการ</h4>
+                            <% if (orders[0].order_status === 'waitpay') {%>
+                            <div class="alert-warning p-2 rounded">
+                                รอชำระ
+                            </div>
+                            <%} else if (orders[0].order_status === 'pending') {%>
+                            <div class="alert-warning p-2 rounded">รอตรวจสอบ</div>
+                            <% } else if (orders[0].order_status === 'produce') {%>
+                            <div class="alert-info  p-2 rounded">
+                                กำลังผลิต
+                            </div>
+                            <% } else if (orders[0].order_status === 'shipping') {%>
+                            <div class="alert-info p-2 rounded">
+                                กำลังจัดส่ง
+                            </div>
+                            <% } else if (orders[0].order_status === 'success') {%>
+                            <div class="alert-success p-2 rounded">
+                                จัดส่งสำเร็จ
+                            </div>
+                            <% } else if (orders[0].order_status === 'cancel') {%>
+                            <div class="alert-danger p-2 rounded">
+                                ยกเลิก
+                            </div>
+                            <% } %>
+                        </div>
+                        <div>
+                            <div role="button" class="editOrder-btn btn btn-primary fs-6" data-bs-toggle="modal"
+                                data-bs-target="#updateModal" data-id="<%= orders[0].order_id %>"
+                                data-status="<%= orders[0].order_status %>"
+                                data-tracking="<%= orders[0].tracking_number %>">
+                                ตั้งค่าออเดอร์
+                            </div>
+                            <% if (orders[0].order_status === 'waitpay' || orders[0].order_status === 'pending') { %>
+                            <button class="btn btn-danger fs-6" data-bs-toggle="modal"
+                                data-bs-target="#cancelOrder">ยกเลิกออเดอร์</button>
+                            <% } %>
+                        </div>
+                    </div>
+                    <div class="px-3">
+                        <div>
+                            <span>สั่งซื้อเมื่อ : <%= datetimeLocal(orders[0].orderdate) %></span>
+                        </div>
+                        <% let sumprice = 0; %>
+                        <% let shipmentprice = orders[0].shipment_price; %>
+                        <% orders[0].order_detail.forEach((order, index) => { %>
+                        <div class="row my-2 py-2">
+                            <div class="col-3 h-100">
+                                <div class="myorder-product-img">
+                                    <img src="<%= order.picture %>" alt="" class="imageFitBox">
+                                </div>
+                            </div>
+                            <div class="col-5">
+                                <h4><%= order.productName %></h4>
+                                <div class="collapse-horizontal">
+                                    <span class="mb-2"> ขนาดของชิ้นงาน : <%= order.size %></span><br>
+                                    <% order.options.forEach((option) => { %>
+                                    <span class="mb-2"> <%= option.option_type %> :
+                                        <%= option.option_name %></span><br>
+                                    <% }) %>
+                                </div>
+                            </div>
+                            <div class="col-2">
+                                <h5>จำนวน</h5>
+                                <p><%= order.quantity %></p>
+                            </div>
+                            <div class="col-2">
+                                <h5>ราคา</h5>
+                                <p><%= money.format(order.price) %></p>
+                            </div>
+                        </div>
+                        <% sumprice += order.price %>
+                        <% }) %>
+                        <% let vat = sumprice * 7 / 100; %>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-2">
+            <div class="col card">
+                <div class="d-flex">
+                    <div class="card-body">
+                        <div class="card-header p-0 mb-3">
+                            <h4>ที่อยู่จัดส่ง</h4>
+                        </div>
+                        <div>
+                            <% shipment.forEach((addr) => { %>
+                            <b id="ad-name"><%= addr.name %></b> <br>
+                            <span class="card-text" id="ad-info">
+                                <%= addr.address %> <%= addr.province %> <%= addr.postcode %>
+                            </span> <br>
+                            <span id="ad-tel"><%= addr.telephone%></span>
+                            <% }) %>
+                        </div>
+                        <div class="mt-">
+                            <h5>การจัดส่ง: <%= shipment[0].shipment_name %></h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-4 card" style="height: fit-content;">
+                <div class="card-body text-center">
+                    <div class="mb-2 mx-3">
+                        <div class="my-2 d-flex justify-content-between">
+                            <span>ยอดรวมสินค้า (<%= orders[0].order_detail.length %> รายการ)</span>
+                            <span>
+                                <%= money.format(sumprice) %>
+                            </span>
+                        </div>
+                        <div class="my-2 d-flex justify-content-between">
+                            <span>ค่าส่ง</span>
+                            <span>
+                                <%= money.format(shipmentprice) %>
+                            </span>
+                        </div>
+                        <div class="my-2 d-flex justify-content-between">
+                            <span>VAT 7%</span>
+                            <span>
+                                <%= money.format(vat) %>
+                            </span>
+                        </div>
+                        <% if (orders[0].coupon_id != null) { %>
+                        <div class="my-2 d-flex justify-content-between">
+                            <span>ส่วนลด</span>
+                            <span class="text-danger">
+                                -<%= money.format(couponDiscount) %>
+                            </span>
+                        </div>
+                        <% } %>
+                        <div class="border-top pt-3 my-2 d-flex justify-content-between">
+                            <b>ยอดรวมทั้งหมด</b>
+                            <div class="d-flex">
+                                <span class="fw-bold me-2" id="totalPrice">
+                                    <%= money.format((sumprice + shipmentprice + vat) - couponDiscount) %>
+                                </span>
+                                <span class="fw-bold" id="newPrice">
+                                </span>
+                            </div>
+                        </div>
+                        <div class="text-start pt-2">
+                            <% const bankname = banklist.find(row => row.en == paymentSelect[0].method_name) %>
+                            <% if (bankname) { %>
+                            <h6>โอนเงินผ่าน<%= bankname.th %></h6>
+                            <% } else { %>
+                            <h6>โอนเงินผ่านพร้อมเพย์</h6>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="updateModal" tabindex="-1" aria-labelledby="addPromptpayLabel" aria-hidden="true"
+        data-mdb-backdrop="static" data-mdb-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <!-- <button class="btn btn-secondary rounded-circle p-0 me-2" style="width: 40px; height: 40px;"
+                data-mdb-toggle="modal" data-mdb-target="#addpayment"><i
+                    class="fas fa-angle-left fs-5"></i></button> -->
+                    <h5 class="modal-title" id="addPromptpayLabel">แก้ไขออเดอร์</h5>
+                    <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="/updateOrder" method="post" id="updateForm" class="needs-validation" novalidate>
+                    <div class="modal-body">
+                        <div class="col mb-2">
+                            <label for="exampleInputEmail1" class="form-label">สถานะออเดอร์ :</label><br>
+                            <select class="form-select" name="statusOrder" id="statusOrder">
+                                <option value="waitpay">รอชำระ</option>
+                                <option value="pending">รอตรวจสอบ</option>
+                                <option value="produce">กำลังผลิต</option>
+                                <option value="shipping">กำลังจัดส่ง</option>
+                                <option value="success">จัดส่งสำเร็จ</option>
+                                <option value="cancel">ยกเลิก</option>
+                            </select>
+                        </div>
+                        <div class="col pb-3">
+                            <div class="form-outline">
+                                <input type="text" class="form-control" name="trackingNumber" id="trackingNumber"
+                                    pattern="[A-Za-zก-๙ ]+$" maxlength="10">
+                                <label for="number" class="form-label">เลขพัสดุ</label>
+                                <div class="invalid-feedback">
+                                    กรุณากรอกเลขพัสดุ
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                        <button type="submit" class="btn btn-primary">บันทึก</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    document.querySelectorAll('.form-outline').forEach((formOutline) => {
+        new mdb.Input(formOutline).init();
+    });
+
+    $(document).ready(function () {
+        $('.editOrder-btn').click(function () {
+            $('#updateForm').attr('action', `/updateOrder/${$(this).data('id')}`)
+            $('#statusOrder').val($(this).data('status'))
+            $('#trackingNumber').val($(this).data('tracking'))
+        })
+    })
+</script>

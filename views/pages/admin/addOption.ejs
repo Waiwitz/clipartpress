@@ -28,7 +28,7 @@
         </div>
         <% }); %>
         <% } %>
-        <form action="/addoption" method="post" enctype="multipart/form-data">
+        <form action="/addoption" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
             <div class="card mb-4 spec" id="spec">
                 <div class="card-body">
                     <div class="sub-options mb-4">
@@ -42,7 +42,7 @@
                                                 <p>คลิกเพื่อเลือกรูปสินค้า</p>
                                             </div>
                                             <input type="file" name="option_img[]" onchange="previewImage(event, [0])"
-                                                accept="image/png, image/jpeg" multiple />
+                                                accept="image/png, image/jpeg" class="form-control" multiple required/>
                                             <img src="/assets/img/white-bg.jpg" id="option_preview[0]" draggable="false"
                                                 class="img_option">
                                         </div>

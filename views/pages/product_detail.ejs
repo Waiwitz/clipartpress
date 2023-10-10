@@ -502,20 +502,18 @@
         const qtyTiers = JSON.parse('<%- JSON.stringify(qtyTiers) %>');
 
 
-        for (let i = 0; i < qtyTiers.length; i++) {
-            if (qtTier >= qtyTiers[i].quantity) {
-                qtprice = qtyTiers[i].qty_price; // Update qtprice if the current qty_price is smaller
-            } 
-            
-            if (qtprice == null) {
-                qtprice = qtyTiers[0].qty_price;
-            }
+        for (let i = 0; i < qtyTiers.length && qtTier >= qtyTiers[i].quantity; i++) {
+            qtprice = qtyTiers[i].qty_price;
         };
+        if (typeof qtprice === 'undefined') {
+            qtprice = qtyTiers[0].qty_price;
+        }
 
-        for (let s = 0; s < sizeTiers.length && width >= sizeTiers[s].width; s++) {
-            sizePrice = sizeTiers[s].size_price
-            if (width == null) {
-                sizePrice = sizeTiers[0].size_price
+        sizePrice = sizeTiers[0].size_price; // Set a default price
+
+        for (let s = 0; s < sizeTiers.length; s++) {
+            if (width >= sizeTiers[s].size_unit || height >= sizeTiers[s].size_unit) {
+                sizePrice = sizeTiers[s].size_price;
             }
         }
         // for (let h = 0; h < sizeTiers.length && heightprice >= sizeTiers[h].height; h++) {

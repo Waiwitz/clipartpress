@@ -18,16 +18,16 @@
         <% }); %>
         <% } %>
         <% if(user.verified == 0) { %>
-            <div class="alert alert-warning">
-                บัญชีของคุณยังไม่ได้ยืนยัน
-            </div>
+        <div class="alert alert-warning">
+            บัญชีของคุณยังไม่ได้ยืนยัน
+        </div>
         <% } %>
         <div class="d-flex">
             <%- include('../partials/usermenu') %>
             <div class="setting-box">
                 <form action="/userprofile" method="post" enctype="multipart/form-data">
                     <div class="d-flex flex-wrap justify-content-center">
-                        <div class="profile-box border rounded p-5 m-3">
+                        <div class="profile-box border rounded p-5 m-3" style="height: 400px;">
                             <h4 class="mb-4">รูปโปรไฟล์</h4>
                             <div class="profile">
                                 <img src="<%= user.picture %>" alt="profile" id="preview" draggable="false">
@@ -62,15 +62,46 @@
                                 <label class="form-label" for="form1Example2">เบอร์โทรศัพท์</label>
                             </div>
                             <!-- Submit button -->
-                            <button type="submit" class="btn btn-primary btn-block">บันทึก</button>
+                            <button type="submit" class="btn btn-primary btn-block fs-6">บันทึก</button>
+
+                            <button type="button" class="btn btn-link fs-6 mt-5 float-end" data-bs-toggle="modal"
+                                data-bs-target="#cancel">ปิดบัญชี</button>
                         </div>
                     </div>
 
                 </form>
 
-
             </div>
+        </div>
+    </div>
 
+    <div class="modal" id="cancel" aria-labelledby="selectAddress" role="dialog" aria-hidden="true" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div>
+                        <i class="fas fa-triangle-exclamation alert-warning rounded-circle p-2 fs-4"></i>
+                        <h5 class="modal-title d-inline">ปิดบัญชี</h5>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="/cancelorder/<%= session.user_id %>" class="needs-validation" method="post" novalidate>
+                    <div class="modal-body" id="cancel-modal-body">
+                        <p>ทันทีที่คุณปิดใช้งานบัญชีของคุณคุณจะไม่สามารถเข้าถึงบัญชีของคุณได้
+                            หากต้องการเปิดใช้งานบัญชีในอนาคตโปรดติดต่อผู้ดูแลระบบ</p>
+                        <div class="form-outline mb-4">
+                            <input type="text" id="form1Example2" class="form-control" name="telephone"
+                                value="" />
+                            <label class="form-label" for="form1Example2">ยืนยันรหัสผ่าน</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn" id="closeInsert" data-bs-dismiss="modal"
+                            aria-label="Close">ปิด</button>
+                        <button type="submit" id="changePayment" class="btn btn-danger">ยกเลิกออเดอร์</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
     <script>
@@ -87,6 +118,20 @@
                 reader.readAsDataURL(file);
             }
         }
+
+        $(document).ready(function () {
+            $('#reason').change(function () {
+                if ($(this).val() === 'other') {
+                    let input =
+                        '<input type="text" id="otherreason" name="reason" class="form-control" placeholder="ใส่เหตุผลอื่นๆ" required/>'
+                    $('#reason').attr('name', '')
+                    $('#cancel-modal-body').append(input);
+                } else {
+                    $('#otherreason').remove();
+                    $('#reason').attr('name', 'reason')
+                }
+            })
+        })
     </script>
 </body>
 <%- include('../partials/head') %>

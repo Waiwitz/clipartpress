@@ -109,7 +109,8 @@
             </div>
 
             <div class="right-box-product p-3">
-                <form action="/updateCart/<%= cart_detail[0].cart_detail_id %>" method="post" enctype="multipart/form-data">
+                <form action="/updateCart/<%= cart_detail[0].cart_detail_id %>" method="post"
+                    enctype="multipart/form-data">
                     <div class="w-75 m-auto">
                         <div class="spec-picking">
                             <input type="text" name="productid" value="<%= product.product_id %>" hidden>
@@ -128,8 +129,8 @@
                                 <select class="form-select" id="size" name="size">
                                     <% if(product.categories === 'card'){ %>
                                     <option value="9x5.5">9 x 5.5 cm (ขนาดมาตรฐานสากล)</option>
-                                    <option value="4x4">9 x 5 cm</option>
-                                    <option value="5x5">8 x 5.5 cm</option>
+                                    <option value="9x5">9 x 5 cm</option>
+                                    <option value="8x5.5">8 x 5.5 cm</option>
                                     <% } else if(product.categories === 'flyer') { %>
 
                                     <% } else if(product.categories === 'leaflet') { %>
@@ -299,7 +300,8 @@
                                 <span>ยอดรวม: </span>
                                 <span id="sum-price"></span>
                                 <span id="new-price"></span>
-                                <input type="number" name="total_price" id="total-price" value="<%= cart_detail[0].price %>" hidden readonly>
+                                <input type="number" name="total_price" id="total-price"
+                                    value="<%= cart_detail[0].price %>" hidden readonly>
                                 <!-- <span id="total-price">฿0</span> -->
                                 <% if(!login){ %>
                                 <p>กรุณาเข้าสู่ระบบก่อนที่จะเพิ่มสินค้าลงตระกร้า</p>
@@ -317,50 +319,6 @@
         </div>
     </div>
 
-    <div class="container-lg mt-5">
-        <div>
-            <h2 class="border-bottom">รีวิว</h2>
-        </div>
-
-        <div class="comment w-100 border-bottom">
-            <div class="d-flex mt-5 mb-3 pb-4">
-                <div class="img-fluid border rounded-circle me-3" style="width: 50px; height: 50px;">
-                    <img src="" alt="." width="30">
-                </div>
-                <div>
-                    <span>name</span>
-                    <p>1:15 13/12/2565</p>
-                    <div class="star">
-                        <span class="fa fa-star"></span>
-                        <span class="fa fa-star"></span>
-                        <span class="fa fa-star"></span>
-                        <span class="fa fa-star"></span>
-                        <span class="fa fa-star"></span>
-                    </div>
-                </div>
-            </div>
-            <div>
-                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsum ex repellendus libero fuga aspernatur
-                    vitae esse inventore velit harum, nihil earum exercitationem voluptatibus officiis mollitia atque
-                    suscipit dicta repudiandae accusamus!</p>
-            </div>
-            <div class="d-flex">
-                <div class="border m-2" style="width: 140px; height: 140px;">
-                    <img src="" alt="d">
-                </div>
-                <div class="border m-2" style="width: 140px; height: 140px;">
-                    <img src="" alt="d">
-                </div>
-                <div class="border m-2" style="width: 140px; height: 140px;">
-                    <img src="" alt="d">
-                </div>
-                <div class="border m-2" style="width: 140px; height: 140px;">
-                    <img src="" alt="d">
-                </div>
-
-            </div>
-        </div>
-    </div>
 
     <div class="modal fade" id="optionImgModal" tabindex="-1" aria-labelledby="optionImgModal" aria-hidden="true">
         <div class="modal-dialog">
@@ -500,13 +458,17 @@
 
         for (let i = 0; i < qtyTiers.length && qtTier >= qtyTiers[i].quantity; i++) {
             qtprice = qtyTiers[i].qty_price;
-            // if (qtTier >= tiers[i].minqt && qtTier <= tiers[i].maxqt) {
-            // }
         };
+        if (typeof qtprice === 'undefined') {
+            qtprice = qtyTiers[0].qty_price;
+        }
 
-        for (let s = 0; s < sizeTiers.length && width >= sizeTiers[s].width && height >= sizeTiers[s].height; s++) {
-            sizePrice = sizeTiers[s].size_price
+        sizePrice = sizeTiers[0].size_price; // Set a default price
 
+        for (let s = 0; s < sizeTiers.length; s++) {
+            if (width >= sizeTiers[s].size_unit || height >= sizeTiers[s].size_unit) {
+                sizePrice = sizeTiers[s].size_price;
+            }
         }
         // for (let h = 0; h < sizeTiers.length && heightprice >= sizeTiers[h].height; h++) {
         //     const element = array[s];
@@ -528,29 +490,84 @@
         const sumPrice = totalPricePerUnit * qtTier;
         console.log(sumPrice);
 
-        $('#sum-price').text(sumPrice.toFixed(2))
-        $('#total-price').val(sumPrice.toFixed(2));
+        $('#sum-price').text(THmoney.format(sumPrice))
+        $('#total-price').val(sumPrice);
 
         let discount
         if (promotions.find(promo => promo.product_id == product.product_id)) {
             promotions.forEach((promo) => {
-                let min_reach;
+                let min_reach = promo.min_reach;
                 if (promo.promo_type == 'discount' && promo.promo_condition == 'value') {
-                    min_reach = promo.min_reach;
                     if (sumPrice >= min_reach) {
                         discount = sumPrice - (sumPrice * promo.type_value / 100);
-                        $('#new-price').text(discount.toFixed(2))
+                        $('#new-price').text(THmoney.format(discount))
                         $('#sum-price').empty().replaceWith(
-                            `<s class="fw-bold me-2" id="sum-price">${sumPrice}</s>`);
+                            `<s class="fw-bold me-2" id="sum-price">${THmoney.format(sumPrice)}</s>`);
+                        let warning = `<div class='alert-success p-3'>
+                             ได้รัับส่วนลด ${promo.type_value} % แล้ว
+                                 </div>`
+                        $('#promo-check').empty().append(warning)
                     } else {
                         $('#new-price').empty()
                         $('#sum-price').empty().replaceWith(
-                            `<b class="fw-bold me-2" id="sum-price">${sumPrice}</b>`);
+                            `<b class="fw-bold me-2" id="sum-price">${THmoney.format(sumPrice)}</b>`);
+                        let warning = `<div class='alert-warning p-3'>
+                                ซื้อเพิ่มอีก ${min_reach - sumPrice} บาท เพื่อรับส่วนลด ${promo.type_value} %
+                                 </div>`
+                        $('#promo-check').empty().append(warning)
+                    }
+                }
+
+
+                if (promo.promo_type == 'discount' && promo.promo_condition == 'qty') {
+                    const optionValue = parseInt(qtTier, 10);
+                    if (optionValue < min_reach) {
+                        let warning = `<div class='alert-warning p-3'>
+                                ซื้อเพิ่มอีก ${min_reach - optionValue} ชิ้น เพื่อรับส่วนลด ${promo.type_value} %
+                                 </div>`
+                        $('#promo-check').empty().append(warning)
+                        $('#new-price').empty()
+                        $('#sum-price').empty().replaceWith(
+                            `<b class="fw-bold me-2" id="sum-price">${THmoney.format(sumPrice)}</b>`
+                        );
+                    } else {
+                        let discount = sumPrice - (sumPrice * promo.type_value / 100);
+                        let warning = `<div class='alert-success p-3'>
+                                คุณได้รับส่วนลด ${promo.type_value} % แล้ว
+                                 </div>`
+                        $('#promo-check').empty().append(warning)
+                        $('#new-price').text(THmoney.format(discount))
+                        $('#sum-price').empty().replaceWith(
+                            `<s class="fw-bold me-2" id="sum-price">${THmoney.format(sumPrice)}</s>`
+                        );
+                    }
+                }
+
+                if (promo.promo_type == 'giveaway' && promo.promo_condition == 'value') {
+                    if (sumPrice >= min_reach) {
+                        let warning = `<div class='alert-success p-3'>
+                        ได้รับเพิ่ม ${promo.type_value} ชิ้น แล้ว
+                                 </div>`
+                        $('#promo-check').empty().append(warning)
+                        $('#qt-select option').each(function () {
+                            const optionValue = parseInt($(this).val(), 10);
+                            $(this).text(optionValue + ' <%= unit %>' + ` + ${promo.type_value}`);
+                        });
+                    } else {
+                        let warning = `<div class='alert-warning p-3'>
+                                ซื้อเพิ่มอีก ${min_reach - qtTier} บาท เพื่อรับเพิ่มอีก ${promo.type_value} ชิ้น
+                                 </div>`
+                        $('#promo-check').empty().append(warning)
+                        $('#qt-select option').each(function () {
+                            const optionValue = parseInt($(this).val(), 10);
+                            $(this).text($(this).val() + ' <%= unit %>');
+                        });
                     }
                 }
             });
         }
     }
+
 
 
     $(document).ready(function () {

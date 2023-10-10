@@ -1,105 +1,279 @@
 <%- include('../../partials/admin-nav') %>
 
+<style>
+    .status-row div {
+        width: 100px;
+    }
+</style>
+<%     function datetimeLocal(datetime) { %>
+<%   const dt = new Date(datetime); %>
+<%    dt.setMinutes(dt.getMinutes() - dt.getTimezoneOffset()); %>
+<%   return dt.toISOString().slice(0, 10) + ' ' + dt.toISOString().slice(11, 16); %>
+<%  } %>
+
 <body class="h-100" style="background-color: rgb(248, 248, 248);">
     <div class="mb-5 secondHead-admin">
         <div class="secondHead-content">
             <h1>ออเดอร์</h1>
         </div>
     </div>
-    <div style="padding-bottom: 150px;"></div>
+    <div style="padding-bottom: 100px;"></div>
 
     <div class="box-admin">
-        <div class="card" style="width: 100%; margin: auto;">
+        <% if(success_msg != "") { %>
+        <% success_msg.forEach((item) => { %>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <strong><%- item %></strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <% }); %>
+        <% }else if(errors != "") {%>
+        <% errors.forEach((item) => { %>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong><%- item %></strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <% }); %>
+        <% } %>
+        <% const waitpay = orders.filter(row => row.order_status == "waitpay") %>
+        <% const pending = orders.filter(row => row.order_status == "pending") %>
+        <% const produce = orders.filter(row => row.order_status == "produce") %>
+        <% const shipping = orders.filter(row => row.order_status == "shipping") %>
+        <% const success = orders.filter(row => row.order_status == "success") %>
+        <% const cancel = orders.filter(row => row.order_status == "cancel") %>
+        <div class="row">
+            <div class="col card order-states-box active" data-target="allSection">
+                <h4><%= orders.length  %> รายการ</h4>
+                <p>ทั้งหมด</p>
+            </div>
+            <div class="col card order-states-box" data-target="waitpaySection">
+                <h4><%= waitpay.length  %> รายการ</h4>
+                <p>รอชำระ</p>
+            </div>
+            <div class="col card order-states-box" data-target="pendingSection">
+                <h4><%= pending.length  %> รายการ</h4>
+                <p>รอตรวจสอบ</p>
+            </div>
+            <div class="col card order-states-box" data-target="produceSection">
+                <h4><%= produce.length  %> รายการ</h4>
+                <p>กำลังผลิต</p>
+            </div>
+            <div class="col card order-states-box" data-target="shippingSection">
+                <h4><%= shipping.length  %> รายการ</h4>
+                <p>กำลังจัดส่ง</p>
+            </div>
+            <div class="col card order-states-box" data-target="successSection">
+                <h4><%= success.length  %> รายการ</h4>
+                <p>จัดส่งสำเร็จ</p>
+            </div>
+            <div class="col card order-states-box" data-target="cancelSection">
+                <h4><%= cancel.length  %> รายการ</h4>
+                <p>ยกเลิก</p>
+            </div>
+        </div>
+
+        <% var status = ["waitpay", "pending", "produce", "shipping", "success", "cancel"] %>
+        <div class="card orderTable" style="width: 100%; margin: auto;" id="allSection">
             <div class="card-body">
                 <table class="table align-middle mb-0 bg-white table-striped" id="table">
                     <thead class="bg-light">
                         <tr>
                             <th>#</th>
-                            <th>เลขออเดอร์</th>
+                            <th>ออเดอร์</th>
                             <th>สินค้า</th>
-                            <th>ที่อยู่</th>
+                            <th>ผู้สั่ง</th>
                             <th>วันที่สั่ง</th>
                             <th>สถานะ</th>
+                            <th>ยอดรวม</th>
                             <th></th>
                         </tr>
                     </thead>
 
 
-                    <tbody id="user_list">
+                    <tbody>
+                        <% let sumprice = 0; %>
+                        <% let shipmentprice = orders[0].shipment_price; %>
+                        <% let couponDiscount = 0; %>
+                        <% if (orders[0].discount != null) { %>
+                        <% couponDiscount = orders[0].discount; %>
+                        <% } %>
+                        <% orders.forEach((order, index) => { %>
                         <tr>
                             <td style="width: 50px;">
-                                <div class="d-flex align-items-center">
-                                    <p class="fw-normal mb-1"></p>
+                                <%= index %>
+                            </td>
+                            <td>
+                                <%= order.order_id %>
+                            </td>
+                            <td>
+                                <% order.order_detail.forEach((detail) => { %>
+                                <% sumprice += detail.price %>
+                                - <%= detail.productName %> <br>
+                                <% }) %>
+                            </td>
+                            <td>
+                                <%= order.userfullname %>
+                            </td>
+                            <td> <%= datetimeLocal(order.orderdate) %></td>
+                            <td class="status-row">
+                                <% if (order.order_status === 'waitpay') {%>
+                                <div role="button" class="alert-warning p-2 rounded">
+                                    รอชำระ
                                 </div>
-                            </td>
-                            <td class="product-picture w-25">
-                            
-                            </td>
-                            <td>
-                                    <img src="" alt="">
-                                    <span>dddddddd</span>
-                            </td>
-                            <td>
-                                <p class="fw-normal mb-1">ddd dd</p>
-                            </td>
-                            <td></td>
-                            <td class="text-center">
-                                <div class="status pending">
-                                    รอตรวจสอบ
+                                <%} else if (order.order_status === 'pending') {%>
+                                <div role="button" class="alert-warning p-2 rounded">รอตรวจสอบ</div>
+                                <% } else if (order.order_status === 'produce') {%>
+                                <div role="button" class="alert-info  p-2 rounded">
+                                    กำลังผลิต
                                 </div>
+                                <% } else if (order.order_status === 'shipping') {%>
+                                <div role="button" class="alert-info p-2 rounded">
+                                    กำลังจัดส่ง
+                                </div>
+                                <% } else if (order.order_status === 'success') {%>
+                                <div role="button" class="alert-success p-2 rounded">
+                                    จัดส่งสำเร็จ
+                                </div>
+                                <% } else if (order.order_status === 'cancel') {%>
+                                <div role="button" class="alert-danger p-2 rounded">
+                                    ยกเลิก
+                                </div>
+                                <% } %>
                             </td>
+                            <% let vat = sumprice * 7 / 100; %>
+                            <td> <%= money.format((sumprice + shipmentprice + vat) - couponDiscount) %></td>
                             <td>
-                                <a href="" class="btn btn-primary">
+                                <a href="/admin/order/<%= order.order_id %>" class="btn btn-primary">
                                     <i class="fa-solid fa-eye fs-5"></i>
                                 </a>
                             </td>
                         </tr>
-                        <form action="/deleteUser" method="post">
-                            <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel"
-                                aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="editModalLabel">ลบผู้ใช้</h5>
-                                            <button type="button" class="btn-close" data-mdb-dismiss="modal"
-                                                aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <form action="/deleteType" id="editForm" method="post">
-                                                <div>
-                                                    <p>ต้องการลบผู้ใช้ใช่หรือไม่ ?</p>
-                                                </div>
-                                                <input type="hidden" id="userid" name="user_id" value="" />
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary "
-                                                        data-mdb-dismiss="modal">ยกเลิก</button>
-                                                    <button type="submit" class="btn btn-danger">ยืนยัน</button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-
+                        <% }) %>
                     </tbody>
                 </table>
             </div>
         </div>
+        <% status.forEach((item) => { %>
+        <div class="card orderTable" id="<%= item %>Section" style="width: 100%; margin: auto;">
+            <div class="card-body">
+                <table class="table align-middle mb-0 bg-white table-striped" id="table">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>#</th>
+                            <th>ออเดอร์</th>
+                            <th>สินค้า</th>
+                            <th>ผู้สั่ง</th>
+                            <th>วันที่สั่ง</th>
+                            <th>สถานะ</th>
+                            <th>ยอดรวม</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+
+
+                    <tbody>
+                        <% let sumprice = 0; %>
+                        <% let shipmentprice = orders[0].shipment_price; %>
+                        <% let couponDiscount = 0; %>
+                        <% if (orders[0].discount != null) { %>
+                        <% couponDiscount = orders[0].discount; %>
+                        <% } %>
+                        <% orders.forEach((order, index) => { %>
+                        <% if (order.order_status === item) { %>
+                        <tr>
+                            <td style="width: 50px;">
+                                <%= index %>
+                            </td>
+                            <td>
+                                <%= order.order_id %>
+                            </td>
+                            <td>
+                                <% order.order_detail.forEach((detail) => { %>
+                                <% sumprice += detail.price %>
+                                - <%= detail.productName %> <br>
+                                <% }) %>
+                            </td>
+                            <td>
+                                <%= order.userfullname %>
+                            </td>
+                            <td> <%= datetimeLocal(order.orderdate) %></td>
+                            <td class="status-row">
+                                <div role="button" class="editOrder-btn btn p-0 fs-6" data-bs-toggle="modal"
+                                    data-bs-target="#updateModal" data-id="<%= order.order_id %>"
+                                    data-status="<%= order.order_status %>"
+                                    data-tracking="<%= order.tracking_number %>">
+                                    <% if (order.order_status === 'waitpay') {%>
+                                    <div role="button" class="alert-warning p-2 rounded">
+                                        รอชำระ
+                                    </div>
+                                    <%} else if (order.order_status === 'pending') {%>
+                                    <div role="button" class="alert-warning p-2 rounded">รอตรวจสอบ</div>
+                                    <% } else if (order.order_status === 'produce') {%>
+                                    <div role="button" class="alert-info  p-2 rounded">
+                                        กำลังผลิต
+                                    </div>
+                                    <% } else if (order.order_status === 'shipping') {%>
+                                    <div role="button" class="alert-info p-2 rounded">
+                                        กำลังจัดส่ง
+                                    </div>
+                                    <% } else if (order.order_status === 'success') {%>
+                                    <div role="button" class="alert-success p-2 rounded">
+                                        จัดส่งสำเร็จ
+                                    </div>
+                                    <% } else if (order.order_status === 'cancel') {%>
+                                    <div role="button" class="alert-danger p-2 rounded">
+                                        ยกเลิก
+                                    </div>
+                                    <% } %>
+                                </div>
+                            </td>
+                            <% let vat = sumprice * 7 / 100; %>
+                            <td> <%= money.format((sumprice + shipmentprice + vat) - couponDiscount) %></td>
+                            <td>
+                                <a href="/admin/order/<%= order.order_id %>" class="btn btn-primary">
+                                    <i class="fa-solid fa-eye fs-5"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <% } %>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <% }) %>
     </div>
+
 </body>
+
+<script src="/js/validateBs.js"></script>
 <script>
-    $(document).on("click", ".delete", function () {
-        var userid = $(this).data("user-id");
-        $("#userid").val(userid);
+    document.querySelectorAll('.form-outline').forEach((formOutline) => {
+        new mdb.Input(formOutline).init();
     });
 
-
+    $('.table').DataTable({
+        order: [
+            [5, 'desc']
+        ],
+    });
+    
     $(document).ready(function () {
-        $('#table').DataTable({
-            order: [
-                [3, 'desc']
-            ],
-        });
-    });
+        `<% status.forEach((item) => { %>`
+        $('#<%= item %>Section').hide();
+        ` <% }) %>`
+
+        $('.order-states-box').each(function () {
+            $(this).click(function () {
+                var card = $(this).data('target')
+                $('.order-states-box').removeClass('active')
+                $(this).addClass('active')
+                $('.orderTable').hide();
+                $(`#${card}`).show();
+            })
+        })
+
+
+     
+    })
 </script>

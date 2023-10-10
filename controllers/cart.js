@@ -63,7 +63,6 @@ const updateCart = async (req, res) => {
 
     let selectedData;
     let query;
-
     if (artwork) {
         query = 'UPDATE cart_detail SET size = ?, design_file = ?, price = ?, quantity = ? WHERE cart_detail_id = ?'
         selectedData = [size, artwork, price, quantity, cartId];
@@ -75,11 +74,15 @@ const updateCart = async (req, res) => {
         dbConnection.query(query, selectedData, (error) => {
             if (error) throw error;
         })
-        for (const option of options) {
-            dbConnection.query('UPDATE cart_selected_options SET option_id = ? WHERE cart_detail_id = ?', [option, cartId], (error) => {
-                if (error) throw error;
-            })
-        }
+
+        dbConnection.promise().query('SELECT id FROM cart_selected_options WHERE cart_detail_id = ?', cartId).then(([rows]) => {
+            for (let i = 0; i < rows.length; i++) {
+                dbConnection.query('UPDATE cart_selected_options SET option_id = ? WHERE id = ?', [options[i], rows[i].id], (error) => {
+                    if (error) throw error;
+                })
+            }
+        })
+
         req.flash('success_msg', 'แก้ไขสินค้าในตะกร้าแล้ว')
         res.redirect(`/cart`);
 

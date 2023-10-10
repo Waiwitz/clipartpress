@@ -5,7 +5,7 @@ const dbConnection = require("../config/database");
 const multer = require('multer');
 const path = require('path');
 
-
+ 
 // อัพโหลดรูป
 
 const storage_product = multer.diskStorage({
@@ -31,8 +31,7 @@ const addProduct = async (req, res) => {
     const productPic = req.file.path.replace('public', '');
 
     const {
-        width,
-        height,
+        unit,
         sizePrice,
         qty,
         qtyPrice
@@ -45,10 +44,9 @@ const addProduct = async (req, res) => {
         await dbConnection.promise().query('INSERT INTO product SET productName = ?, categories = ?, status = ?, picture = ?, description = ?', [product_name, categories, status, productPic, product_description])
             .then(async ([row]) => {
                 const productId = row.insertId;
-                for (let i = 0; i < width.length; i++) {
+                for (let i = 0; i < unit.length; i++) {
                     const sizes = {
-                        width: width[i],
-                        height: height[i],
+                        size_unit: unit[i],
                         size_price: sizePrice[i],
                         product_id: productId
                     }
@@ -137,8 +135,7 @@ const updateProduct = async (req, res) => {
 
     const {
         sizeId,
-        width,
-        height,
+        unit,
         sizePrice,
         qtyId,
         qty,
@@ -146,8 +143,7 @@ const updateProduct = async (req, res) => {
     } = req.body;
 
     const {
-        newWidth,
-        newHeight,
+        newUnit,
         newSizePrice,
         newQty,
         newQtyPrice
@@ -170,8 +166,7 @@ const updateProduct = async (req, res) => {
             .then(async () => {
                 for (let i = 0; i < sizeId.length; i++) {
                     const sizes = {
-                        width: width[i],
-                        height: height[i],
+                        size_unit: unit[i],
                         size_price: sizePrice[i]
                     }
 
@@ -203,12 +198,10 @@ const updateProduct = async (req, res) => {
 
                 // }
 
-                if ('newWidth' in req.body) {
-                    console.log(newWidth.length);
-                    for (let ns = 0; ns < newWidth.length; ns++) {
+                if ('newUnit' in req.body) {
+                    for (let ns = 0; ns < newUnit.length; ns++) {
                         const sizes = {
-                            width: newWidth[ns],
-                            height: newHeight[ns],
+                            size_unit: newUnit[ns],
                             size_price: newSizePrice[ns],
                             product_id: productId,
                         }

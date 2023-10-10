@@ -103,7 +103,7 @@
                             <% parcel = "ขนาดของชิ้นงาน" %>
                             <% }else if(option.option_type === "papertype"){ %>
                             <% parcel = "ประเภทกระดาษ" %>
-                            <% }else if(option.option_type === "oil"){ %>
+                            <% }else if(option.option_type === "laminating"){ %>
                             <% parcel = "การเคลือบเงา" %>
                             <% }else if(option.option_type === "pumping"){ %>
                             <% parcel = "การปั้ม" %>
@@ -111,7 +111,7 @@
                             <% parcel = "การไดคัท" %>
                             <% }else if(option.option_type === "folding"){ %>
                             <% parcel = "การพับ" %>
-                            <% }else if(option.option_type === "side"){%>
+                            <% }else if(option.option_type === "printside"){%>
                             <% parcel = "ด้านพิมพ์" %>
                             <% } %>
                             <td><%= parcel %></td>
@@ -571,47 +571,58 @@
     </div>
     <div class="modal fade slidedown" id="updateModal" tabindex="-1" aria-labelledby="updateModalLabel"
         aria-hidden="true">
-        <div class="modal-dialog modal-xl">
+        <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="editModalLabel">แก้ไขตัวเลือกวัสดุ</h5>
                     <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form action="/updateOption" id="editForm" method="post">
+                    <form action="/updateOption" id="editForm" method="post" class="needs-validation" novalidate>
                         <input type="hidden" id="id1" name="option_id" value="" />
                         <div class="sub-option-row">
                             <div class="row row-cols-lg-auto mb-4">
-                                <div class="col" style="width: 15%;">
-                                    <div class="option-img ">
-                                        <i class="fa-solid fa-plus"></i>
-                                        <input type="file" name="option_img" onchange="previewImage(event, [0])"
-                                            accept="image/png, image/jpeg" multiple />
-                                        <img src="https://www.solidbackgrounds.com/images/950x350/950x350-white-solid-color-background.jpg"
-                                            alt="" id="option_preview" draggable="false" class="img_option">
+                                <div class="col-2">
+                                    <div class="product-preview-upload me-4 mb-2">
+                                        <div class="option-img">
+                                            <div class="upload-icon">
+                                                <i class="fa-regular fa-image"></i>
+                                                <p>คลิกเพื่อเลือกรูปสินค้า</p>
+                                            </div>
+                                            <input type="file" name="option_img" onchange="previewImage(event, [0])"
+                                                accept="image/png, image/jpeg" multiple class="form-control" multiple
+                                                 />
+                                            <img src="https://www.solidbackgrounds.com/images/950x350/950x350-white-solid-color-background.jpg"
+                                                alt="" id="option_preview" draggable="false" class="img_option">
+                                        </div>
                                     </div>
+                                    <!-- <span class="mx-4"> รองรับไฟล์</span><br>
+                                    <span class="mx-4"> PNG, JPEG</span> -->
                                 </div>
-                                <div class="col" style="width: 42.5%;">
+                                <div class="col">
                                     <div class="form-outline mb-3">
                                         <input type="text" name="option" class="sub-option-name form-control"
                                             id="optionName" required>
                                         <label class="form-label" for="optionName">ชื่อตัวเลือก</label>
                                     </div>
-                                    <div class="form-outline">
+                                    <div class="form-outline mb-3">
                                         <input type="number" name="option_price" id="price"
                                             class="sub-option-price form-control" required>
                                         <label class="form-label">ราคาต่อหน่วย</label>
                                     </div>
-                                </div>
-                                <div class="col" style="width: 42.5%;">
                                     <select class="form-select mb-3" id="parcel"
-                                        <% const values = ['papertype', 'laminating', 'pumping', 'die-cut', 'folding']; %>
-                                        <% const thai = ['ประเภทกระดาษ', 'การเคลือบเงา', 'การปั้ม', 'การไดคัท', 'การพับ']; %>
                                         aria-label="Default select example" name="option_parcel">
-                                        <% for (let i = 0; i < values.length; i++) { %>
-                                        <option value="<%= values[i] %>">
-                                            <%= thai[i] %></option>
-                                        <% } %>
+                                        <option value="papertype">ประเภทกระดาษ</option>
+                                        <option value="laminating">การเคลือบเงา</option>
+                                        <option value="pumping">การปั้ม</option>
+                                        <option value="die-cut">การไดคัท</option>
+                                        <option value="printside">ด้านพิมพ์</option>
+                                        <option value="folding">การพับ</option>
+                                        <optgroup label="ตัวเลือกเฉพาะบิล">
+                                            <option value="color">สี</option>
+                                            <option value="number">รันเลข</option>
+                                            <option value="layer">จำนวนชั้น</option>
+                                        </optgroup>
                                     </select>
                                 </div>
                             </div>
@@ -647,6 +658,7 @@
             </div>
         </div>
     </div>
+
     <script>
         $(document).ready(function () {
             $('.table').DataTable({
@@ -702,7 +714,7 @@
             $("#price").val(price);
             $(".img_option").attr("src", img)
             $("#parcel").val(parcel)
-            $("#product-cb").attr("option", product)
+            // $("#product-cb").attr("option", product)
         });
 
         $(document).ready(function () {

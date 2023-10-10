@@ -3,7 +3,7 @@
 <body class="h-100" style="background-color: rgb(248, 248, 248);">
     <div class="mb-5 secondHead-admin">
         <div class="secondHead-content">
-            <h1>ตัวเลือกสินค้า</h1>
+            <h1>สมาชิก</h1>
             <!-- <ol class="list-unstyled d-flex ">
                 <li class="breadcrumb-item"><a class="link-light" href="#">หน้าแรก</a></li>
                 <li class="active text-light ms-2">/ ตัวเลือกสินค้า</li>
@@ -12,19 +12,19 @@
     </div>
     <div style="padding-bottom: 150px;"></div>
     <div class="box-admin">
-          <% if(success_msg != "") { %>
+        <% if(success_msg != "") { %>
         <% success_msg.forEach((item) => { %>
         <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <strong><%- item %></strong> 
+            <strong><%- item %></strong>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
         <% }); %>
         <% }else if(errors != "") {%>
         <% errors.forEach((item) => { %>
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <strong><%- item %></strong> 
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong><%- item %></strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
         <% }); %>
         <% } %>
         <!-- <div class="d-flex w-50 float-end justify-content-end">
@@ -55,11 +55,10 @@
                             <th></th>
                         </tr>
                     </thead>
-
-
                     <tbody id="user_list">
                         <% if(user.length > 0) {%>
                         <% user.forEach((users) => { %>
+                        <% if (users.deleted_at == null) { %>
                         <tr>
                             <td>
                                 <div class="d-flex align-items-center">
@@ -80,60 +79,111 @@
                                 ยืนยันอีเมลแล้ว
                                 <% } %></td>
                             <td>
-                                <button type="button" class="btn btn-danger btn-edit delete"
-                                    data-mdb-toggle="modal" data-mdb-target="#deleteModal"
-                                    data-user-id="<%= users.user_id %>">
-                                    ลบ
+                                <button type="button" class="btn btn-danger btn-edit delete" data-mdb-toggle="modal"
+                                    data-mdb-target="#deleteModal" data-user-id="<%= users.user_id %>">
+                                    ปิดบัญชี
                                 </button>
                             </td>
                         </tr>
-                        <form action="/deleteUser" method="post">
-                            <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel"
-                                aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="editModalLabel">ลบผู้ใช้</h5>
-                                            <button type="button" class="btn-close" data-mdb-dismiss="modal"
-                                                aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <form action="/deleteType" id="editForm" method="post">
-                                                <div>
-                                                    <p>ต้องการลบผู้ใช้ใช่หรือไม่ ?</p>
-                                                </div>
-                                                <input type="hidden" id="userid" name="user_id" value="" />
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary "
-                                                        data-mdb-dismiss="modal">ยกเลิก</button>
-                                                    <button type="submit" class="btn btn-danger">ยืนยัน</button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
+                        <% } %>
                         <% }); %>
                         <% } %>
-                        <script>
-                            $(document).on("click", ".delete", function () {
-                                var userid = $(this).data("user-id");
-                                $("#userid").val(userid);
-                            });
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
 
-                            $(document).ready(function () {
-                                $('#table').DataTable({
-                                    order: [
-                                        [3, 'desc']
-                                    ],
-                                });
-                            });
-                        </script>
+        <div class="card" style="width: 100%; margin: auto;">
+            <div class="card-body">
+                <table class="table align-middle mb-0 bg-white table-striped" id="table">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>No.</th>
+                            <th>รูปภาพ</th>
+                            <th>ชื่อ</th>
+                            <th>เบอร์โทร</th>
+                            <th>สถานะ</th>
+                            <th>สถานะยืนยัน</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="user_list">
+                        <% if(user.length > 0) {%>
+                        <% user.forEach((users) => { %>
+                        <% if (users.deleted_at !== null) { %>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <p class="fw-normal mb-1"><%= users.user_id %></p>
+                                </div>
+                            </td>
+                            <td class="product-picture">
+                                <img src="<%= users.picture %>" alt="">
+                            </td>
+                            <td>
+                                <p class="fw-normal mb-1"><%= users.name %></p>
+                            </td>
+                            <td><%= users.telephone %></td>
+                            <td><%= users.email %></td>
+                            <td><% if(users.verified == false) { %>
+                                ยังไม่ยืนยันอีเมล
+                                <% }else{ %>
+                                ยืนยันอีเมลแล้ว
+                                <% } %></td>
+                            <td>
+                                <button type="button" class="btn btn-secondary btn-edit delete" data-mdb-toggle="modal"
+                                    data-mdb-target="#deleteModal" data-user-id="<%= users.user_id %>">
+                                    กู้บัญชี
+                                </button>
+                            </td>
+                        </tr>
+                        <% } %>
+                        <% }); %>
+                        <% } %>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
+    <form action="/deleteUser" method="post">
+        <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editModalLabel">ปิดบัญชี</h5>
+                        <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="/deleteType" id="editForm" method="post">
+                            <div>
+                                <p>ต้องการปิดบัญชีนี้ใช่หรือไม่ ?</p>
+                            </div>
+                            <input type="hidden" id="userid" name="user_id" value="" />
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary "
+                                    data-mdb-dismiss="modal">ยกเลิก</button>
+                                <button type="submit" class="btn btn-danger">ยืนยัน</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
 </body>
+<script>
+    $(document).on("click", ".delete", function () {
+        var userid = $(this).data("user-id");
+        $("#userid").val(userid);
+    });
+
+
+    $(document).ready(function () {
+        $('#table').DataTable({
+            order: [
+                [3, 'desc']
+            ],
+        });
+    });
+</script>

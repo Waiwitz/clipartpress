@@ -1,60 +1,148 @@
-<%- include('../partials/header') %> 
+<%- include('../partials/header') %>
+
 <body>
   <!-- <h1>Hello, </h1> -->
-    <div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="carousel">
-        <div class="carousel-inner ">
-          <div class="carousel-item active">
-            <img src="assets/img/large-format-digital-printing.jpg" class="d-block w-100" alt="...">
+  <div class="banner shadow-5-strong">
+    <!-- <img class="imageFitBox" src="/assets/img/Flyers-Brochure-Test-mage.jpg" alt=""> -->
+    <div class="banner-content overlay">
+      <div class="container">
+        <h1 class="fw-bold">โรงพิมพ์ Cilpart Press</h1>
+        <h4 class="mb-3"> บริการสิ่งพิมพ์คุณภาพ
+          ด้วยกระบวนการ Print On Demand</h4>
+        <a href="/product/all">
+          <button class="btn btn-outline-light fs-6">เลือกชมสินค้า</button>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="container">
+    <% if(promotions.length > 0){ %>
+    <div class="mb-3">
+      <h2 class="text-center mb-3 fw-semibold">สินค้าโปรโมชั่น</h2>
+      <div>
+        <div class="itemlist justify-content-center me-0">
+          <% let count = 0; %>
+          <% products.forEach((product) => { %>
+          <% if (promotions.some(promo => promo.product_id === product.product_id) && count < 4) { %>
+          <% count++ %>
+          <div class="card m-1 p-3 mb-4 <%= product.status == 0 ? 'product-refrain' : '' %> ">
+            <div class="promo-sign">
+              <%= promotions[0].promo_name %>
+            </div>
+            <a href="/product/item/<%= product.product_id %>">
+              <div class="pb-1 product_list_card" data-bs-toggle="modal" data-id="<%= product.product_id %>"
+                data-cate="<%= product.categories %>">
+                <% if(product.status == 0) { %>
+                <div class="refrain-sign">
+                  งดรับทำ
+                </div>
+                <% } %>
+                <img src="<%= product.picture %>" class="img-fluid rounded" draggable="false" />
+              </div>
+            </a>
+            <div class="card-body p-0 mt-3">
+              <h5 class="card-title text-truncate"><%= product.productName %></h5>
+              <p class="card-text text-truncate des"><%= product.description %></p>
+            </div>
+            <div class="price">
+              <% const findPrice = priceTiers.filter(price => price.product_id === product.product_id) %>
+              <% let sum = (findPrice[0].size_price + findPrice[0].qty_price) * findPrice[0].quantity %>
+              <span>ราคาเริ่มต้น <%= parseFloat(sum).toFixed(0) %> บาท ต่อ <%= findPrice[0].quantity %>
+                ชิ้น</span>
+            </div>
+            <a href="/product/item/<%= product.product_id %>">
+              <div class="w-100">
+                <button
+                  class="btn btn-primary w-100 enter-product fs-6 <%= product.status == 0 ? 'refrain-button' : '' %>"
+                  data-bs-toggle="modal" data-id="<%= product.product_id %>"
+                  data-cate="<%= product.categories %>">สั่งทำ</button>
+              </div>
+            </a>
           </div>
-          <div class="carousel-item">
-            <img src="assets/img/13257093993_5e605d966d_z.jpg" class="d-block w-100" alt="...">
-          </div>
-          
+          <% } %>
+          <% }); %>
         </div>
-        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="prev">
-          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-          <span class="visually-hidden">Previous</span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="next">
-          <span class="carousel-control-next-icon" aria-hidden="true"></span>
-          <span class="visually-hidden">Next</span>
-        </button>
       </div>
-      <div class="homed">
-        <h5>โรงพิมพ์ Cilpart Press บริการสิ่งพิมพ์คุณภาพ ด้วยประสบการณ์กว่า 30 ปี
-            ด้วยกระบวนการ Print On Demand</h5>
-      </div>
-      <div class="wrap-home-content">
-        <h4>ผลิตภัณฑ์ของเรา</h4>
-        <div class="container-lg d-sm-flex mt-4">
-            <div class="card" style="width: 18rem;">
-                <img src="assets/img/บิล.jpg" class="card-img-top" alt="..." draggable="false">
-                <div class="card-body">
-                  <p class="card-text">บิล</p>
-                </div>
-              </div>
-              <div class="card" style="width: 18rem;">
-                <img src="assets/img/สติ๊กเกอร์.jpg" class="card-img-top" alt="..." draggable="false">
-                <div class="card-body">
-                  <p class="card-text">สติ๊กเกอร์</p>
-                </div>
-              </div>
-              <div class="card" style="width: 20rem;">
-                <img src="assets/img/ซองจดหมาย.jpg" class="card-img-top" alt="..." draggable="false">
-                <div class="card-body">
-                  <p class="card-text">ซองจดหมาย</p>
-                </div>
-              </div>
-              <div class="card" style="width: 18rem;">
-                <img src="assets/img/stockcard.jpg" class="card-img-top" alt="..." draggable="false">
-                <div class="card-body">
-                  <p class="card-text">สต๊อกการ์ด</p>
-                </div>
-              </div>
-          </div>
-      </div>
+    </div>
+    <% } %>
+  </div>
 
-    
+  <div class="wrap-home-content">
+    <h2 class="text-center mb-3 fw-semibold">สินค้าของเรา</h2>
+    <div class="d-flex justify-content-center flex-wrap mt-4">
+      <div class="card allproduct-preview">
+        <img src="assets/img/card1.jpeg" class="card-img-top" alt="..." draggable="false">
+        <div class="p-2">
+          <p class="card-text">นามบัตร</p>
+        </div>
+      </div>
+      <div class="card allproduct-preview">
+        <img src="assets/img/Flyers-Brochure-Test-mage.jpg" class="card-img-top" alt="..." draggable="false">
+        <div class="p-2">
+          <p class="card-text">แผ่นพับ & ใบปลิว</p>
+        </div>
+      </div>
+      <div class="card allproduct-preview">
+        <img src="assets/img/สติ๊กเกอร์.jpg" class="card-img-top" alt="..." draggable="false">
+        <div class="p-2">
+          <p class="card-text">สติ๊กเกอร์</p>
+        </div>
+      </div>
+      <div class="card allproduct-preview">
+        <img src="assets/img/bill1.png" class="card-img-top" alt="..." draggable="false">
+        <div class="p-2">
+          <p class="card-text">บิล</p>
+        </div>
+      </div>
+      <div class="card allproduct-preview">
+        <img src="assets/img/letter1.jpg" class="card-img-top" alt="..." draggable="false">
+        <div class="p-2">
+          <p class="card-text">ซองจดหมาย</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="container mt-5 pt-5">
+    <h2 class="text-center mb-3 fw-semibold">ขั้นตอนการสั่ง</h2>
+    <div class="d-flex my-3 text-center flex-wrap justify-content-center">
+      <div class="card m-1" style="width: 250px; height: 200px;">
+        <div class="card-body">
+          <div>
+            <img src="/assets/img/choose.png" class="w-50 h-50 img-fluid" alt="choose" draggable="false">
+          </div>
+          <p class="card-text mt-4">เลือกสินค้าและออฟชั่น</p>
+        </div>
+      </div>
+      <div class="card m-1" style="width: 250px; height: 200px;">
+        <div class="card-body">
+          <div>
+            <img src="/assets/img/upload.png" class="w-50 h-50 img-fluid" alt="upload" draggable="false">
+          </div>
+          <p class="card-text mt-4">อัปโหลดไฟล์</p>
+        </div>
+      </div>
+      <div class="card m-1" style="width: 250px; height: 200px;">
+        <div class="card-body">
+          <div>
+            <img src="/assets/img/mobile-payment.png" class="w-50 h-50 img-fluid" alt="mobile-payment"
+              draggable="false">
+          </div>
+          <p class="card-text mt-4">ชำระเงิน</p>
+        </div>
+      </div>
+      <div class="card m-1" style="width: 250px; height: 200px;">
+        <div class="card-body">
+          <div>
+            <img src="/assets/img/recieved.png" class="w-50 h-50 img-fluid" alt="recieved" draggable="false">
+          </div>
+          <p class="card-text mt-4">รอรับสินค้า</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </body>
-<%- include('../partials/footer') %> 
+<%- include('../partials/footer') %>
 <%- include('../partials/chat') %>

@@ -1,6 +1,7 @@
 <%- include('../partials/header') %>
+
 <body style="background-color: #f8f8f8;">
-    <div class="banner shadow-5-strong">
+    <!-- <div class="banner shadow-5-strong">
         <img class="imageFitBox" src="/assets/img/Flyers-Brochure-Test-mage.jpg" alt="">
         <div class="banner-content overlay">
             <div>
@@ -11,69 +12,135 @@
                 </ol>
             </div>
         </div>
-    </div>
+    </div> -->
+    
     <div class="container-lg mt-5 mb-5 p-auto">
+        <div>
+            <h1><%= currentMenu %></h1>
+            <ol class="breadcrumb bg-light">
+                <li class="breadcrumb-item"><a href="/">หน้าแรก</a></li>
+                <li class="breadcrumb-item active" aria-current="page"><%= currentMenu %></li>
+            </ol>
+        </div>
         <div class="d-flex">
-            <div class="myorder-tab active" id="waitforpay">
+            <div class="myorder-tab active" data-target="waitpay">
                 <i class="fa-solid fa-hourglass-start me-1"></i>
                 <span>รอชำระ</span>
             </div>
-            <div class="myorder-tab" id="waitforpay">
+            <div class="myorder-tab" data-target="pending">
                 <i class="fa-regular fa-clock me-1"></i>
                 <span>รอตรวจสอบ</span>
             </div>
-            <div class="myorder-tab" id="waitforpay">
-                <i class="fa-solid fa-box me-1"></i>
-                <span>รอจัดส่ง</span>
+            <div class="myorder-tab" data-target="produce">
+                <i class="fa-solid fa-gears me-1"></i>
+                <span>กำลังผลิต</span>
             </div>
-            <div class="myorder-tab" id="waitforpay">
+            <div class="myorder-tab" data-target="shipping">
+                <i class="fa-solid fa-box me-1"></i>
+                <span>ระหว่างจัดส่ง</span>
+            </div>
+            <div class="myorder-tab" data-target="success">
                 <i class="fa-solid fa-truck-fast me-1"></i>
                 <span>จัดส่งสำเร็จ</span>
             </div>
-            <div class="myorder-tab" id="waitforpay">
+            <div class="myorder-tab" data-target="cancel">
                 <i class="fa-solid fa-circle-xmark me-1"></i>
                 <span>ยกเลิก</span>
             </div>
         </div>
-
-        <div>
+        <% const status = ["waitpay","pending","produce","shipping","success","cancel"] %>
+        <% status.forEach((st) => { %>
+        <div class="orders-list" id="<%= st %>">
+            <% if(orders.length > 0) { %>
+            <% let found = false; %>
+            <% orders.forEach((order) => { %>
+            <% if (order.order_status == st && !found) { %>
+            <% found = true; %>
             <div class="card order-item">
-                <div class="card-body m-3">
+                <div class="card-body">
                     <div class="d-flex justify-content-between">
-                        <h3>รายการ 01</h3>
+                        <a class="link fs-4" href="/myorder/invoices/<%= order.order_id %>">ออเดอร์
+                            #<%= order.order_id %></a>
+                        <a class="link" href="/myorder/invoices/<%= order.order_id %>"><button
+                                class="btn btn-secondary fs-6">ดูรายละเอียด</button></a>
                     </div>
                     <hr>
-                    <div class="d-flex">
-                        <div class="col me-3" id="product-picture">
-                            <div class="myorder-product-img">
-                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRudVYQys6rTbDytpASp-NC6nJkVT8Tiq2fog&usqp=CAU"
-                                    alt="" class="imageFitBox">
+                    <div class="">
+                        <% let sumprice = 0; %>
+                        <% order.order_detail.forEach((detail) => { %>
+                        <div class="d-flex flex-wrap">
+                            <div class="col-3 me-3 order-product-img">
+                                <div class="myorder-product-img">
+                                    <img src="<%= detail.picture %>" alt="" class="imageFitBox">
+                                </div>
                             </div>
-                            <button class="btn btn-primary w-100">รายละเอียด</button>
-                        </div>
-                        <div class="col-8">
-                            <div style="height: 160px;">
-                                <h3>ชื่อสินค้า</h3>
-                                <p>วันที่ทำรายการ: </p>
+                            <div class="col-5 option-detail">
+                                <div style="height: 160px;">
+                                    <h4><%= detail.productName %></h4>
+                                    <% detail.options.forEach((option) => { %>
+                                    <span class="mb-2"> <%= option.option_type %> :
+                                        <%= option.option_name %></span><br>
+                                    <% }) %>
+                                </div>
                             </div>
-                            <div class="border-top bottom-price">
-                                <div class="text-center bg-light-subtle">
-                                    <span class="fs-5">฿1000</span>
+                            <div class="d-flex">
+                                <div class="me-3">
+                                    <div class="text-center">
+                                        <h5>จำนวน</h5>
+                                        <span><%= detail.quantity %> ชิ้น</span>
+                                    </div>
+                                </div>
+                                <div class="">
+                                    <div class="text-center">
+                                        <h5>ราคา</h5>
+                                        <span><%= money.format(detail.price) %></span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col border-start" id="right-price">
-                            <div class="text-center m-5 pt-4">
-                                <span class="fs-5">฿1000</span>
+                        <% sumprice += detail.price %>
+                        <% }) %>
+                        <% let vat = sumprice * 7 / 100 %>
+                        <!-- <div class="mx-2">
+                            <div class="text-center">
+                                <h5>ยอดรวม</h5>
+                                <span><%= money.format((sumprice + order.shipment_price + vat) - order.discount) %></span>
                             </div>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
             </div>
+            <% } %>
+            <% }) %>
+            <%   if (!found){ %>
+            <h4 class="text-center mt-5 pt-5">ไม่พบออเดอร์</h4>
+            <% } %>
+            <% }  %>
         </div>
+        <% }) %>
     </div>
     <script>
     </script>
 </body>
+<script>
+    $(document).ready(function () {
+        $('#pending').hide()
+        $('#produce').hide()
+        $('#shipping').hide()
+        $('#success').hide()
+        $('#cancel').hide()
+        $('.myorder-tab').each(function () {
+            $(this).click(function () {
+                $('.myorder-tab').removeClass('active');
+                $(this).addClass('active');
+
+                let target = $(this).data('target')
+                $('.orders-list').hide()
+                $(`#${target}`).show()
+            })
+        })
+    })
+</script>
+
 <%- include('../partials/footer') %>
 <%- include('../partials/chat') %>
