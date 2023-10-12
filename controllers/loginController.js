@@ -98,6 +98,7 @@ let getPageLogin = (req, res) => {
         currentMenu: 'เข้าสู่ระบบ',
         errors: req.flash("errors"),
         Title: 'Clipart Press',
+        close: req.query.close
     });
 };
 

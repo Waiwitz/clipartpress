@@ -91,7 +91,6 @@
 
 
                     <tbody>
-                        <% let sumprice = 0; %>
                         <% let shipmentprice = orders[0].shipment_price; %>
                         <% let couponDiscount = 0; %>
                         <% if (orders[0].discount != null) { %>
@@ -99,6 +98,7 @@
                         <% } %>
                         <% orders.forEach((order, index) => { %>
                         <tr>
+
                             <td style="width: 50px;">
                                 <%= index %>
                             </td>
@@ -106,6 +106,7 @@
                                 <%= order.order_id %>
                             </td>
                             <td>
+                                <% let sumprice = 0; %>
                                 <% order.order_detail.forEach((detail) => { %>
                                 <% sumprice += detail.price %>
                                 - <%= detail.productName %> <br>
@@ -115,27 +116,27 @@
                                 <%= order.userfullname %>
                             </td>
                             <td> <%= datetimeLocal(order.orderdate) %></td>
-                            <td class="status-row">
+                            <td class="status-row text-center">
                                 <% if (order.order_status === 'waitpay') {%>
-                                <div role="button" class="alert-warning p-2 rounded">
+                                <div class=" alert-warning p-2 rounded">
                                     รอชำระ
                                 </div>
                                 <%} else if (order.order_status === 'pending') {%>
-                                <div role="button" class="alert-warning p-2 rounded">รอตรวจสอบ</div>
+                                <div class="alert-warning p-2 rounded">รอตรวจสอบ</div>
                                 <% } else if (order.order_status === 'produce') {%>
-                                <div role="button" class="alert-info  p-2 rounded">
+                                <div class="alert-info  p-2 rounded">
                                     กำลังผลิต
                                 </div>
                                 <% } else if (order.order_status === 'shipping') {%>
-                                <div role="button" class="alert-info p-2 rounded">
+                                <div class="alert-info p-2 rounded">
                                     กำลังจัดส่ง
                                 </div>
                                 <% } else if (order.order_status === 'success') {%>
-                                <div role="button" class="alert-success p-2 rounded">
+                                <div class="alert-success p-2 rounded">
                                     จัดส่งสำเร็จ
                                 </div>
                                 <% } else if (order.order_status === 'cancel') {%>
-                                <div role="button" class="alert-danger p-2 rounded">
+                                <div class="alert-danger p-2 rounded">
                                     ยกเลิก
                                 </div>
                                 <% } %>
@@ -172,13 +173,7 @@
 
 
                     <tbody>
-                        <% let sumprice = 0; %>
-                        <% let shipmentprice = orders[0].shipment_price; %>
-                        <% let couponDiscount = 0; %>
-                        <% if (orders[0].discount != null) { %>
-                        <% couponDiscount = orders[0].discount; %>
-                        <% } %>
-                        <% orders.forEach((order, index) => { %>
+                       <% orders.forEach((order, index) => { %>
                         <% if (order.order_status === item) { %>
                         <tr>
                             <td style="width: 50px;">
@@ -188,6 +183,7 @@
                                 <%= order.order_id %>
                             </td>
                             <td>
+                                <% let sumprice = 0; %> 
                                 <% order.order_detail.forEach((detail) => { %>
                                 <% sumprice += detail.price %>
                                 - <%= detail.productName %> <br>
@@ -197,35 +193,30 @@
                                 <%= order.userfullname %>
                             </td>
                             <td> <%= datetimeLocal(order.orderdate) %></td>
-                            <td class="status-row">
-                                <div role="button" class="editOrder-btn btn p-0 fs-6" data-bs-toggle="modal"
-                                    data-bs-target="#updateModal" data-id="<%= order.order_id %>"
-                                    data-status="<%= order.order_status %>"
-                                    data-tracking="<%= order.tracking_number %>">
-                                    <% if (order.order_status === 'waitpay') {%>
-                                    <div role="button" class="alert-warning p-2 rounded">
-                                        รอชำระ
-                                    </div>
-                                    <%} else if (order.order_status === 'pending') {%>
-                                    <div role="button" class="alert-warning p-2 rounded">รอตรวจสอบ</div>
-                                    <% } else if (order.order_status === 'produce') {%>
-                                    <div role="button" class="alert-info  p-2 rounded">
-                                        กำลังผลิต
-                                    </div>
-                                    <% } else if (order.order_status === 'shipping') {%>
-                                    <div role="button" class="alert-info p-2 rounded">
-                                        กำลังจัดส่ง
-                                    </div>
-                                    <% } else if (order.order_status === 'success') {%>
-                                    <div role="button" class="alert-success p-2 rounded">
-                                        จัดส่งสำเร็จ
-                                    </div>
-                                    <% } else if (order.order_status === 'cancel') {%>
-                                    <div role="button" class="alert-danger p-2 rounded">
-                                        ยกเลิก
-                                    </div>
-                                    <% } %>
+                            <td class="status-row text-center">
+                                <% if (order.order_status === 'waitpay') {%>
+                                <div class="alert-warning p-2 rounded">
+                                    รอชำระ
                                 </div>
+                                <%} else if (order.order_status === 'pending') {%>
+                                <div class="alert-warning p-2 rounded">รอตรวจสอบ</div>
+                                <% } else if (order.order_status === 'produce') {%>
+                                <div class=" text-center alert-info  p-2 rounded">
+                                    กำลังผลิต
+                                </div>
+                                <% } else if (order.order_status === 'shipping') {%>
+                                <div class="alert-info p-2 rounded">
+                                    กำลังจัดส่ง
+                                </div>
+                                <% } else if (order.order_status === 'success') {%>
+                                <div class="alert-success p-2 rounded">
+                                    จัดส่งสำเร็จ
+                                </div>
+                                <% } else if (order.order_status === 'cancel') {%>
+                                <div class="alert-danger p-2 rounded">
+                                    ยกเลิก
+                                </div>
+                                <% } %>
                             </td>
                             <% let vat = sumprice * 7 / 100; %>
                             <td> <%= money.format((sumprice + shipmentprice + vat) - couponDiscount) %></td>
@@ -257,7 +248,7 @@
             [5, 'desc']
         ],
     });
-    
+
     $(document).ready(function () {
         `<% status.forEach((item) => { %>`
         $('#<%= item %>Section').hide();
@@ -274,6 +265,6 @@
         })
 
 
-     
+
     })
-</script>
+</script> 

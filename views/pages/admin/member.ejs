@@ -41,7 +41,13 @@
                 </select>
             </div>
         </div> -->
-        <div class="card" style="width: 100%; margin: auto;">
+        <div class="table-cate-tab">
+            <div class="d-flex">
+                <button class="tab btn active" data-target="activeaccount">ทั้งหมด</button>
+                <button class="tab btn" data-target="closeaccount">บัญชีที่ปิด</button>
+            </div>
+        </div>
+        <div class="card " id="activeaccount" style="width: 100%; margin: auto;">
             <div class="card-body">
                 <table class="table align-middle mb-0 bg-white table-striped" id="table">
                     <thead class="bg-light">
@@ -94,9 +100,9 @@
         </div>
 
 
-        <div class="card" style="width: 100%; margin: auto;">
+        <div class="card" id="closeaccount" style="width: 100%; margin: auto;">
             <div class="card-body">
-                <table class="table align-middle mb-0 bg-white table-striped" id="table">
+                <table class="table align-middle mb-0 bg-white table-striped">
                     <thead class="bg-light">
                         <tr>
                             <th>No.</th>
@@ -132,8 +138,9 @@
                                 ยืนยันอีเมลแล้ว
                                 <% } %></td>
                             <td>
-                                <button type="button" class="btn btn-secondary btn-edit delete" data-mdb-toggle="modal"
-                                    data-mdb-target="#deleteModal" data-user-id="<%= users.user_id %>">
+                                <button type="button" class="btn btn-secondary restore" data-mdb-toggle="modal"
+                                    data-mdb-target="#deleteModal" data-user-id="<%= users.user_id %>"
+                                    data-name="<%= users.name %>">
                                     กู้บัญชี
                                 </button>
                             </td>
@@ -146,44 +153,56 @@
             </div>
         </div>
     </div>
-    <form action="/deleteUser" method="post">
-        <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="editModalLabel">ปิดบัญชี</h5>
-                        <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form action="/deleteType" id="editForm" method="post">
-                            <div>
-                                <p>ต้องการปิดบัญชีนี้ใช่หรือไม่ ?</p>
-                            </div>
-                            <input type="hidden" id="userid" name="user_id" value="" />
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary "
-                                    data-mdb-dismiss="modal">ยกเลิก</button>
-                                <button type="submit" class="btn btn-danger">ยืนยัน</button>
-                            </div>
-                        </form>
-                    </div>
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">ปิดบัญชี</h5>
+                    <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="/deleteType" id="userform" method="post">
+                        <div>
+                            <p>ต้องการปิดบัญชีของ <i class="getname"></i> ใช่หรือไม่ ?</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary " data-mdb-dismiss="modal">ยกเลิก</button>
+                            <button type="submit" class="btn btn-danger">ยืนยัน</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
-    </form>
+    </div>
 </body>
 <script>
     $(document).on("click", ".delete", function () {
         var userid = $(this).data("user-id");
-        $("#userid").val(userid);
+        $('#userform').attr('action', `/deleteUser/${userid}`)
+        $('.getname').text($(this).data('name'));
+    });
+    $(document).on("click", ".restore", function () {
+        var userid = $(this).data("user-id");
+        $('#userform').attr('action', `/restoreUser/${userid}`)
+        $('.getname').text($(this).data('name'));
+
     });
 
 
     $(document).ready(function () {
-        $('#table').DataTable({
+        $('.table').DataTable({
             order: [
                 [3, 'desc']
             ],
         });
+        $('#closeaccount').hide()
+        $('.tab').each(function () {
+            $(this).click(function () {
+                $('.tab').removeClass('active');
+                $(this).addClass('active')
+                $(`.card`).hide()
+                $(`#${$(this).data('target')}`).show()
+            })
+        })
     });
 </script>

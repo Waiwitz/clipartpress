@@ -88,16 +88,16 @@
         </div>
 
         <div class="row">
-            <div class="col card m-2">
+            <div class="col card m-2" style="height: 400px;">
                 <div class="card-body">
-                    <canvas id="orderChart"></canvas>
-
+                    <h3 class="mx-3 mt-2">ยอดขาย</h3>
+                    <canvas id="orderChart" class="w-100"></canvas>
                 </div>
             </div>
-            <div class="col card m-2">
+            <div class="col card m-2" style="height: 400px;">
                 <div class="card-body">
-                    <canvas id="orderChart"></canvas>
-
+                    <h3 class="mx-3 mt-2">สินค้าขายดี</h3>
+                    <canvas id="productpieChart" class="m-auto"></canvas>
                 </div>
             </div>
         </div>
@@ -110,16 +110,17 @@
                             <tr>
                                 <th>#</th>
                                 <th>ออเดอร์</th>
+                                <th>สินค้า</th>
                                 <th>ผู้สั่ง</th>
                                 <th>วันที่สั่ง</th>
                                 <th>สถานะ</th>
                                 <th>ยอดรวม</th>
+                                <th></th>
                             </tr>
                         </thead>
 
 
                         <tbody>
-                            <% let sumprice = 0; %>
                             <% let shipmentprice = orders[0].shipment_price; %>
                             <% let couponDiscount = 0; %>
                             <% orders.forEach((order, index) => { %>
@@ -131,111 +132,61 @@
                                     <%= index %>
                                 </td>
                                 <td>
-                                    <a href="/admin/order/<%= order.order_id %>" class="btn btn-link fs-6">
+                                    <a href="/admin/order/<%= order.order_id %>" class="btn btn-link btn-sm">
                                         #<%= order.order_id %>
                                     </a>
+                                </td>
+                                <td>
+                                    <% let sumprice = 0; %>
+                                    <% order.order_detail.forEach((detail) => { %>
+                                    <% sumprice += detail.price %>
+                                    - <%= detail.productName %> <br>
+                                    <% }) %>
                                 </td>
                                 <td>
                                     <%= order.userfullname %>
                                 </td>
                                 <td> <%= datetimeLocal(order.order_date) %></td>
-                                <td class="status-row">
+                                <td class="status-row text-center">
                                     <% if (order.order_status === 'waitpay') {%>
-                                    <div role="button" class="alert-warning p-2 rounded">
+                                    <div class=" alert-warning p-2 rounded">
                                         รอชำระ
                                     </div>
                                     <%} else if (order.order_status === 'pending') {%>
-                                    <div role="button" class="alert-warning p-2 rounded">รอตรวจสอบ</div>
+                                    <div class="alert-warning p-2 rounded">รอตรวจสอบ</div>
                                     <% } else if (order.order_status === 'produce') {%>
-                                    <div role="button" class="alert-info  p-2 rounded">
+                                    <div class="alert-info  p-2 rounded">
                                         กำลังผลิต
                                     </div>
                                     <% } else if (order.order_status === 'shipping') {%>
-                                    <div role="button" class="alert-info p-2 rounded">
+                                    <div class="alert-info p-2 rounded">
                                         กำลังจัดส่ง
                                     </div>
                                     <% } else if (order.order_status === 'success') {%>
-                                    <div role="button" class="alert-success p-2 rounded">
+                                    <div class="alert-success p-2 rounded">
                                         จัดส่งสำเร็จ
                                     </div>
                                     <% } else if (order.order_status === 'cancel') {%>
-                                    <div role="button" class="alert-danger p-2 rounded">
+                                    <div class="alert-danger p-2 rounded">
                                         ยกเลิก
                                     </div>
                                     <% } %>
                                 </td>
                                 <% let vat = sumprice * 7 / 100; %>
                                 <td> <%= money.format((sumprice + shipmentprice + vat) - couponDiscount) %></td>
-                            </tr>
-                            <% }) %>
-                        </tbody>
-                    </table>
-
-                </div>
-            </div>
-            <div class="col card m-2">
-                <div class="card-body">
-                    <h3 class="mt-3">แจ้งชำระล่าสุด</h3>
-                    <table class="table align-middle mb-0" id="table">
-                        <thead class="bg-light">
-                            <tr>
-                                <th>#</th>
-                                <th>ออเดอร์</th>
-                                <th>หลักฐาน</th>
-                                <th>จำนวนเงิน</th>
-                                <th>ผู้จ่าย</th>
-                                <th>วันที่ชำระ</th>
-                                <th>สถานะ</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-
-
-                        <tbody>
-                            <% payments.forEach((payment, index) => { %>
-                            <tr id="row<%= payment.payment_id %>">
-                                <td style="width: 50px;">
-                                    <%= index %>
-                                </td>
-                                <td style="width: 150px;">
-                                    <a href="/admin/order/<%= payment.order_id %>" class="btn btn-link btn-sm">
-                                        #<%= payment.order_id %>
+                                <td>
+                                    <a href="/admin/order/<%= order.order_id %>" class="btn btn-primary">
+                                        <i class="fa-solid fa-eye fs-5"></i>
                                     </a>
                                 </td>
-                                <td class="slipRow" role="button" data-bs-toggle="modal" data-bs-target="#slipShow"
-                                    data-img="<%= payment.slip %>">
-                                    <img src="<%= payment.slip %>"" alt="" style=" height: 50px; object-fit: cover;">
-                                </td>
-                                <td>
-                                    <%= money.format(payment.amount) %>
-                                </td>
-                                <td><%= payment.name %></td>
-                                <td>
-                                    <%= datetimeLocal(payment.paid_date) %>
-                                </td>
-                                <td id="colStatus<%= payment.payment_id %>">
-                                    <div>
-                                        <% if (payment.payment_status === 'pending') { %>
-                                        <span class="alert-warning p-2">รอตรวจสอบ</span>
-                                        <% } else if (payment.payment_status === 'approved') { %>
-                                        <span class="alert-success p-2">ยืนยัน</span>
-                                        <% } else if (payment.payment_status === 'declined') { %>
-                                        <span class="alert-danger p-2">ปฏิเสธ</span>
-                                        <% } %>
-                                    </div>
-                                </td>
-                                <td class="action-row">
-                                    <button class="btn btn-success actionBtn" data-id="<%= payment.payment_id %>"
-                                        data-status="approved">ยืนยัน</button>
-                                    <button class="btn btn-danger actionBtn" data-id="<%= payment.payment_id %>"
-                                        data-status="declined">ปฏิเสธ</button>
-                                </td>
                             </tr>
                             <% }) %>
                         </tbody>
                     </table>
+
                 </div>
             </div>
+
         </div>
     </div>
     </div>
@@ -243,6 +194,11 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script>
+    $('.table').DataTable({
+        order: [
+            [5, 'desc']
+        ],
+    });
     // JavaScript code to create your chart using Chart.js
     var ctx = document.getElementById('orderChart').getContext('2d');
     var myChart = new Chart(ctx, {
@@ -266,7 +222,33 @@
             }],
         },
         options: {
-            // Chart options (e.g., title, scales, etc.)
+            responsive: false,
+        },
+    });
+
+    var ctx = document.getElementById('productpieChart').getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: 'pie', // Change the chart type as needed
+        data: {
+            labels: ['Label 1', 'Label 2', 'Label 3'],
+            datasets: [{
+                label: 'Dataset Label',
+                data: [10, 20, 30],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                ],
+                borderWidth: 1,
+            }],
+        },
+        options: {
+            responsive: false,
         },
     });
 </script>

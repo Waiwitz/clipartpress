@@ -36,11 +36,22 @@
         <% couponDiscount = orders[0].discount; %>
         <% } %>
         <div class="col">
+            <div class="text-end mb-4">
+                <div role="button" class="editOrder-btn btn btn-primary fs-6" data-bs-toggle="modal"
+                    data-bs-target="#updateModal" data-id="<%= orders[0].order_id %>"
+                    data-status="<%= orders[0].order_status %>" data-tracking="<%= orders[0].tracking_number %>">
+                    ตั้งค่าออเดอร์
+                </div>
+                <% if (orders[0].order_status === 'waitpay' || orders[0].order_status === 'pending') { %>
+                <button class="btn btn-danger fs-6" data-bs-toggle="modal"
+                    data-bs-target="#cancelOrder">ยกเลิกออเดอร์</button>
+                <% } %>
+            </div>
             <div class="card m-0">
                 <div class=" m-3">
                     <div class="card-header mb-3 d-flex justify-content-between">
                         <div class="d-flex">
-                            <h4 class="m-0 me-2 d-inline">รายละเอียดรายการ</h4>
+                            <h4 class="m-0 me-2 d-inline align-self-center">รายละเอียดรายการ</h4>
                             <% if (orders[0].order_status === 'waitpay') {%>
                             <div class="alert-warning p-2 rounded">
                                 รอชำระ
@@ -63,18 +74,6 @@
                             <div class="alert-danger p-2 rounded">
                                 ยกเลิก
                             </div>
-                            <% } %>
-                        </div>
-                        <div>
-                            <div role="button" class="editOrder-btn btn btn-primary fs-6" data-bs-toggle="modal"
-                                data-bs-target="#updateModal" data-id="<%= orders[0].order_id %>"
-                                data-status="<%= orders[0].order_status %>"
-                                data-tracking="<%= orders[0].tracking_number %>">
-                                ตั้งค่าออเดอร์
-                            </div>
-                            <% if (orders[0].order_status === 'waitpay' || orders[0].order_status === 'pending') { %>
-                            <button class="btn btn-danger fs-6" data-bs-toggle="modal"
-                                data-bs-target="#cancelOrder">ยกเลิกออเดอร์</button>
                             <% } %>
                         </div>
                     </div>
@@ -192,6 +191,70 @@
                 </div>
             </div>
         </div>
+
+        <div class="card" style="width: 100%; margin: auto;">
+            <div class="card-header">
+                <h2>การชำระเงิน</h2>
+            </div>
+            <div class="card-body">
+                <table class="table align-middle mb-0 bg-white table-striped" id="table">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>#</th>
+                            <th>ออเดอร์</th>
+                            <th>หลักฐานการชำระเงิน</th>
+                            <th>จำนวนเงิน</th>
+                            <th>ผู้จ่าย</th>
+                            <th>วันที่ชำระ</th>
+                            <th>สถานะ</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% payments.forEach((payment, index) => { %>
+                        <tr id="row<%= payment.payment_id %>">
+                            <td style="width: 50px;">
+                                <%= index %>
+                            </td>
+                            <td style="width: 150px;">
+                                <a href="/admin/order/<%= payment.order_id %>" class="btn btn-link btn-sm">
+                                    #<%= payment.order_id %>
+                                </a>
+                            </td>
+                            <td class="slipRow" role="button" data-bs-toggle="modal" data-bs-target="#slipShow"
+                                data-img="<%= payment.slip %>">
+                                <img src="<%= payment.slip %>"" alt="" style=" height: 50px; object-fit: cover;">
+                            </td>
+                            <td>
+                                <%= money.format(payment.amount) %>
+                            </td>
+                            <td><%= payment.name %></td>
+                            <td>
+                                <%= datetimeLocal(payment.paid_date) %>
+                            </td>
+                            <td id="colStatus<%= payment.payment_id %>">
+                                <div>
+                                    <% if (payment.payment_status === 'pending') { %>
+                                    <span class="alert-warning p-2">รอตรวจสอบ</span>
+                                    <% } else if (payment.payment_status === 'approved') { %>
+                                    <span class="alert-success p-2">ยืนยัน</span>
+                                    <% } else if (payment.payment_status === 'declined') { %>
+                                    <span class="alert-danger p-2">ปฏิเสธ</span>
+                                    <% } %>
+                                </div>
+                            </td>
+                            <td class="action-row">
+                                <button class="btn btn-success actionBtn" data-id="<%= payment.payment_id %>"
+                                    data-status="approved">ยืนยัน</button>
+                                <button class="btn btn-danger actionBtn" data-id="<%= payment.payment_id %>"
+                                    data-status="declined">ปฏิเสธ</button>
+                            </td>
+                        </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
     <div class="modal fade" id="updateModal" tabindex="-1" aria-labelledby="addPromptpayLabel" aria-hidden="true"
         data-mdb-backdrop="static" data-mdb-keyboard="false">
@@ -218,9 +281,8 @@
                             </select>
                         </div>
                         <div class="col pb-3">
-                            <div class="form-outline">
-                                <input type="text" class="form-control" name="trackingNumber" id="trackingNumber"
-                                    pattern="[A-Za-zก-๙ ]+$" maxlength="10">
+                            <div class="form-outline" id="trackingNumberInput">
+                                <input type="text" class="form-control" name="trackingNumber" id="trackingNumber" maxlength="10">
                                 <label for="number" class="form-label">เลขพัสดุ</label>
                                 <div class="invalid-feedback">
                                     กรุณากรอกเลขพัสดุ
@@ -236,6 +298,20 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="slipShow" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header border-bottom-0">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        <img id="slipImg" src="" alt="slipimg" class="w-100 h-100">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 <script>
     document.querySelectorAll('.form-outline').forEach((formOutline) => {
@@ -244,9 +320,64 @@
 
     $(document).ready(function () {
         $('.editOrder-btn').click(function () {
-            $('#updateForm').attr('action', `/updateOrder/${$(this).data('id')}`)
-            $('#statusOrder').val($(this).data('status'))
-            $('#trackingNumber').val($(this).data('tracking'))
+            $('#updateForm').attr('action', `/updateOrder/${$(this).data('id')}`);
+            $('#statusOrder').val($(this).data('status'));
+            $('#trackingNumber').val($(this).data('tracking'));
+        });
+
+        $('#statusOrder').on('change', function() {
+            if ($(this).val() == 'waitpay' || $(this).val() == 'pending' || $(this).val() == 'cancel') {
+                $('#trackingNumberInput').hide();
+            } else {
+                $('#trackingNumberInput').show();
+            }
+        })
+        $('#statusOrder').trigger('change');
+
+    });
+
+    $('.table').DataTable({
+        order: [
+            [5, 'desc']
+        ],
+    });
+
+    $(document).ready(function () {
+        $('.actionBtn').each(function () {
+            $(this).click(function () {
+                var id = $(this).data('id');
+                var statusText = $(this).data('status');
+                let loading = `<div class="spinner-border text-secondary fs-3" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>`
+                const actionRow = $(this).closest('.action-row');
+
+                actionRow.append(loading)
+                $('.actionBtn').prop('disabled', true)
+                $.ajax({
+                    url: `/updatePaymentStatus/${id}/${statusText}`,
+                    type: 'POST',
+                    success: function () {
+                        setTimeout(() => {
+                            $(`#colStatus${id}`).load(location.href +
+                                ` #colStatus${id}`);
+                            $('.spinner-border').remove()
+                            $('.actionBtn').prop('disabled', false)
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'อัพเดทสถานะการชำระเงินสำเร็จ',
+                                text: '',
+                            })
+                        }, 1000);
+                    }
+                })
+            })
+        });
+
+        $('.slipRow').each(function () {
+            $(this).click(function () {
+                $('#slipImg').attr('src', `${$(this).data('img')}`)
+            })
         })
     })
 </script>

@@ -40,8 +40,8 @@
         <% let SumPrice = 0; %>
         <% let SumQty = 0; %>
         <% if(cartsItem.length > 0) { %>
-        <div class="d-flex flex-wrap">
-            <div class="col">
+        <div class="row">
+            <div class="col-xl-8">
                 <% cartsItem.forEach((item) => { %>
                 <% qty = item.quantity %>
                 <% price = item.price %>
@@ -125,7 +125,7 @@
                 </div>
                 <% }) %>
             </div>
-            <div class="col-4">
+            <div class="col-xl-4">
                 <div class="card" style="height: fit-content;">
                     <div class="card-header">
                         <h3>สรุปรายการ</h3>

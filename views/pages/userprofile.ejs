@@ -85,14 +85,17 @@
                     </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form action="/cancelorder/<%= session.user_id %>" class="needs-validation" method="post" novalidate>
+                <form action="/closeAccount" class="needs-validation" method="post" novalidate>
                     <div class="modal-body" id="cancel-modal-body">
                         <p>ทันทีที่คุณปิดใช้งานบัญชีของคุณคุณจะไม่สามารถเข้าถึงบัญชีของคุณได้
                             หากต้องการเปิดใช้งานบัญชีในอนาคตโปรดติดต่อผู้ดูแลระบบ</p>
                         <div class="form-outline mb-4">
-                            <input type="text" id="form1Example2" class="form-control" name="telephone"
-                                value="" />
-                            <label class="form-label" for="form1Example2">ยืนยันรหัสผ่าน</label>
+                            <input type="password" id="password" class="form-control" name="password"
+                                value="" required/>
+                            <label class="form-label" for="password">ยืนยันรหัสผ่าน</label>
+                            <div class="invalid-feedback">
+                                กรุณากรอกรหัสผ่าน
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">

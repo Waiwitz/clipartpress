@@ -87,6 +87,7 @@ app.use(function (req, res, next) {
     res.locals.error_msg = req.flash('error_msg');
     res.locals.warnings = req.flash('warnings');
     res.locals.errors = req.flash('errors');
+    res.locals.info = '';
     res.locals.currentMenu = ''
     res.locals.Title = 'Clipart Press'
     res.locals.message = ''

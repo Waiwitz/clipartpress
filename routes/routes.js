@@ -22,7 +22,9 @@ const shipmentController = require('../controllers/shipmentController');
 
 const QRCode = require('qrcode')
 const generatePayload = require('promptpay-qr');
-const { Chart } = require('chart.js');
+const {
+    Chart
+} = require('chart.js');
 
 
 let Routes = (app) => {
@@ -86,7 +88,7 @@ let Routes = (app) => {
     router.get("/logout", loginController.postLogOut);
 
     // รีเซ็ตรหัสผ่าน
-    router.get('/identify', (req, res) => {
+    router.get('/identify', loginController.checkLoggedOut, (req, res) => {
         res.render('pages/forgetpw', {
             currentMenu: 'ลืมรหัสผ่าน',
             errors: req.flash("errors"),
@@ -95,14 +97,18 @@ let Routes = (app) => {
     });
     router.post("/identify", resetPassword.identify)
 
-    router.get("/resetpassword", (req, res) => {
+    router.get("/resetpassword", loginController.checkLoggedOut, (req, res) => {
         const token = req.query.token;
         // console.log(token);
-        res.render('pages/resetPw', {
-            token,
-            errors: req.flash("errors"),
-            Title: 'Clipart Press',
-        });
+        if (token == undefined) {
+            res.redirect('/')
+        } else {
+            res.render('pages/resetPw', {
+                token,
+                errors: req.flash("errors"),
+                Title: 'Clipart Press',
+            });
+        }
     })
     router.post("/resetpassword", resetPassword.reset);
 
@@ -714,6 +720,7 @@ let Routes = (app) => {
         });
     });
 
+    router.post('/closeAccount', userController.closeAccount);
     // ---------------------------------------------------------------------------------------------------
     // แอดมิน
     router.get('/admin/dashborad', (req, res) => {
@@ -874,7 +881,7 @@ let Routes = (app) => {
                     options: option,
                     currentLink: "option"
                 })
-            })
+            }) 
         })
     });
 
@@ -972,8 +979,6 @@ let Routes = (app) => {
             'JOIN order_product_options opo ON opo.opd_id = opd.opd_id JOIN options o ON o.option_id = opo.option_id WHERE ors.order_id = ?', order_id).then(async ([orders]) => {
             const orderItem = [];
             await dbConnection.promise().query('SELECT co.*, ors.order_id FROM cancelOrder co JOIN orders ors ON co.order_id = ors.order_id WHERE co.order_id = ?', order_id).then(async ([cancel]) => {
-
-
                 orders.forEach((rows) => {
                     const existingOrder = orderItem.find((item) => item.order_id === rows.order_id);
                     if (existingOrder) {
@@ -1045,7 +1050,8 @@ let Routes = (app) => {
                     }
                 });
 
-                await dbConnection.promise().query('SELECT pm.*, ors.order_id FROM payment pm JOIN orders ors ON pm.order_id = ors.order_id WHERE ors.order_id = ?', order_id).then(async ([payment]) => {
+                await dbConnection.promise().query('SELECT p.*, pm.*, ors.*, u.name FROM payment p JOIN payment_method pm ON pm.payment_method_id = p.payment_method_id ' +
+                    'JOIN orders ors ON ors.order_id = p.order_id JOIN users u ON u.user_id = ors.user_id WHERE p.order_id = ?', order_id).then(async ([payments]) => {
                     await dbConnection.promise().query('SELECT s.*, sh.*, ors.order_id FROM ship_address s JOIN orders ors ON s.order_id = ors.order_id JOIN shipments sh ON sh.shipment_id = s.shipment_id WHERE ors.order_id = ?', order_id).then(async ([shipment]) => {
                         await dbConnection.promise().query('SELECT c.*, ors.coupon_id FROM coupon c JOIN orders ors ON c.coupon_id = ors.coupon_id').then(async ([coupon]) => {
                             await dbConnection.promise().query('SELECT * FROM payment_method').then(async ([payment_method]) => {
@@ -1060,7 +1066,7 @@ let Routes = (app) => {
                                     payment_method.forEach((method) => {
                                         if (method.payment_method_id === orders[0].payment_method_id) {
                                             number = decipher.update(method.number, 'hex', 'utf8');
-                                            number += decipher.final('utf8')
+                                           number += decipher.final('utf8')
                                             let Select = {
                                                 payment_method_id: method.payment_method_id,
                                                 method_type: method.method_type,
@@ -1070,7 +1076,7 @@ let Routes = (app) => {
                                             };
                                             Arr.push(Select)
                                         }
-                                    });
+                                    }); 
                                     console.log(Arr);
                                     var SumPrice = 0
                                     var finalPrice = 0
@@ -1112,7 +1118,7 @@ let Routes = (app) => {
                                             Title: `Clipart Press || ออเดอร์ #${order_id}`,
                                             currentLink: "order",
                                             orders: orderItem,
-                                            payment: payment,
+                                            payments: payments,
                                             shipment: shipment,
                                             coupon: coupon,
                                             qrcode: imgQr,
@@ -1306,7 +1312,8 @@ let Routes = (app) => {
             })
         })
     });
-    router.post("/deleteUser", userController.deleteUser);
+    router.post("/deleteUser/:id", userController.deleteUser);
+    router.post("/restoreUser/:id", userController.restoreUser);
 
 
 

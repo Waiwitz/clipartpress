@@ -21,7 +21,7 @@
     }
 
     .itemlist .card {
-        width: 205px;
+        width: 265px;
         height: 320px;
         transition: 0.2s ease-in;
     }
@@ -48,6 +48,33 @@
 }
 
 @media only screen and (max-width: 680px) {
+
+    .order-item .col,
+    .order-item .col-7 {
+        /* width: 100% !important; */
+    }
+
+    .option-detail {
+        display: none;
+    }
+
+    .itemlist .card {
+        width: 235px;
+        transition: 0.2s ease-in;
+    }
+
+    .allproduct-preview {
+        width: 8em;
+        margin: 10px !important;
+    }
+
+    .chat-windows {
+        width: 320px;
+    }
+}
+
+
+@media only screen and (max-width: 390px) {
 
     .order-item .col,
     .order-item .col-7 {

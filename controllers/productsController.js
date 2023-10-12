@@ -5,7 +5,6 @@ const dbConnection = require("../config/database");
 const multer = require('multer');
 const path = require('path');
 
- 
 // อัพโหลดรูป
 
 const storage_product = multer.diskStorage({

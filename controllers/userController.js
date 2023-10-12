@@ -80,12 +80,12 @@ const updateProfile = async (req, res) => {
         req.session.picture = profilePicturePath;
     } else {
         query = 'UPDATE users SET username = ?, email = ? ,name = ?, telephone = ? WHERE user_id = ?'
-    } 
+    }
 
 
     try {
         const data = [username, email, profilePicturePath, name, telephone, req.session.user_id];
-         dbConnection.query(query, data);
+        dbConnection.query(query, data);
         // return res.render('pages/userprofile', { success_msg: ['แก้ไขโปรไฟล์สำเร็จ'] });
         req.flash("success_msg", 'แก้ไขโปรไฟล์สำเร็จ');
         return res.redirect("/userprofile");
@@ -182,7 +182,7 @@ const deleteAddress = async (req, res) => {
 }
 const changepassword = async (req, res) => {
     let errorsArr = [];
-    let validationErr = await validationResult(req);
+    let validationErr = validationResult(req);
     if (!validationErr.isEmpty()) {
         let errors = Object.values(validationErr.mapped());
         errors.forEach((item) => {
@@ -234,7 +234,7 @@ const upload_profile = multer({
 });
 
 const deleteUser = async (req, res) => {
-    const id = req.body.user_id;
+    const id = req.params.id;
     try {
         dbConnection.query("UPDATE users SET deleted_at = CURRENT_TIMESTAMP WHERE user_id = ?", [id]);
         req.flash("success_msg", 'ลบผู้ใช้สำเร็จ');
@@ -243,6 +243,41 @@ const deleteUser = async (req, res) => {
         req.flash("errors", error.message);
         return res.redirect("/admin/member");
     }
+}
+
+const restoreUser = async (req, res) => {
+    const id = req.params.id;
+    try {
+        dbConnection.query("UPDATE users SET deleted_at = NULL WHERE user_id = ?", [id]);
+        req.flash("success_msg", 'กู้คืนใช้สำเร็จ');
+        return res.redirect("/admin/member");
+    } catch (error) {
+        req.flash("errors", error.message);
+        return res.redirect("/admin/member");
+    }
+}
+
+const closeAccount = (req, res) => {
+    const password = req.body.password;
+    dbConnection.promise().query("SELECT * FROM users WHERE user_id = ?", [req.session.user_id])
+        .then(async ([row]) => {
+            try {
+                await bcrypt.compare(password, row[0].password).then(compare_result => {
+                    if (compare_result) {
+                        dbConnection.query('UPDATE users SET deleted_at = now() WHERE user_id = ?', [req.session.user_id]);
+                        req.session.destroy(() => {
+                            return res.redirect("/login?close=1");
+                        })
+                    } else {
+                        req.flash("errors", 'รหัสผ่านไม่ถูกต้องหรือไม่ตรง');
+                        return res.redirect("/userprofile");
+                    }
+                })
+            } catch (error) {
+                console.log(error);
+                return res.redirect("/");
+            }
+        })
 }
 
 
@@ -257,5 +292,7 @@ module.exports = {
     validatePassword: validatePassword,
     changepassword: changepassword,
     upload_profile: upload_profile,
-    deleteUser: deleteUser
+    deleteUser: deleteUser,
+    restoreUser: restoreUser,
+    closeAccount: closeAccount
 }
