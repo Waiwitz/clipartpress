@@ -121,9 +121,9 @@
 
 
                         <tbody>
-                            <% let shipmentprice = orders[0].shipment_price; %>
                             <% let couponDiscount = 0; %>
                             <% orders.forEach((order, index) => { %>
+                            <% let shipmentprice = order.shipment_price; %>
                             <% if (order.discount != null) { %>
                             <% couponDiscount = order.discount; %>
                             <% } %>

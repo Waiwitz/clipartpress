@@ -13,7 +13,7 @@
             </div>
         </div>
     </div> -->
-    
+
     <div class="container-lg mt-5 mb-5 p-auto">
         <div>
             <h1><%= currentMenu %></h1>
@@ -21,6 +21,37 @@
                 <li class="breadcrumb-item"><a href="/">หน้าแรก</a></li>
                 <li class="breadcrumb-item active" aria-current="page"><%= currentMenu %></li>
             </ol>
+        </div>
+        <div class="mt-3">
+            <% if(success_msg != "") { %>
+            <% success_msg.forEach((item) => { %>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <strong><%- item %></strong>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            <% }); %>
+            <% }else if(errors != "") {%>
+            <% errors.forEach((item) => { %>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <strong><%- item %></strong>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            <% }); %>
+            <% }else if(warnings != ""){ %>
+            <% warnings.forEach((item) => { %>
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <strong><%- item %></strong>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            <% }); %>
+            <% } %>
+
+            <% if (typeof close !== 'undefined' && close === '1') { %>
+            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                <strong>ปิดบัญชีเรียบร้อยแล้ว</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            <% } %>
         </div>
         <div class="d-flex">
             <div class="myorder-tab active" data-target="waitpay">
@@ -54,15 +85,28 @@
             <% if(orders.length > 0) { %>
             <% let found = false; %>
             <% orders.forEach((order) => { %>
-            <% if (order.order_status == st && !found) { %>
+            <% if (order.order_status == st) { %>
             <% found = true; %>
             <div class="card order-item">
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <a class="link fs-4" href="/myorder/invoices/<%= order.order_id %>">ออเดอร์
                             #<%= order.order_id %></a>
-                        <a class="link" href="/myorder/invoices/<%= order.order_id %>"><button
-                                class="btn btn-secondary fs-6">ดูรายละเอียด</button></a>
+                        <div>
+                            <% if (order.order_status == 'success') { %>
+                            <% if (reviews.some(row => row.order_id == order.order_id)) { %>
+                            <a class="btn btn-warning fs-6" href="/myorder/review/<%= order.order_id %>">
+                                <i class="fa fa-star"></i>
+                                แก้ไขคะแนน</a>
+                            <% } else { %>
+                            <a class="btn btn-warning fs-6" href="/myorder/review/<%= order.order_id %>">
+                                <i class="fa fa-star"></i>
+                                ให้คะแนน</a>
+                            <% } %>
+                            <% } %>
+                            <a class="link" href="/myorder/invoices/<%= order.order_id %>"><button
+                                    class="btn btn-secondary fs-6">ดูรายละเอียด</button></a>
+                        </div>
                     </div>
                     <hr>
                     <div class="">
@@ -78,8 +122,14 @@
                                 <div style="height: 160px;">
                                     <h4><%= detail.productName %></h4>
                                     <% detail.options.forEach((option) => { %>
-                                    <span class="mb-2"> <%= option.option_type %> :
-                                        <%= option.option_name %></span><br>
+                                    <% let type; %>
+                                    <% if (option.option_type == 'papertype') type = 'กระดาษ' %>
+                                    <% if (option.option_type == 'die-cut') type = 'การไดคัท' %>
+                                    <% if (option.option_type == 'color') type = 'สีกระดาษ' %>
+                                    <% if (option.option_type == 'tear') type = 'แนวฉีก' %>
+                                    <% if (option.option_type == 'printside') type = 'ด้านพิมพ์' %>
+                                    <p class="mb-2"> <%= type %> : <%= option.option_name %></p>
+                                    
                                     <% }) %>
                                 </div>
                             </div>

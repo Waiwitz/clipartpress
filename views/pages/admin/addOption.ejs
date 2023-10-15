@@ -42,7 +42,7 @@
                                                 <p>คลิกเพื่อเลือกรูปสินค้า</p>
                                             </div>
                                             <input type="file" name="option_img[]" onchange="previewImage(event, [0])"
-                                                accept="image/png, image/jpeg" class="form-control" multiple required/>
+                                                accept="image/png, image/jpeg" class="form-control" multiple  />
                                             <img src="/assets/img/white-bg.jpg" id="option_preview[0]" draggable="false"
                                                 class="img_option">
                                         </div>
@@ -57,7 +57,7 @@
                                         <label class="form-label" for="optionName">ชื่อตัวเลือก</label>
                                     </div>
                                     <div class="form-outline">
-                                        <input type="number" name="option_price[]" class="sub-option-price form-control"
+                                        <input type="number" name="option_price[]" class="sub-option-price form-control" value="0"
                                             required>
                                         <label class="form-label">ราคาต่อหน่วย</label>
                                     </div>
@@ -65,17 +65,11 @@
                                 <div class="col" style="width: 42.5%;">
                                     <select class="form-select mb-3" id="parcel" aria-label="Default select example"
                                         name="option_parcel[]">
-                                        <option value="papertype">ประเภทกระดาษ</option>
-                                        <option value="laminating">การเคลือบเงา</option>
-                                        <option value="pumping">การปั้ม</option>
-                                        <option value="die-cut">การไดคัท</option>
+                                        <option value="papertype">กระดาษ</option>
+                                        <!-- <option value="die-cut">การไดคัท</option> -->
                                         <option value="printside">ด้านพิมพ์</option>
-                                        <option value="folding">การพับ</option>
-                                        <optgroup label="ตัวเลือกเฉพาะบิล">
-                                            <option value="color">สี</option>
-                                            <option value="number">รันเลข</option>
-                                            <option value="layer">จำนวนชั้น</option>
-                                        </optgroup>
+                                        <option value="color">สีกระดาษ</option>
+                                        <option value="tear">แนวฉีก</option>
                                     </select>
 
                                     <!-- <select multiple="multiple" id="product-cb" class="option-checkbox w-100"
@@ -167,12 +161,17 @@
                         <div class="sub-option-row">
                             <div class="row row-cols-lg-auto mb-4">
                                 <div class="col" style="width: 15%;">
-                                    <div class="option-img ">
-                                        <i class="fa-solid fa-plus"></i>
-                                        <input type="file" name="option_img[]" onchange="previewImage(event, [${ img }])"
-                                            accept="image/png, image/jpeg" multiple />
-                                        <img src="/assets/img/white-bg.jpg"
-                                            alt="" id="option_preview[${specCount}]" draggable="false" class="img_option">
+                                    <div class="product-preview-upload me-4 mb-2">
+                                        <div class="option-img">
+                                            <div class="upload-icon">
+                                                <i class="fa-regular fa-image"></i>
+                                                <p>คลิกเพื่อเลือกรูปสินค้า</p>
+                                            </div>
+                                            <input type="file" name="option_img[]" onchange="previewImage(event, [${specCount}])"
+                                                accept="image/png, image/jpeg" class="form-control" multiple  />
+                                            <img src="/assets/img/white-bg.jpg" id="option_preview[${specCount}]" draggable="false"
+                                                class="img_option">
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col" style="width: 42.5%;">
@@ -182,7 +181,7 @@
                                         <label class="form-label" for="optionName">ชื่อตัวเลือก</label>
                                     </div>
                                     <div class="form-outline">
-                                        <input type="number" name="option_price[${specCount}]"
+                                        <input type="number" name="option_price[${specCount}]" value="0"
                                             class="sub-option-price form-control" required>
                                         <label class="form-label">ราคาต่อหน่วย</label>
                                     </div>
@@ -190,17 +189,11 @@
                                 <div class="col" style="width: 42.5%;">
                                     <select class="form-select mb-3" id="parcel" aria-label="Default select example"
                                         name="option_parcel[${specCount}]">
-                                        <option value="papertype">ประเภทกระดาษ</option>
-                                        <option value="laminating">การเคลือบเงา</option>
-                                        <option value="pumping">การปั้ม</option>
+                                        <option value="papertype">กระดาษ</option>
                                         <option value="die-cut">การไดคัท</option>
                                         <option value="printside">ด้านพิมพ์</option>
-                                        <option value="folding">การพับ</option>
-                                        <optgroup label="ตัวเลือกเฉพาะบิล">
-                                            <option value="color">สี</option>
-                                            <option value="number">รันเลข</option>
-                                            <option value="layer">จำนวนชั้น</option>
-                                        </optgroup>
+                                        <option value="color">สีกระดาษ</option>
+                                        <option value="tear">แนวฉีก</option>
                                     </select>
                                 </div>
                                 <div class="col">

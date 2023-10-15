@@ -101,6 +101,11 @@
                             <% }) %>
                         </div>
                     </div>
+                    <div class="m-3 col">
+                        <div class="mx-3">
+                            <h4>การจัดส่ง : <%= shipment[0].shipment_name %></h4>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="col">
@@ -209,7 +214,7 @@
                                 <h5 class="alert-info p-3">
                                     กำลังจัดส่ง
                                 </h5>
-                                <span>เลขพัสดุ: </span>
+                                <span>เลขพัสดุ: <%= orders[0].tracking_number %></span>
                                 <% } else if (orders[0].order_status === 'success') {%>
                                 <h5 class="alert-success p-3">
                                     จัดส่งสำเร็จ

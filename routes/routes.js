@@ -25,6 +25,7 @@ const generatePayload = require('promptpay-qr');
 const {
     Chart
 } = require('chart.js');
+const reviewController = require('../controllers/reviewController');
 
 
 let Routes = (app) => {
@@ -108,7 +109,7 @@ let Routes = (app) => {
                 errors: req.flash("errors"),
                 Title: 'Clipart Press',
             });
-        }
+        };
     })
     router.post("/resetpassword", resetPassword.reset);
 
@@ -122,7 +123,7 @@ let Routes = (app) => {
     // ผู้ใช้ ************************************************************************
     // แก้ไขโปรไฟล์
     router.get('/userprofile', verifyToken, (req, res) => {
-        dbConnection.promise().query('SELECT * FROM users WHERE user_id =?', [req.session.user_id]).then(([data]) => {
+        dbConnection.promise().query('SELECT * FROM users WHERE user_id = ?', [req.session.user_id]).then(([data]) => {
             // console.log(data)
             res.render('pages/userprofile', {
                 currentMenu: 'โปรไฟล์',
@@ -228,15 +229,19 @@ let Routes = (app) => {
                                     dbConnection.promise().query('SELECT pm.*, p.*, phm.* FROM promotions pm JOIN product_has_promotion phm ON phm.promo_id = pm.promo_id ' +
                                             'JOIN product p ON p.product_id = phm.product_id WHERE pm.deleted_at IS null AND phm.deleted_at IS null AND phm.product_id = ? AND now() < pm.end_date ', productId)
                                         .then(([promotions]) => {
-                                            res.render('pages/product_detail', {
-                                                currentMenu: "",
-                                                product: row[0],
-                                                options: options,
-                                                sizeTiers: sizeTiers,
-                                                qtyTiers: qtyTiers,
-                                                promotions: promotions,
-                                                currentLink: ""
-                                            })
+                                            dbConnection.promise().query('SELECT r.*, p.product_id, u.* FROM reviews r JOIN product p ON p.product_id = r.product_id JOIN users u ON u.user_id = r.user_id WHERE u.deleted_at is null')
+                                                .then(([reviews]) => {
+                                                    res.render('pages/product_detail', {
+                                                        currentMenu: "",
+                                                        product: row[0],
+                                                        options: options,
+                                                        sizeTiers: sizeTiers,
+                                                        qtyTiers: qtyTiers,
+                                                        promotions: promotions,
+                                                        currentLink: "",
+                                                        reviews: reviews
+                                                    })
+                                                })
                                         })
                                 })
                         });
@@ -529,11 +534,14 @@ let Routes = (app) => {
                     orderItem.push(item);
                 };
             });
-            res.render('pages/myorder', {
-                currentMenu: 'รายการที่สั่ง',
-                Title: 'Clipart Press || รายการที่สั่ง',
-                currentLink: "myorder",
-                orders: orderItem,
+            dbConnection.promise().query('SELECT order_id FROM reviews').then(([reviews]) => {
+                res.render('pages/myorder', {
+                    currentMenu: 'รายการที่สั่ง',
+                    Title: 'Clipart Press || รายการที่สั่ง',
+                    currentLink: "myorder",
+                    orders: orderItem,
+                    reviews: reviews
+                });
             });
         });
     });
@@ -592,10 +600,11 @@ let Routes = (app) => {
                             shipment_price: rows.shipment_price,
                             order_status: rows.order_status,
                             discount: rows.discount,
-                            coupon_id: rows.coupon_id,
+                            coupon_id: rows.coupon_id, 
                             user_id: rows.user_id,
                             payment_method_id: rows.payment_method_id,
                             method_type: rows.method_type,
+                            tracking_number: rows.tracking_number,
                             order_detail: [{
                                 opd_id: rows.opd_id,
                                 size: rows.size,
@@ -701,7 +710,26 @@ let Routes = (app) => {
             });
         });
     });
-    router.post('/changepayment/:oid/:mid', orderController.changePayment)
+
+    router.get('/myorder/review/:id', (req, res) => {
+        const id = req.params.id
+        dbConnection.promise().query("SELECT opd.order_id, p.* FROM product p JOIN order_product_detail opd ON opd.product_id = p.product_id WHERE opd.order_id = ?", id)
+            .then(([products]) => {
+                dbConnection.promise().query("SELECT * FROM reviews WHERE order_id = ?", products[0].order_id).then(([reviews]) => {
+                    res.render('pages/review', {
+                        currentMenu: 'รีวิว',
+                        Title: 'Clipart Press || รีวิว',
+                        currentLink: "review",
+                        products: products,
+                        reviews: reviews,
+                    });
+                })
+            })
+    })
+    router.post('/postReviews/:id', reviewController.postReview);
+
+
+    router.post('/changepayment/:oid/:mid', orderController.changePayment);
     router.post("/uploadslip/:oid/:amount/:method", orderController.upload.single("slip"), orderController.paid);
     router.post("/cancelorder/:oid", orderController.cancel);
     router.get('/example', (req, res) => {
@@ -881,7 +909,7 @@ let Routes = (app) => {
                     options: option,
                     currentLink: "option"
                 })
-            }) 
+            })
         })
     });
 
@@ -971,8 +999,8 @@ let Routes = (app) => {
                 orders: orderItem,
             });
         });
-    })
-    router.post('/updateOrder/:id', orderController.updateOrder);
+    });
+
     router.get('/admin/order/:id', async (req, res) => {
         const order_id = req.params.id;
         await dbConnection.promise().query('SELECT ors.*, opd.*, p.* ,opo.*, o.* FROM orders ors JOIN order_product_detail opd ON opd.order_id = ors.order_id JOIN product p ON p.product_id = opd.product_id ' +
@@ -1051,83 +1079,42 @@ let Routes = (app) => {
                 });
 
                 await dbConnection.promise().query('SELECT p.*, pm.*, ors.*, u.name FROM payment p JOIN payment_method pm ON pm.payment_method_id = p.payment_method_id ' +
-                    'JOIN orders ors ON ors.order_id = p.order_id JOIN users u ON u.user_id = ors.user_id WHERE p.order_id = ?', order_id).then(async ([payments]) => {
+                    'JOIN orders ors ON ors.order_id = p.order_id JOIN users u ON u.user_id = ors.user_id WHERE p.order_id = ? AND p.deleted_at IS NULL', order_id).then(async ([payments]) => {
                     await dbConnection.promise().query('SELECT s.*, sh.*, ors.order_id FROM ship_address s JOIN orders ors ON s.order_id = ors.order_id JOIN shipments sh ON sh.shipment_id = s.shipment_id WHERE ors.order_id = ?', order_id).then(async ([shipment]) => {
-                        await dbConnection.promise().query('SELECT c.*, ors.coupon_id FROM coupon c JOIN orders ors ON c.coupon_id = ors.coupon_id').then(async ([coupon]) => {
-                            await dbConnection.promise().query('SELECT * FROM payment_method').then(async ([payment_method]) => {
-                                if (orderItem.length === 0) { //|| orderItem[0].user_id !== req.session.user_id
-                                    res.redirect('/')
-                                } else {
-                                    const key = Buffer.from('ef045d157e2df86220ee67ac37132a604f51477fef58fdaac52ed312d97a1538', 'hex');
-                                    const iv = Buffer.from('72d78a8a792f98f086bd892600e3638a', 'hex');
-                                    const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
-                                    let number = '';
-                                    var Arr = [];
-                                    payment_method.forEach((method) => {
-                                        if (method.payment_method_id === orders[0].payment_method_id) {
-                                            number = decipher.update(method.number, 'hex', 'utf8');
-                                           number += decipher.final('utf8')
-                                            let Select = {
-                                                payment_method_id: method.payment_method_id,
-                                                method_type: method.method_type,
-                                                method_name: method.method_name,
-                                                number: number,
-                                                name: method.name,
-                                            };
-                                            Arr.push(Select)
-                                        }
-                                    }); 
-                                    console.log(Arr);
-                                    var SumPrice = 0
-                                    var finalPrice = 0
-                                    orderItem[0].order_detail.forEach((order) => {
-                                        SumPrice += order.price
-                                    })
-                                    var vat = SumPrice * 7 / 100;
-                                    let imgQr;
-                                    // if (orderItem[0].coupon_id !== null) {
-                                    //     coupon.forEach((c) => {
-                                    //         if (c.coupon_type == 'value') {
-                                    //             finalPrice = (SumPrice + vat + orderItem[0].shipment_price) - c.discount_value;
-                                    //         } else if (c.coupon_type == 'percent') {
-                                    //             finalPrice = (SumPrice + vat + orderItem[0].shipment_price) - ((SumPrice + vat + shipment_price) * c.discount_value / 100);
-                                    //         }
-                                    //         coupon = c.coupon_id
-                                    //     });
-                                    // } else {
-                                    //     finalPrice = (SumPrice + vat + orderItem[0].shipment_price);
-                                    // }
-
-                                    const amount = parseFloat(finalPrice)
-                                    const payload = generatePayload(number, {
-                                        amount
-                                    });
-                                    const options = {
-                                        color: {
-                                            dark: '#000',
-                                            light: '#fff'
-                                        }
+                        await dbConnection.promise().query('SELECT * FROM payment_method').then(async ([payment_method]) => {
+                            if (orderItem.length === 0) { //|| orderItem[0].user_id !== req.session.user_id
+                                res.redirect('/')
+                            } else {
+                                const key = Buffer.from('ef045d157e2df86220ee67ac37132a604f51477fef58fdaac52ed312d97a1538', 'hex');
+                                const iv = Buffer.from('72d78a8a792f98f086bd892600e3638a', 'hex');
+                                const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
+                                let number = '';
+                                var Arr = [];
+                                payment_method.forEach((method) => {
+                                    if (method.payment_method_id === orders[0].payment_method_id) {
+                                        number = decipher.update(method.number, 'hex', 'utf8');
+                                        number += decipher.final('utf8')
+                                        let Select = {
+                                            payment_method_id: method.payment_method_id,
+                                            method_type: method.method_type,
+                                            method_name: method.method_name,
+                                            number: number,
+                                            name: method.name,
+                                        };
+                                        Arr.push(Select)
                                     }
-                                    QRCode.toDataURL(payload, options, (err, url) => {
-                                        if (err) {
-                                            console.log('generate fail')
-                                            return;
-                                        }
-                                        imgQr = url;
-                                        res.render('pages/admin/orderDetail', {
-                                            Title: `Clipart Press || ออเดอร์ #${order_id}`,
-                                            currentLink: "order",
-                                            orders: orderItem,
-                                            payments: payments,
-                                            shipment: shipment,
-                                            coupon: coupon,
-                                            qrcode: imgQr,
-                                            paymentSelect: Arr,
-                                            cancel: cancel,
-                                        });
-                                    });
-                                };
-                            });
+                                });
+
+                                res.render('pages/admin/orderDetail', {
+                                    Title: `Clipart Press || ออเดอร์ #${order_id}`,
+                                    currentLink: "order",
+                                    orders: orderItem,
+                                    payments: payments,
+                                    shipment: shipment,
+                                    paymentSelect: Arr,
+                                    cancel: cancel,
+                                });
+                            };
                         });
                     });
                 });
@@ -1145,7 +1132,9 @@ let Routes = (app) => {
             });
         });
     });
-    router.post('/updatePaymentStatus/:id/:status', paymentController.updatePaymentStatus);
+    router.post('/updatePaymentStatus/:oid/:pid/:status', orderController.updatePaymentStatus);
+    router.post('/updateOrderShipment/:oid', orderController.updateOrderShipment);
+
     // discount
     router.get('/admin/promotion', (req, res) => {
         dbConnection.promise().query('SELECT * FROM promotions WHERE deleted_at IS null').then(([promotions]) => {

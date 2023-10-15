@@ -61,7 +61,13 @@
                                 <div class="collapse-horizontal">
                                     <p class="mb-2"> ขนาดของชิ้นงาน : <%= item.size %></p>
                                     <% item.options.forEach((option) => {  %>
-                                    <p class="mb-2"> <%= option.option_type %> : <%= option.option_name %></p>
+                                    <% let type; %>
+                                    <% if (option.option_type == 'papertype') type = 'กระดาษ' %>
+                                    <% if (option.option_type == 'die-cut') type = 'การไดคัท' %>
+                                    <% if (option.option_type == 'color') type = 'สีกระดาษ' %>
+                                    <% if (option.option_type == 'tear') type = 'แนวฉีก' %>
+                                    <% if (option.option_type == 'printside') type = 'ด้านพิมพ์' %>
+                                    <p class="mb-2"> <%= type %> : <%= option.option_name %></p>
                                     <% }) %>
                                 </div>
                             </div>
@@ -139,13 +145,6 @@
                                 </span>
                             </div>
                             <div class="my-2 d-flex justify-content-between">
-                                <span>ค่าส่ง</span>
-                                <span>
-                                    <% let ship = 0; %>
-                                    0
-                                </span>
-                            </div>
-                            <div class="my-2 d-flex justify-content-between">
                                 <span>VAT 7%</span>
                                 <span>
                                     <% let vat = SumPrice * 7 / 100;%>
@@ -167,7 +166,7 @@
                             <b>ยอดรวมทั้งหมด</b>
                             <div class="d-flex">
                                 <span class="fw-bold me-2" id="totalPrice">
-                                    <%=money.format(SumPrice + ship + vat) %>
+                                    <%=money.format(SumPrice +  vat) %>
                                 </span>
                                 <span class="fw-bold" id="newPrice">
                                 </span>

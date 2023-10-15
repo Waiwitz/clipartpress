@@ -94,25 +94,9 @@ const deletemethod = (req, res) => {
     // res.send(number)
 };
 
-const updatePaymentStatus = (req, res) => {
-    const id = req.params.id;
-    const statustext = req.params.status
-    try {
-        dbConnection.promise().query('UPDATE payment SET payment_status = ? WHERE payment_id = ?', [statustext, id]).then(() => {
-            res.json({
-                message: 'data updated'
-            });
-        });
-    } catch (error) {
-        console.log(error);
-        res.json({
-            message: 'error'
-        });
-    }
-};
+
 module.exports = {
     addmethod: addmethod,
     editmethod: editmethod,
     deletemethod: deletemethod,
-    updatePaymentStatus: updatePaymentStatus
 }

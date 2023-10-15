@@ -83,13 +83,13 @@
           <span class="align-self-center">สินค้า</span>
           <i class="fas fa-caret-down text-end"></i>
         </div>
-        <div class="collapse <%= currentLink == "option" ? 'show' : " "%>" id="product">
-          <a class="admin-navlink <%= currentLink == 'option' ? 'admin-nav-active' : " "%>" href="/admin/options">
-            <span class="ms-5 align-self-center">ออฟชั่นสินค้า</span>
-          </a>
+        <div class="collapse <%= currentLink == "allproduct" || currentLink == "option" ? 'show' : " "%>" id="product">
           <a class="admin-navlink <%= currentLink == 'allproduct' ? 'admin-nav-active' : " "%>"
             href="/admin/product-list">
             <span class="ms-5 align-self-center">จัดการสินค้า</span>
+          </a>
+          <a class="admin-navlink <%= currentLink == 'option' ? 'admin-nav-active' : " "%>" href="/admin/options">
+            <span class="ms-5 align-self-center">ออฟชั่นสินค้า</span>
           </a>
         </div>
       </li>

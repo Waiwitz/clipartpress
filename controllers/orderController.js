@@ -78,9 +78,9 @@ const placeOrder = (req, res) => {
                                     }
                                 }
                             }
-                            SumPrice += price
-                            SumQty += qty
                         })
+                        SumPrice += price
+                        SumQty += qty
                     });
                     let coupon = null;
                     var vat = SumPrice * 7 / 100
@@ -112,6 +112,8 @@ const placeOrder = (req, res) => {
                                 });
                             })
                         }
+                        console.log(SumPrice);
+                        console.log(discount);
                         dbConnection.promise().query('INSERT INTO orders SET order_date = NOW(), order_status = "waitpay", discount = ?, user_id = ?, coupon_id = ?, shipment_price = ?, payment_method_id = ?', [discount, req.session.user_id, coupon, shipment_price, paymentMethod])
                             .then(([order]) => {
                                 const order_id = order.insertId;
@@ -201,18 +203,74 @@ const cancel = (req, res) => {
     res.redirect(`/myorder/invoices/${oid}`);
 }
 
-const updateOrder = (req, res) => {
-    const oid = req.params.id;
-    const {
-        statusOrder,
-        trackingNumber
-    } = req.body
-    console.log(req.body);
-    dbConnection.promise().query('UPDATE orders SET order_status = ?, tracking_number = ? WHERE order_id = ?', [statusOrder, trackingNumber, oid], (err, results) => {
-        console.log(err);
+const AdminCancel = (req, res) => {
+    const oid = req.params.oid;
+    const reason = req.body.reason;
+    dbConnection.promise().query('UPDATE orders SET order_status = "cancel" WHERE order_id = ?', [oid], (err) => {
         if (err) throw err;
     });
-    req.flash('success_msg', 'แก้ไขออเดอร์สำเร็จ')
+    dbConnection.promise().query('INSERT INTO cancelOrder SET reason = ?, order_id = ?', [reason, oid], (err) => {
+        if (err) throw err;
+    });
+    req.flash(``);
+    res.redirect(`/admin/order/${oid}`);
+}
+
+// const updateOrder = (req, res) => {
+//     const oid = req.params.id;
+//     const {
+//         statusOrder,
+//         trackingNumber
+//     } = req.body
+//     console.log(req.body);
+//     dbConnection.promise().query('UPDATE orders SET order_status = ?, tracking_number = ? WHERE order_id = ?', [statusOrder, trackingNumber, oid], (err, results) => {
+//         console.log(err);
+//         if (err) throw err;
+//     });
+//     req.flash('success_msg', 'แก้ไขออเดอร์สำเร็จ')
+//     res.redirect(`/admin/order/${oid}`);
+// }
+
+const updatePaymentStatus = (req, res) => {
+    const oid = req.params.oid;
+    const pid = req.params.pid;
+    const statustext = req.params.status
+    // const {
+    //     statusOrder,
+    //     trackingNumber
+    // } = req.body
+    console.log(req.body);
+    let order_status;
+    if (statustext == 'approved') {
+        order_status = 'produce';
+    } else if (statustext == 'declined') {
+        order_status = 'waitpay';
+    }
+
+    dbConnection.promise().query('UPDATE payment SET payment_status = ? WHERE payment_id = ?', [statustext, pid], (err, results) => {
+        res.json({
+            message: 'error'
+        });
+    })
+    dbConnection.promise().query('UPDATE orders SET order_status = ? WHERE order_id = ?', [order_status, oid], (err, results) => {
+        console.log(err);
+        res.json({
+            message: 'error'
+        });
+    });
+    res.json({
+        message: 'data updated'
+    });
+};
+
+const updateOrderShipment = (req, res) => {
+    const oid = req.params.oid;
+    const trackingNumber = req.body.trackingNumber;
+    dbConnection.promise().query('UPDATE orders SET order_status = "shipping", tracking_number = ? WHERE order_id = ?', [trackingNumber, oid], (err, results) => {
+        console.log(err);
+        res.redirect(`/admin/order/${oid}`);
+    });
+    req.flash('success_msg', 'เปลี่ยนสถานะเป็นจัดส่งและเพิ่มหมายเลขพัสดุให้ลูกค้าเรียบร้อยแล้ว')
     res.redirect(`/admin/order/${oid}`);
 }
 
@@ -222,5 +280,7 @@ module.exports = {
     upload: upload,
     paid: paid,
     cancel: cancel,
-    updateOrder: updateOrder
+    AdminCancel: AdminCancel,
+    updatePaymentStatus: updatePaymentStatus,
+    updateOrderShipment: updateOrderShipment
 }

@@ -3,7 +3,7 @@
 <body class="h-100">
     <div class="container-lg mt-5">
         <div class="d-flex justify-content-between flex-wrap">
-            <div class="left-box-product">
+            <div class="col-md-5 left-box-product">
                 <div class="card productPic">
                     <div class="card-body p-0">
                         <span class="product_name"><%= product.productName %></span>
@@ -47,38 +47,14 @@
                     </div>
                     <div class="card-body">
                         <% let i = 1; %>
-                        <% const card = ['ประเภทกระดาษ', 'ด้านพิมพ์', 'การปั้ม', 'การเคลือบ'] %>
-                        <% const flyer = ['ประเภทกระดาษ', 'ด้านพิมพ์', 'การเคลือบ'] %>
-                        <% const leaflet = ['ประเภทกระดาษ', 'ด้านพิมพ์', 'การพับ', 'การเคลือบ'] %>
-                        <% const sticker = ['ประเภทกระดาษ', 'การปั้ม', 'การไดคัท'] %>
-                        <% const bill = ['ประเภทกระดาษ', 'สี', 'จำนวนชั้น', 'รันเลข'] %>
-                        <% const letter = ['ประเภทกระดาษ', 'ด้านพิมพ์', 'การปั้ม'] %>
+                        <% const sticker = ['กระดาษ', 'การไดคัท'] %>
+                        <% const bill = ['กระดาษ', 'สีกระดาษ', 'แนวฉีก'] %>
+                        <% const envelope = ['กระดาษ', 'ด้านพิมพ์'] %>
                         <div class="d-flex justify-content-between fs-5">
                             <p>ขนาดของชิ้นงาน</p>
                             <p class="select-option" id="select-option-<%= i++ %>">-</p>
                         </div>
-                        <% if (product.categories == 'card') { %>
-                        <% card.forEach((item) => { %>
-                        <div class="d-flex justify-content-between fs-5">
-                            <p><%= item %></p>
-                            <p class="select-option" id="select-option-<%= i++ %>">-</p>
-                        </div>
-                        <% }) %>
-                        <% } else if (product.categories == 'flyer') { %>
-                        <% flyer.forEach((item) => { %>
-                        <div class="d-flex justify-content-between fs-5">
-                            <p><%= item %></p>
-                            <p class="select-option" id="select-option-<%= i++ %>">-</p>
-                        </div>
-                        <% }) %>
-                        <% } else if (product.categories == 'leaflet') { %>
-                        <% leaflet.forEach((item) => { %>
-                        <div class="d-flex justify-content-between fs-5">
-                            <p><%= item %></p>
-                            <p class="select-option" id="select-option-<%= i++ %>">-</p>
-                        </div>
-                        <% }) %>
-                        <% } else if (product.categories == 'sticker') { %>
+                        <% if (product.categories == 'sticker') { %>
                         <% sticker.forEach((item) => { %>
                         <div class="d-flex justify-content-between fs-5">
                             <p><%= item %></p>
@@ -93,7 +69,7 @@
                         </div>
                         <% }) %>
                         <% } else if (product.categories == 'letter') { %>
-                        <% letter.forEach((item) => { %>
+                        <% envelope.forEach((item) => { %>
                         <div class="d-flex justify-content-between fs-5">
                             <p><%= item %></p>
                             <p class="select-option" id="select-option-<%= i++ %>">-</p>
@@ -108,7 +84,7 @@
                 </div>
             </div>
 
-            <div class="right-box-product p-3">
+            <div class="col card right-box-product p-3 mt-3">
                 <form action="/updateCart/<%= cart_detail[0].cart_detail_id %>" method="post"
                     enctype="multipart/form-data">
                     <div class="w-75 m-auto">
@@ -122,41 +98,22 @@
                                     <i class="fa-solid fa-circle-question"></i>
                                     <% } %>
                                     <div class="des-question">
-                                        <p>ขนาดของตัวสติ๊กเกอร์ที่จะถูกพิมพ์ลงบนแผ่น A3 หรือ A4</p>
+                                        <p>ขนาดของตัวสติ๊กเกอร์ที่จะถูกพิมพ์ลงบนแผ่น A3</p>
                                     </div>
                                 </legend>
                                 <hr>
                                 <select class="form-select" id="size" name="size">
-                                    <% if(product.categories === 'card'){ %>
-                                    <option value="9x5.5">9 x 5.5 cm (ขนาดมาตรฐานสากล)</option>
-                                    <option value="9x5">9 x 5 cm</option>
-                                    <option value="8x5.5">8 x 5.5 cm</option>
-                                    <% } else if(product.categories === 'flyer') { %>
-
-                                    <% } else if(product.categories === 'leaflet') { %>
-
-                                    <% } else if(product.categories === 'sticker') { %>
-                                    <option value="3x3">3 x 3 cm</option>
-                                    <option value="4x4">4 x 4 cm</option>
-                                    <option value="5x5">5 x 5 cm</option>
-                                    <option value="6x6">6 x 6 cm</option>
-                                    <% } else if(product.categories === 'bill') { %>
-
-                                    <% } else if(product.categories === 'letter') { %>
-                                    <option value="4.125x9.5">เบอร์ 10 4.125 x 9.5 inch</option>
-                                    <option value="3.875x8.875">เบอร์ 9 3.875 x 8.875 inch</option>
-                                    <option value="4.375x5.75">A2 4.375 x 5.75 inch</option>
-                                    <option value="4.75x6.5">A6 4.75 X 6.5 inch</option>
-                                    <option value="5.25x7.25">A7 5.25 x 7.25 inch</option>
-                                    <option value="9x12">9 x 12 inch</option>
-                                    <% } %>
+                                    <% sizeTiers.forEach((size) => { %>
+                                    <option value="<%= size.size_unit %>" data-id="<%= size.tierSize_id %>">
+                                        <%= size.size_unit %></option>
+                                    <% }) %>>
                                 </select>
 
-                                <% if (product.categories != 'card') { %>
+                                <!-- <% if (product.categories != 'card') { %>
                                 <button type="button" id="customSizeBtn" class="btn btn-primary w-100 my-2 fs-6"
                                     data-mdb-toggle="modal"
                                     data-mdb-target="#customSizeModal">กำหนดขนาดชิ้นงานเอง</button>
-                                <% } %>
+                                <% } %> -->
                                 <div id="countSticker1" style="display: none;">
                                     <p style="font-size: 18px;">จำนวนที่จะได้รับสติ๊กเกอร์บนกระดาษ A3+ คือ <span
                                             id="per-sticker"></span> ดวงต่อแผ่น</p>
@@ -211,13 +168,7 @@
                                 </div>
                             </div>
 
-                            <% if(product.categories === 'card'){ %>
-                            <%- include('./product_select/card', { count: count, options: options }) %>
-                            <% } else if(product.categories === 'flyer') { %>
-                            <%- include('./product_select/flyer', { count: count, options: options }) %>
-                            <% } else if(product.categories === 'leaflet') { %>
-                            <%- include('./product_select/leaflet', { count: count, options: options }) %>
-                            <% } else if(product.categories === 'sticker') { %>
+                            <% if(product.categories === 'sticker') { %>
                             <%- include('./product_select/sticker', { count: count, options: options }) %>
                             <% } else if(product.categories === 'bill') { %>
                             <%- include('./product_select/bill', { count: count, options: options }) %>
@@ -230,27 +181,17 @@
                                 <hr>
                                 <select name="qt" id="qt-select" class="form-select">
                                     <% let unit = '' %>
-                                    <% if(product.categories === 'card' || product.categories === 'flyer' ){ %>
-                                    <% unit = 'ใบ' %>
-                                    <% } else if(product.categories === 'leaflet') { %>
+                                    <% if(product.categories === 'sticker') { %>
                                     <% unit = 'แผ่น' %>
-                                    <% } else if(product.categories === 'sticker') { %>
-                                    <% unit = 'แผ่น' %>
-
                                     <% } else if(product.categories === 'bill') { %>
                                     <% unit = 'เล่ม' %>
-                                    <% } else if(product.categories === 'letter') { %>
+                                    <% } else if(product.categories === 'envelope') { %>
                                     <% unit = 'ซอง' %>
                                     <% } %>
-                                    <option value="10">10 <%= unit %></option>
-                                    <option value="50">50 <%= unit %></option>
-                                    <option value="100">100 <%= unit %></option>
-                                    <option value="200">200 <%= unit %></option>
-                                    <option value="500">500 <%= unit %></option>
-                                    <option value="1000">1000 <%= unit %></option>
-                                    <option value="2000">2500 <%= unit %></option>
-                                    <option value="2000">5000 <%= unit %></option>
-                                    <option value="2000">10000 <%= unit %></option>
+
+                                    <% qtyTiers.forEach((qty) => { %>
+                                    <option value="<%= qty.quantity %>"><%= qty.quantity %> <%= unit %></option>
+                                    <% }) %>
                                 </select>
                                 <div id="countSticker2" style="display: none;">
                                     <p style="font-size: 18px;">จำนวนดวงสติ๊กเกอร์ที่จะได้ทั้งหมดคือ <span
@@ -434,7 +375,7 @@
     const product = JSON.parse('<%- JSON.stringify(product) %>')
 
     function calculatePrice() {
-        optionSum = 0;
+        let optionSum = 0;
         $('select.radio-choice').each(function () {
             const selectedOption = $(this).find('option:selected');
             const dataPrice = selectedOption.data('price');
@@ -443,9 +384,10 @@
             }
         });
 
-        const sizeTier = $('#size').find('option:selected').val(); // ขนาด
+        const size = $('#size').find('option:selected').val(); // ขนาด
         const qtTier = $('#qt-select').find('option:selected').val(); // จำนวน
-        const [width, height] = sizeTier.split('x');
+        // const [width, height] = sizeTier.split('x');
+
 
         let widthprice;
         let heightprice;
@@ -465,10 +407,8 @@
 
         sizePrice = sizeTiers[0].size_price; // Set a default price
 
-        for (let s = 0; s < sizeTiers.length; s++) {
-            if (width >= sizeTiers[s].size_unit || height >= sizeTiers[s].size_unit) {
-                sizePrice = sizeTiers[s].size_price;
-            }
+        for (let s = 0; s < sizeTiers.length && size == qtyTiers[s].size_unit; s++) {
+            sizePrice = sizeTiers[s].size_price;
         }
         // for (let h = 0; h < sizeTiers.length && heightprice >= sizeTiers[h].height; h++) {
         //     const element = array[s];
@@ -480,7 +420,7 @@
         //     return;
         // }
 
-        console.log(`${width} x ${height}`);
+        console.log(`${size}`);
         console.log(`ราคาปริมาณต่อหน่วย : ${qtprice}`);
         // const totalSize = widthprice + heightprice;
         const perUnitSum = qtprice + sizePrice;
@@ -572,10 +512,9 @@
 
     $(document).ready(function () {
         const productCate = `<%- product.categories  %>`
-        if (productCate === 'sticker') {
-            $('#countSticker1, #countSticker2').show()
-        }
-        let optionSum = 0;
+        // if (productCate === 'sticker') {
+        //     $('#countSticker1, #countSticker2').show()
+        // }
         $('select.form-select').on('change', calculatePrice);
         calculatePrice();
     });

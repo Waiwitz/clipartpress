@@ -53,7 +53,7 @@ const updateCart = async (req, res) => {
     const cartId = req.params.cartDetailid;
     // const userId = req.session.user_id;
     const quantity = req.body.qt;
-    let artwork;
+    let artwork; 
     if (req.file) {
         artwork = req.file.path.replace('public', '');
     }

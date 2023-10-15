@@ -53,6 +53,7 @@ app.use(express.urlencoded({
 }));
 app.set('view engine', 'ejs');
 app.use(express.static(path.join(__dirname, '/public')));
+app.use('/node_modules', express.static(__dirname + '/node_modules'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
     extended: true

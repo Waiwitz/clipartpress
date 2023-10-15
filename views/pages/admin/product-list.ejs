@@ -38,16 +38,13 @@
         <div class="table-cate-tab">
             <div class="d-flex">
                 <button class="tab btn active" data-target="all-tb">ทั้งหมด</button>
-                <button class="tab btn" data-target="card-tb">นามบัตร</button>
-                <button class="tab btn" data-target="flyer-tb">ใบปลิว</button>
-                <button class="tab btn" data-target="leaflet-tb">แผ่นพับ</button>
-                <button class="tab btn" data-target="sticker-tb">สติ๊กเกอร์</button>
                 <button class="tab btn" data-target="bill-tb">บิล</button>
+                <button class="tab btn" data-target="sticker-tb">สติ๊กเกอร์</button>
                 <button class="tab btn" data-target="envelope-tb">ซองจดหมาย</button>
             </div>
         </div>
 
-        <% const cate = ['card','flyer','leaflet','sticker','bill','envelope'] %>
+        <% const cate = ['bill', 'sticker', 'envelope'] %>
 
         <div class="card shadow-5-strong" id="all-tb" style="width: 100%; margin: auto; border-top-left-radius: 0;">
             <div class="card-body">
@@ -79,7 +76,13 @@
                             <td>
                                 <p class="fw-normal mb-1"><%= product.productName %></p>
                             </td>
-                            <td><%= product.categories %></td>
+                            <td>
+                                <% let cate; %>
+                                <% if (product.categories == 'bill') cate = 'บิล' %>
+                                <% if (product.categories == 'sticker') cate = 'สติ๊กเกอร์' %>
+                                <% if (product.categories == 'envelope') cate = 'ซองจดหมาย' %>
+                                <%= cate %>
+                            </td>
                             <td><% if(product.status = 1) { %>
                                 เปิดรับทำ
                                 <% }else if(product.status = 0){ %>
@@ -106,7 +109,8 @@
             </div>
         </div>
         <% cate.forEach((item) => { %>
-        <div class="card shadow-5-strong" id="<%= item %>-tb" style="width: 100%; margin: auto; border-top-left-radius: 0;">
+        <div class="card shadow-5-strong" id="<%= item %>-tb"
+            style="width: 100%; margin: auto; border-top-left-radius: 0;">
             <div class="card-body">
                 <table class="table align-middle mb-0 bg-white tb">
                     <thead class="bg-light">

@@ -31,7 +31,7 @@
                         <h4>รายละเอียดสินค้า</h4>
                     </div>
                     <div class="card-body">
-                        <div class="d-flex ">
+                        <div class="d-flex">
                             <div>
                                 <div class="product-preview-upload me-4 mb-2" style="margin-top: 33px;">
                                     <div class="option-img">
@@ -63,11 +63,8 @@
                                             class="text-danger ms-2">*</span></label> <br>
                                     <select class="form-select" id="categories" style="height: 35px;" name="categories"
                                         required>
-                                        <option value="card">นามบัตร</option>
-                                        <option value="flyer">ใบปลิว</option>
-                                        <option value="leaflet">แผ่บพับ</option>
-                                        <option value="sticker">สติ๊กเกอร์</option>
                                         <option value="bill">ใบบิล</option>
+                                        <option value="sticker">สติ๊กเกอร์</option>
                                         <option value="envelope">ซองจดหมาย</option>
                                     </select>
                                 </div>
@@ -153,7 +150,7 @@
                         </div>
                         <div class="card-body">
                             <div class="row">
-                                <div class="col-4 mb-3 tier">
+                                <div class="col-3 mb-3 tier">
                                     <div class="rounded border p-2 mb-2 me-2"
                                         style="width: fit-content; height: 540px;">
                                         <div class="m-2">
@@ -170,9 +167,9 @@
                                                 <div class="d-flex mb-2 sizeTierRow" style="height: 36px;">
                                                     <div class="me-2">
                                                         <div class="form-outline" style="width: 85px;">
-                                                            <input type="number" class="form-control" name="unit[0][]"
-                                                                required step="0.01" min="0">
-                                                            <label class="form-label">ค่าขนาด<span
+                                                            <input type="text" class="form-control" name="unit[0][]" placeholder="เช่น 1x1"
+                                                                required>
+                                                            <label class="form-label">ขนาด<span
                                                                     class="text-danger ms-2">*</span></label>
                                                         </div>
                                                     </div>
@@ -416,73 +413,25 @@
             new mdb.Input(formOutline).init();
         });
 
-        const cardEng = ['papertype', 'printside', 'pumping', 'laminating']
-        const flyerEng = ['papertype', 'printside', 'laminating']
-        const leafletEng = ['papertype', 'printside', 'folding', 'laminating']
-        const stickerEng = ['papertype', 'pumping', 'die-cut']
-        const billEng = ['papertype', 'color', 'layer', 'number']
-        const envelopeEng = ['papertype', 'printside', 'pumping']
-
-        const card = ['ประเภทกระดาษ', 'ด้านพิมพ์', 'การปั้ม', 'การเคลือบ']
-        const flyer = ['ประเภทกระดาษ', 'ด้านพิมพ์', 'การเคลือบ']
-        const leaflet = ['ประเภทกระดาษ', 'ด้านพิมพ์', 'การพับ', 'การเคลือบ']
-        const sticker = ['ประเภทกระดาษ', 'การปั้ม', 'การไดคัท']
-        const bill = ['ประเภทกระดาษ', 'สี', 'จำนวนชั้น', 'รันเลข']
-        const envelope = ['ประเภทกระดาษ', 'ด้านพิมพ์', 'การปั้ม']
+        // const cardEng = ['papertype', 'printside', 'pumping', 'laminating']
+        // const flyerEng = ['papertype', 'printside', 'laminating']
+        // const leafletEng = ['papertype', 'printside', 'folding', 'laminating']
+        const stickerEng = ['papertype'];
+        const billEng = ['papertype', 'color', 'tear'];
+        const envelopeEng = ['papertype', 'printside'];
+        // const card = ['ประเภทกระดาษ', 'ด้านพิมพ์', 'การปั้ม', 'การเคลือบ']
+        // const flyer = ['ประเภทกระดาษ', 'ด้านพิมพ์', 'การเคลือบ']
+        // const leaflet = ['ประเภทกระดาษ', 'ด้านพิมพ์', 'การพับ', 'การเคลือบ']
+        const sticker = ['กระดาษ'];
+        const bill = ['กระดาษ', 'สีกระดาษ', 'แนวฉีก'];
+        const envelope = ['กระดาษ', 'ด้านพิมพ์'];
 
         $(document).ready(function () {
             const options = JSON.parse('<%- JSON.stringify(options) %>');
             $("#categories").change(function () {
                 var selectedCategory = $(this).val();
                 var form = '';
-                if (selectedCategory === "card") {
-                    cardEng.forEach((item, index) => {
-                        form += `
-        <div class="border p-4 rounded option-box mb-2">
-            <input type="hidden" name="option_type[${index}]">
-          <h5 class="d-inline">${card[index]}</h5> <span class="text-danger ms-2">*</span>
-          <select multiple="multiple" class="option-checkbox w-100" name="option[${index}][]" multiple required>
-            ${options
-              .filter(option => option.option_type === item)
-              .map(option => `<option value="${option.option_id}">${option.option_name}</option>`)
-              .join('')}
-          </select>
-        </div>
-      `;
-                    });
-                } else if (selectedCategory === "flyer") {
-                    flyerEng.forEach((item, index) => {
-                        form += `<div class="border p-4 rounded option-box mb-2">
-                            <input type="hidden" name="option_type[${index}]">
-                            <h5 class="d-inline">${flyer[index]}</h5> <span class="text-danger ms-2">*</span>
-                            <div class="d-flex" id="option-multiselect-0">
-                            </div>
-                            <select multiple="multiple" class="option-checkbox w-100" name="option[${index}][]" multiple required>
-                                ${options
-              .filter(option => option.option_type === item)
-              .map(option => `<option value="${option.option_id}">${option.option_name}</option>`)
-              .join('')}
-                            </select>
-                        </div>
-                        `
-                    });
-                } else if (selectedCategory === "leaflet") {
-                    leafletEng.forEach((item, index) => {
-                        form += `<div class="border p-4 rounded option-box mb-2">
-                            <input type="hidden" name="option_type[${index}]">
-                            <h5 class="d-inline">${leaflet[index]}</h5> <span class="text-danger ms-2">*</span>
-                            <div class="d-flex" id="option-multiselect-0">
-                            </div>
-                            <select multiple="multiple" class="option-checkbox w-100" name="option[${index}][]" multiple required>
-                                ${options
-              .filter(option => option.option_type === item)
-              .map(option => `<option value="${option.option_id}">${option.option_name}</option>`)
-              .join('')}
-                            </select>
-                        </div>
-                        `
-                    });
-                } else if (selectedCategory === "sticker") {
+               if (selectedCategory === "sticker") {
                     stickerEng.forEach((item, index) => {
                         form += `<div class="border p-4 rounded option-box mb-2">
                             <input type="hidden" name="option_type[${index}]">

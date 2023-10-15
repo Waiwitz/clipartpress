@@ -88,7 +88,13 @@
                                     <div class="collapse-horizontal">
                                         <p class="mb-2"> ขนาดของชิ้นงาน : <%= item.size %></p>
                                         <% item.options.forEach((option) => {  %>
-                                        <p class="mb-2"> <%= option.option_type %> : <%= option.option_name %></p>
+                                        <% let type; %>
+                                        <% if (option.option_type == 'papertype') type = 'กระดาษ' %>
+                                        <% if (option.option_type == 'die-cut') type = 'การไดคัท' %>
+                                        <% if (option.option_type == 'color') type = 'สีกระดาษ' %>
+                                        <% if (option.option_type == 'tear') type = 'แนวฉีก' %>
+                                        <% if (option.option_type == 'printside') type = 'ด้านพิมพ์' %>
+                                        <p class="mb-2"> <%= type %> : <%= option.option_name %></p>
                                         <% }) %>
                                     </div>
                                 </div>
@@ -160,7 +166,7 @@
                                 </span> <br>
                                 <span id="ad-tel"><%= data.telephone%></span>
                                 <% } else { %>
-                                <b class="alert-warning p-1 m-auto">ยังไม่เลือกที่อยู่หลัก</b>
+                                <!-- <b class="alert-warning p-1 m-auto">ยังไม่เลือกที่อยู่หลัก</b> -->
                                 <% } %>
                                 <% }) %>
                                 <% } else { %>
@@ -509,6 +515,34 @@
         });
         $(document).ready(function () {
             let newprice = 0;
+            $('select#shipment').on('change', function () {
+                var id = $(this).find(':selected').data('id')
+                var type = $(this).find(':selected').data('stype');
+                var startprice = $(this).find(':selected').data('startprice');
+                var originalPrice = $('#sumPrice').val();
+                var qty = `<%- SumQty %>`
+                const shipmentPrice = JSON.parse(`<%- JSON.stringify(shipmentsPrice)  %>`)
+
+                shipmentPrice.forEach((rows) => {
+                    if (rows.shipment_id === id) {
+                        if (type == 'free') {
+                            $('#shipment-show').text('ฟรี')
+                            $('#totalPrice').empty().text(THmoney.format(originalPrice));
+                        } else {
+                            if (qty < rows.qty_min) {
+                                newprice = parseFloat(originalPrice) + parseFloat(startprice);
+                                $('#shipment-show').text(THmoney.format(startprice))
+                                $('#totalPrice').text(THmoney.format(newprice));
+                            } else if (qty >= rows.qty_min) {
+                                newprice = parseFloat(originalPrice) + parseFloat(rows.price);
+                                $('#shipment-show').text(THmoney.format(rows.price))
+                                $('#totalPrice').text(THmoney.format(newprice));
+                            }
+                        }
+                    }
+                });
+            }).change()
+
             const couponReq = () => {
                 const code_input = $('#coupon').val();
                 $('#applyCode').prop('disabled', true)
@@ -538,6 +572,7 @@
                             $('#coupon').prop('disabled', false)
 
                             if (findCode) {
+                                const totalPrice = $('#sumPrice').val();
                                 const start_date = new Date(findCode.start_date);
                                 const end_date = new Date(findCode.end_date);
                                 const currentDate = new Date();
@@ -553,7 +588,7 @@
                                     let calPrice = 0;
                                     if (findCode.coupon_type == 'percent') {
                                         detail = `ส่วนลด ${findCode.discount_value} %`
-                                        calPrice = newprice - (totalPrice * findCode
+                                        calPrice = newprice - (newprice * findCode
                                             .discount_value /
                                             100);
                                     } else if (findCode.coupon_type == 'value') {
@@ -563,7 +598,8 @@
                                     let updateOldPrice =
                                         `<s class="fw-bold me-2" id="totalPrice">${THmoney.format(newprice)}</s>`
 
-                                    if (newprice >= findCode.min_amount && coupon_amount
+                                    if (newprice >= findCode.min_amount &&
+                                        coupon_amount
                                         .length < findCode.coupon_amount && user_limit
                                         .length < findCode
                                         .user_limitUse) {
@@ -641,7 +677,6 @@
 
             // ที่อยู่
             $('#selectAddress-btn').click(() => {
-                console.log($('#sumPrice').val());
                 var checked = $("input[name='selectAddress']:checked");
                 var name = checked.data("name");
                 var address = checked.data("address");
@@ -801,40 +836,6 @@
                 imagePosition: "left",
             });
             $('#paymentMethod .dd-selected-value').attr('name', 'paymentMethod')
-
-            $('select#shipment').on('change', function () {
-                var id = $(this).find(':selected').data('id')
-                var type = $(this).find(':selected').data('stype');
-                var startprice = $(this).find(':selected').data('startprice');
-                var originalPrice = $('#sumPrice').val();
-                var qty = `<%- SumQty %>`
-                const shipmentPrice = JSON.parse(`<%- JSON.stringify(shipmentsPrice)  %>`)
-
-                shipmentPrice.forEach((rows) => {
-                    if (rows.shipment_id === id) {
-                        if (type == 'free') {
-                            $('#shipment-show').text('ฟรี')
-                            $('#totalPrice').empty().replaceWith(
-                                `<b class="fw-bold me-2" id="totalPrice">${THmoney.format(originalPrice)}</b>`
-                            );
-                        } else {
-                            if (qty < rows.qty_min) {
-                                newprice = parseFloat(originalPrice) + parseFloat(startprice);
-                                $('#shipment-show').text(THmoney.format(startprice))
-                                $('#totalPrice').empty().replaceWith(
-                                    `<b class="fw-bold me-2" id="totalPrice">${THmoney.format(newprice)}</b>`
-                                );
-                            } else if (qty >= rows.qty_min) {
-                                newprice = parseFloat(originalPrice) + parseFloat(rows.price);
-                                $('#shipment-show').text(THmoney.format(rows.price))
-                                $('#totalPrice').empty().replaceWith(
-                                    `<b class="fw-bold me-2" id="totalPrice">${THmoney.format(newprice)}</b>`
-                                );
-                            }
-                        }
-                    }
-                });
-            }).change()
         });
     </script>
 </body>

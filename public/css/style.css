@@ -270,7 +270,7 @@ footer {
 .cate-select-group {
     background-color: white;
     width: 300px;
-    height: 400px !important;
+    height: fit-content !important;
     margin: 0;
     margin-bottom: 10px;
     padding: 0;
@@ -283,7 +283,7 @@ footer {
     width: 90%;
     cursor: pointer;
     padding: 5px;
-    margin: auto;
+    margin: 5px auto;
     box-shadow: 0 0 10px #0000002f;
     border-radius: 5px;
 }
@@ -1228,4 +1228,8 @@ input.cart-cb {
 
 .form-select-payment.active {
     border: 3px solid #005698 !important;
+}
+
+.form-control {
+    padding-right: 10px !important;
 }

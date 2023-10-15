@@ -11,20 +11,35 @@
       </ol>
     </div>
     <div class="mt-3">
+      <!-- <div class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-mdb-toggle="dropdown" aria-expanded="false">
+          Dropdown button
+        </button>
+        <ul class="dropdown-menu dropdown-menu-dark w-100">
+          <li><a class="dropdown-item active" href="#">Action</a></li>
+          <li><a class="dropdown-item" href="#">Another action</a></li>
+          <li><a class="dropdown-item" href="#">Something else here</a></li>
+          <li>
+            <hr class="dropdown-divider">
+          </li>
+          <li><a class="dropdown-item" href="#">Separated link</a></li>
+        </ul>
+      </div> -->
+
       <div class="d-flex mb-5" id="rs-productList">
         <!-- ประเภท -->
-        <ul class="cate-select-group card">
+        <ul class="cate-select-group me-3 card">
           <li href="/product/all" class="cate-button cate-active" data-target="allSection">
             สินค้าทั้งหมด</li>
-          <li class="cate-button" data-target="cardSection">นามบัตร</li>
+          <!-- <li class="cate-button" data-target="cardSection">นามบัตร</li>
           <li class="cate-button" data-target="flyerSection">ใบปลิว</li>
-          <li class="cate-button" data-target="leafletSection">แผ่บพับ</li>
-          <li class="cate-button" data-target="stickerSection">สติ๊กเกอร์</li>
+          <li class="cate-button" data-target="leafletSection">แผ่บพับ</li> -->
           <li class="cate-button" data-target="billSection">ใบบิล</li>
-          <li class="cate-button" data-target="letterSection">ซองจดหมาย</li>
+          <li class="cate-button" data-target="stickerSection">สติ๊กเกอร์</li>
+          <li class="cate-button" data-target="envelopeSection">ซองจดหมาย</li>
         </ul>
 
-        <% const cate = ["card", "flyer", "leaflet", "sticker", "bill", "letter"] %>
+        <% const cate = ["sticker", "bill", "envelope"] %>
         <!-- สินค้าทั้งหมด -->
         <% let foundItem = false; %>
         <% let pronoun; %>
@@ -144,7 +159,7 @@
       $('#leafletSection').hide();
       $('#stickerSection').hide();
       $('#billSection').hide();
-      $('#letterSection').hide();
+      $('#envelopeSection').hide();
     });
 
     $(document).ready(function () {

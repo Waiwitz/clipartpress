@@ -1,0 +1,75 @@
+<%- include('../partials/header') %>
+<link href="/node_modules/star-rating.js/dist/star-rating.css" rel="stylesheet">
+
+<body style="background-color: #f8f8f8;">
+    <div class="container-lg mt-5 mb-5 p-auto">
+        <div>
+            <% if (reviews.length > 0) { %>
+            <h1>แก้ไขคะแนนสินค้า</h1>
+            <% } else { %>
+            <h1>ให้คะแนนสินค้า</h1>
+            <% } %>
+            <ol class="breadcrumb bg-light">
+                <li class="breadcrumb-item"><a href="/">หน้าแรก</a></li>
+                <li class="breadcrumb-item"><a href="/myorder">รายการที่สั่ง</a></li>
+                <li class="breadcrumb-item active" aria-current="page">รีวิวสินค้า ออเดอร์ #<%= products[0].order_id  %>
+                </li>
+            </ol>
+        </div>
+        <form action="/postReviews/<%= products[0].order_id %>" method="post">
+            <% const productStore = [];  %>
+            <% products.forEach((product, index) => { %>
+            <% if (!productStore.includes(product.product_id)) { %>
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-2 mb-2 p-0 border rounded-2">
+                            <img src="<%= product.picture %>" alt="product_img" class="object-cover w-100 h-100"
+                                draggable="false">
+                        </div>
+                        <div class="col mb-2">
+                            <h4><%= product.productName %></h4>
+                            <select class="star-rating" name="rating[<%= index %>]">
+                                <option value="">เลือกคะแนน</option>
+                                <option value="5" <%= reviews.length > 0 && reviews[0].rate == 5 ? 'selected' : '' %>>
+                                    ดีมาก</option>
+                                <option value="4" <%= reviews.length > 0 && reviews[0].rate == 4 ? 'selected' : '' %>>ดี
+                                </option>
+                                <option value="3" <%= reviews.length > 0 && reviews[0].rate == 3 ? 'selected' : '' %>>
+                                    พอใช้</option>
+                                <option value="2" <%= reviews.length > 0 && reviews[0].rate == 2 ? 'selected' : '' %>>
+                                    แย่</option>
+                                <option value="1" <%= reviews.length > 0 && reviews[0].rate == 1 ? 'selected' : '' %>>
+                                    แย่มาก</option>
+                            </select>
+                            <div class="form-outline mt-3 w-100">
+                                <textarea class="form-control w-100" name="detail[<%= index %>]" id="textAreaExample"
+                                    rows="5" data-mdb-showcounter="true"
+                                    maxlength="80"><%= reviews.length > 0 ? reviews[0].detail : '' %></textarea>
+                                <label class="form-label" for="textAreaExample">ข้อความ</label>
+                                <div class="form-helper"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <% productStore.push(product.product_id); %>
+            <% } %>
+            <% }) %>
+            <button class="btn btn-primary fs-6 float-end mb-3">
+                ยืนยัน
+            </button>
+        </form>
+    </div>
+</body>
+
+<%- include('../partials/footer') %>
+<%- include('../partials/chat') %>
+<script src="/node_modules//star-rating.js/dist/star-rating.min.js"></script>
+<script>
+    var stars = new StarRating('.star-rating');
+
+    document.querySelectorAll('.form-outline').forEach((formOutline) => {
+        new mdb.Input(formOutline).init();
+    });
+</script>

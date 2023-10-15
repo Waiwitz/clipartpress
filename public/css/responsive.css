@@ -69,12 +69,12 @@
     }
 
     .chat-windows {
-        width: 320px;
+        width: 80vw;
     }
 }
 
 
-@media only screen and (max-width: 390px) {
+@media only screen and (max-width: 435px) {
 
     .order-item .col,
     .order-item .col-7 {
@@ -90,12 +90,23 @@
         transition: 0.2s ease-in;
     }
 
+    .itemlist h5 {
+        font-size: 16px;
+    }
+
     .allproduct-preview {
         width: 8em;
         margin: 10px !important;
     }
 
     .chat-windows {
-        width: 320px;
+        width: 90vw;
     }
+}
+
+@media only screen and (max-width: 435px) {
+    .itemlist .card {
+        width: 145px;
+    }
+
 }

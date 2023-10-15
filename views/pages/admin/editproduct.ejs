@@ -64,16 +64,16 @@
                                             class="text-danger ms-2">*</span></label> <br>
                                     <select class="form-select" id="categories" style="height: 35px;" name="categories"
                                         required>
-                                        <option value="card" <%= product.categories == 'card' ? 'selected' : '' %>>
+                                        <!-- <option value="card" <%= product.categories == 'card' ? 'selected' : '' %>>
                                             นามบัตร</option>
                                         <option value="flyer" <%= product.categories == 'flyer' ? 'selected' : '' %>>
                                             ใบปลิว</option>
                                         <option value="leaflet"
-                                            <%= product.categories == 'leaflet' ? 'selected' : '' %>>แผ่บพับ</option>
-                                        <option value="sticker"
-                                            <%= product.categories == 'sticker' ? 'selected' : '' %>>สติ๊กเกอร์</option>
+                                            <%= product.categories == 'leaflet' ? 'selected' : '' %>>แผ่บพับ</option> -->
                                         <option value="bill" <%= product.categories == 'bill' ? 'selected' : '' %>>ใบบิล
                                         </option>
+                                        <option value="sticker"
+                                            <%= product.categories == 'sticker' ? 'selected' : '' %>>สติ๊กเกอร์</option>
                                         <option value="envelope"
                                             <%= product.categories == 'envelope' ? 'selected' : '' %>>
                                             ซองจดหมาย</option>
@@ -119,7 +119,7 @@
                         </div>
                         <div class="card-body">
                             <div class="row">
-                                <div class="col-4 mb-3 tier">
+                                <div class="col-3 mb-3 tier">
                                     <div class="rounded border p-2 mb-2 me-2"
                                         style="width: fit-content; height: 540px;">
                                         <div class="m-2">
@@ -138,9 +138,8 @@
                                                         value="<%= sizeTier[0].tierSize_id %>">
                                                     <div class="me-2">
                                                         <div class="form-outline" style="width: 85px;">
-                                                            <input type="number" class="form-control" name="unit[0][]"
-                                                                required step="0.01" min="0"
-                                                                value="<%= sizeTier[0].size_unit %>">
+                                                            <input type="text" class="form-control" name="unit[0][]"
+                                                                required value="<%= sizeTier[0].size_unit %>">
                                                             <label class="form-label">ค่าขนาด<span
                                                                     class="text-danger ms-2">*</span></label>
                                                         </div>
@@ -175,8 +174,8 @@
                                                         value="<%= sizeTier[i].tierSize_id %>">
                                                     <div class="me-2">
                                                         <div class="form-outline" style="width: 85px;">
-                                                            <input type="number" class="form-control"
-                                                                name="unit[<%= i %>][]" required step="0.01" min="0"
+                                                            <input type="text" class="form-control"
+                                                                name="unit[<%= i %>][]" required
                                                                 value="<%= sizeTier[i].size_unit %>">
                                                             <label class="form-label">ค่าขนาด<span
                                                                     class="text-danger ms-2">*</span></label>
@@ -408,9 +407,9 @@
             <div class="d-flex mb-2 sizeTierRow" style="height: 36px;">
                                                     <div class="me-2">
                                                         <div class="form-outline" style="width: 85px;">
-                                                            <input type="number" class="form-control" name="newUnit[${news}][]"
+                                                            <input type="text" class="form-control" name="newUnit[${news}][]"
                                                                 required>
-                                                            <label class="form-label">กว้าง<span
+                                                            <label class="form-label">ค่าขนาด<span
                                                                     class="text-danger ms-2">*</span></label>
                                                         </div>
                                                     </div>
@@ -438,7 +437,7 @@
         $(document).on('click', '.addPrice', function () {
             if (qtyTierCount < 9) {
                 qtyTierCount++
-                newq ++
+                newq++
                 // var count = $(this).closest('.tier').index('.tier');
                 var form = `
           <div class="d-flex mb-2 qtyTierRow">
@@ -543,19 +542,19 @@
             new mdb.Input(formOutline).init();
         });
 
-        const cardEng = ['papertype', 'printside', 'pumping', 'laminating']
-        const flyerEng = ['papertype', 'printside', 'laminating']
-        const leafletEng = ['papertype', 'printside', 'folding', 'laminating']
-        const stickerEng = ['papertype', 'pumping', 'die-cut']
-        const billEng = ['papertype', 'color', 'layer', 'number']
-        const envelopeEng = ['papertype', 'printside', 'pumping']
 
-        const card = ['ประเภทกระดาษ', 'ด้านพิมพ์', 'การปั้ม', 'การเคลือบ']
-        const flyer = ['ประเภทกระดาษ', 'ด้านพิมพ์', 'การเคลือบ']
-        const leaflet = ['ประเภทกระดาษ', 'ด้านพิมพ์', 'การพับ', 'การเคลือบ']
-        const sticker = ['ประเภทกระดาษ', 'การปั้ม', 'การไดคัท']
-        const bill = ['ประเภทกระดาษ', 'สี', 'จำนวนชั้น', 'รันเลข']
-        const envelope = ['ประเภทกระดาษ', 'ด้านพิมพ์', 'การปั้ม']
+        // const cardEng = ['papertype', 'printside', 'pumping', 'laminating']
+        // const flyerEng = ['papertype', 'printside', 'laminating']
+        // const leafletEng = ['papertype', 'printside', 'folding', 'laminating']
+        const stickerEng = ['papertype']
+        const billEng = ['papertype', 'color', 'tear']
+        const envelopeEng = ['papertype', 'printside']
+        // const card = ['ประเภทกระดาษ', 'ด้านพิมพ์', 'การปั้ม', 'การเคลือบ']
+        // const flyer = ['ประเภทกระดาษ', 'ด้านพิมพ์', 'การเคลือบ']
+        // const leaflet = ['ประเภทกระดาษ', 'ด้านพิมพ์', 'การพับ', 'การเคลือบ']
+        const sticker = ['กระดาษ', 'การไดคัท']
+        const bill = ['กระดาษ', 'สีกระดาษ', 'แนวฉีก']
+        const envelope = ['กระดาษ', 'ด้านพิมพ์']
 
         $(document).ready(function () {
             const options = JSON.parse('<%- JSON.stringify(options) %>');
@@ -563,57 +562,10 @@
                 var selectedCategory = $(this).val();
                 var form = '';
                 console.log(selectedCategory);
-                if (selectedCategory === "card") {
-                    cardEng.forEach((item, index) => {
-                        form += `
-        <div class="border p-4 rounded option-box mb-2">
-            <input type="hidden" name="option_type[${index}][]">
-          <h5 class="d-inline">${card[index]}</h5> <span class="text-danger ms-2">*</span>
-          <select multiple="multiple" class="option-checkbox w-100" name="option[${index}][]" multiple required>
-            ${options
-              .filter(option => option.option_type === item)
-              .map(option => `<option value="${option.option_id}">${option.option_name}</option>`)
-              .join('')}
-          </select>
-        </div>
-      `;
-                    });
-                } else if (selectedCategory === "flyer") {
-                    flyerEng.forEach((item, index) => {
-                        form += `<div class="border p-4 rounded option-box mb-2">
-                            <input type="hidden" name="option_type[${index}][]">
-                            <h5 class="d-inline">${flyer[index]}</h5> <span class="text-danger ms-2">*</span>
-                            <div class="d-flex" id="option-multiselect-0">
-                            </div>
-                            <select multiple="multiple" class="option-checkbox w-100" name="option[${index}][]" multiple required>
-                                ${options
-              .filter(option => option.option_type === item)
-              .map(option => `<option value="${option.option_id}">${option.option_name}</option>`)
-              .join('')}
-                            </select>
-                        </div>
-                        `
-                    });
-                } else if (selectedCategory === "leaflet") {
-                    leafletEng.forEach((item, index) => {
-                        form += `<div class="border p-4 rounded option-box mb-2">
-                            <input type="hidden" name="option_type[${index}][]">
-                            <h5 class="d-inline">${leaflet[index]}</h5> <span class="text-danger ms-2">*</span>
-                            <div class="d-flex" id="option-multiselect-0">
-                            </div>
-                            <select multiple="multiple" class="option-checkbox w-100" name="option[${index}][]" multiple required>
-                                ${options
-              .filter(option => option.option_type === item)
-              .map(option => `<option value="${option.option_id}">${option.option_name}</option>`)
-              .join('')}
-                            </select>
-                        </div>
-                        `
-                    });
-                } else if (selectedCategory === "sticker") {
+                if (selectedCategory === "sticker") {
                     stickerEng.forEach((item, index) => {
                         form += `<div class="border p-4 rounded option-box mb-2">
-                            <input type="hidden" name="option_type[${index}][]">
+                            <input type="hidden" name="option_type[${index}]">
                             <h5 class="d-inline">${sticker[index]}</h5> <span class="text-danger ms-2">*</span>
                             <div class="d-flex" id="option-multiselect-0">
                             </div>
@@ -629,7 +581,7 @@
                 } else if (selectedCategory === "bill") {
                     billEng.forEach((item, index) => {
                         form += `<div class="border p-4 rounded option-box mb-2">
-                            <input type="hidden" name="option_type[${index}][]">
+                            <input type="hidden" name="option_type[${index}]">
                             <h5 class="d-inline">${bill[index]}</h5> <span class="text-danger ms-2">*</span>
                             <div class="d-flex" id="option-multiselect-0">
                             </div>
@@ -645,7 +597,7 @@
                 } else if (selectedCategory === "envelope") {
                     envelopeEng.forEach((item, index) => {
                         form += `<div class="border p-4 rounded option-box mb-2">
-                            <input type="hidden" name="option_type[${index}][]">
+                            <input type="hidden" name="option_type[${index}]">
                             <h5 class="d-inline">${envelope[index]}</h5> <span class="text-danger ms-2">*</span>
                             <div class="d-flex" id="option-multiselect-0">
                             </div>

@@ -91,12 +91,12 @@
 
 
                     <tbody>
-                        <% let shipmentprice = orders[0].shipment_price; %>
                         <% let couponDiscount = 0; %>
-                        <% if (orders[0].discount != null) { %>
-                        <% couponDiscount = orders[0].discount; %>
-                        <% } %>
                         <% orders.forEach((order, index) => { %>
+                        <% let shipmentprice = order.shipment_price; %>
+                        <% if (order.discount != null) { %>
+                        <% couponDiscount = order.discount; %>
+                        <% } %>
                         <tr>
 
                             <td style="width: 50px;">
@@ -173,7 +173,13 @@
 
 
                     <tbody>
-                       <% orders.forEach((order, index) => { %>
+                        <% let couponDiscount = 0; %>
+                        <% orders.forEach((order, index) => { %>
+                        <% let shipmentprice = order.shipment_price; %>
+                        <% if (order.discount != null) { %>
+                        <% couponDiscount = order.discount; %>
+                        <% } %>
+
                         <% if (order.order_status === item) { %>
                         <tr>
                             <td style="width: 50px;">
@@ -183,7 +189,7 @@
                                 <%= order.order_id %>
                             </td>
                             <td>
-                                <% let sumprice = 0; %> 
+                                <% let sumprice = 0; %>
                                 <% order.order_detail.forEach((detail) => { %>
                                 <% sumprice += detail.price %>
                                 - <%= detail.productName %> <br>
@@ -267,4 +273,4 @@
 
 
     })
-</script> 
+</script>

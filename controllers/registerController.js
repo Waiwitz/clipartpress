@@ -13,7 +13,7 @@ const getRegisterPage = (req, res) => {
     return res.render('pages/register', {
         currentMenu: 'สมัครสมาชิก',
         Title: 'Clipart Press',
-      });
+    });
 }
 
 const transporter = nodemailer.createTransport({
@@ -110,7 +110,7 @@ const createNewUserController = async (req, res) => {
 
     try {
         createNewUser(newUser);
-        return res.redirect("/sucessfulRegister"); 
+        return res.redirect("/sucessfulRegister");
     } catch (err) {
         req.flash("errors", err);
         // console.log(err)
@@ -139,11 +139,11 @@ const createNewUser = (user) => {
                 text: `คลิกที่ลิ้งค์เพื่อยืนยันอีเมล: http://localhost:3000/verify?email=${data.email}&token=${data.token}`
             };
             transporter.sendMail(mailOptions);
-  
+
         } catch (e) {
             reject(e);
         }
- 
+
     })
 };
 
@@ -153,21 +153,19 @@ const verify = async (req, res) => {
     const token = req.query.token;
     try {
         // check if email and token match a user in the database
-        const [rows] =  dbConnection.query('SELECT * FROM users WHERE email = ? AND token = ?', [email, token]);
-        if (rows.length === 0) {
-            // email and token don't match, send error message
-            res.status(400).send('Invalid verification link');
-            return;
-        }
-
-        // update user's status to "verified"
-         dbConnection.query('UPDATE users SET verified = true WHERE email = ?', [email]);
-
-        // send success message
-        res.status(200).send('Email address verified');
+        dbConnection.promise().query('SELECT * FROM users WHERE email = ? AND token = ?', [email, token]).then(([rows]) => {
+            if (rows.length === 0) {
+                // email and token don't match, send error message
+                res.status(400).send('Invalid verification link');
+                return;
+            }
+            dbConnection.query('UPDATE users SET verified = true WHERE email = ?', [email]);
+            req.flash('success_msg', 'ยืนยันบัญชีเรียบร้อยแล้ว');
+            res.redirect('/login');
+        })
     } catch (error) {
         console.error(error);
-        res.status(500).send('Server error');
+        res.redirect('/');
     }
 };
 

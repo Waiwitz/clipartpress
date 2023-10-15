@@ -1,6 +1,6 @@
 <div class="mb-5" id="<%= count++ %>">
     <input type="text" name="spec" value="รูปแบบ" hidden>
-    <legend>ประเภทกระดาษ</legend>
+    <legend>กระดาษ</legend>
     <hr>
     <div class="form-check ps-0">
         <div class="option-select">
@@ -9,8 +9,8 @@
             </div>
             <select name="option[]" id="papertype" class="form-select radio-choice" data-img-id="<%= count %>">
                 <% options.forEach((option) => { %>
-                <% if(option.parcel_type === 'papertype'){ %>
-                <option value="<%= option.option_name %>" data-price="<%= option.option_perPrice %>"
+                <% if(option.option_type === 'papertype'){ %>
+                <option value="<%= option.option_id %>" data-price="<%= option.price_per_unit %>"
                     data-img="<%= option.option_img %>">
                     <%= option.option_name %>
                 </option>
@@ -23,7 +23,7 @@
 
 <div class="mb-5" id="<%= count++ %>">
     <input type="text" name="spec" value="รูปแบบ" hidden>
-    <legend>สี</legend>
+    <legend>สีกระดาษ</legend>
     <hr>
     <div class="form-check ps-0">
         <div class="option-select">
@@ -32,8 +32,8 @@
             </div>
             <select name="option[]" id="color" class="form-select radio-choice" data-img-id="<%= count %>">
                 <% options.forEach((option) => { %>
-                <% if(option.parcel_type === 'color'){ %>
-                <option value="<%= option.option_name %>" data-price="<%= option.option_perPrice %>"
+                <% if(option.option_type === 'color'){ %>
+                <option value="<%= option.option_id %>" data-price="<%= option.price_per_unit %>"
                     data-img="<%= option.option_img %>">
                     <%= option.option_name %>
                 </option>
@@ -46,7 +46,7 @@
 
 <div class="mb-5" id="<%= count++ %>">
     <input type="text" name="spec" value="รูปแบบ" hidden>
-    <legend>จำนวนชั้น</legend>
+    <legend>แนวฉีก</legend>
     <hr>
     <div class="form-check ps-0">
         <div class="option-select">
@@ -55,8 +55,8 @@
             </div>
             <select name="option[]" id="layer" class="form-select radio-choice" data-img-id="<%= count %>">
                 <% options.forEach((option) => { %>
-                <% if(option.parcel_type === 'layer'){ %>
-                <option value="<%= option.option_name %>" data-price="<%= option.option_perPrice %>"
+                <% if(option.option_type === 'tear'){ %>
+                <option value="<%= option.option_id %>" data-price="<%= option.price_per_unit %>"
                     data-img="<%= option.option_img %>">
                     <%= option.option_name %>
                 </option>
@@ -67,26 +67,4 @@
     </div>
 </div>
 
-<div class="mb-5" id="<%= count++ %>">
-    <input type="text" name="spec" value="รูปแบบ" hidden>
-    <legend>รันเลข</legend>
-    <hr>
-    <div class="form-check ps-0">
-        <div class="option-select">
-            <div class="border" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                <img class="selectedimg" id="selectedimg<%= count %>" src="" alt="" style="width: 80px; height: 80px;">
-            </div>
-            <select name="option[]" id="number" class="form-select radio-choice" data-img-id="<%= count %>">
-                <% options.forEach((option) => { %>
-                <% if(option.parcel_type === 'number'){ %>
-                <option value="<%= option.option_name %>" data-price="<%= option.option_perPrice %>"
-                    data-img="<%= option.option_img %>">
-                    <%= option.option_name %>
-                </option>
-                <% } %>
-                <% }) %>
-            </select>
-        </div>
-    </div>
-</div>
 
