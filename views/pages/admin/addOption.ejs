@@ -42,7 +42,7 @@
                                                 <p>คลิกเพื่อเลือกรูปสินค้า</p>
                                             </div>
                                             <input type="file" name="option_img[]" onchange="previewImage(event, [0])"
-                                                accept="image/png, image/jpeg" class="form-control" multiple  />
+                                                accept="image/png, image/jpeg" class="form-control" multiple />
                                             <img src="/assets/img/white-bg.jpg" id="option_preview[0]" draggable="false"
                                                 class="img_option">
                                         </div>
@@ -51,15 +51,22 @@
                                     <span class="mx-4"> PNG, JPEG</span> -->
                                 </div>
                                 <div class="col" style="width: 42.5%;">
-                                    <div class="form-outline mb-3">
-                                        <input type="text" name="option[]" class="sub-option-name form-control"
-                                            id="optionName" required>
-                                        <label class="form-label" for="optionName">ชื่อตัวเลือก</label>
+                                    <div class="mb-4">
+                                        <div class="form-outline">
+                                            <input type="text" name="option[]" class="sub-option-name form-control"
+                                                id="optionName" required>
+                                            <label class="form-label" for="optionName">ชื่อตัวเลือก</label>
+                                            <div class="invalid-feedback">
+                                                กรุณากรอกชื่อตัวเลือก
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="form-outline">
-                                        <input type="number" name="option_price[]" class="sub-option-price form-control" value="0"
-                                            required>
-                                        <label class="form-label">ราคาต่อหน่วย</label>
+                                    <div class="pt-1">
+                                        <div class="form-outline">
+                                            <input type="number" name="option_price[]"
+                                                class="sub-option-price form-control" value="0" required>
+                                            <label class="form-label">ราคาต่อหน่วย</label>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col" style="width: 42.5%;">
@@ -113,7 +120,7 @@
             </div>
             <div id="newRow"></div>
 
-            <button type="button" id="add-spec" class="btn btn-secondary w-100">เพิ่มสเปค</button>
+            <!-- <button type="button" id="add-spec" class="btn btn-secondary w-100">เพิ่มสเปค</button> -->
             <button type="submit" class="btn btn-primary btn-block mt-5 float-end" style="width: 150px;">ยืนยัน</button>
         </form>
     </div>

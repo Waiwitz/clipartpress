@@ -27,7 +27,11 @@
           <% count++ %>
           <div class="card m-1 p-3 mb-4 <%= product.status == 0 ? 'product-refrain' : '' %> ">
             <div class="promo-sign">
-              <%= promotions[0].promo_name %>
+              <% promotions.forEach((promo) => { %>
+              <% if (promo.product_id === product.product_id) { %>
+              <%= promo.promo_name %>
+              <% } %>
+              <% }) %>
             </div>
             <a href="/product/item/<%= product.product_id %>">
               <div class="pb-1 product_list_card" data-bs-toggle="modal" data-id="<%= product.product_id %>"
@@ -71,13 +75,13 @@
     <h2 class="text-center mb-3 fw-semibold">สินค้าของเรา</h2>
     <div class="d-flex justify-content-center flex-wrap mt-4">
       <div class="card allproduct-preview">
-        <img src="assets/img/bill1.png" class="card-img-top" alt="..." draggable="false">
+        <img src="assets/img/bill.jpg" class="card-img-top" alt="..." draggable="false">
         <div class="p-2">
           <p class="card-text">กระดาษต่อเนื่อง & บิลเล่ม</p>
         </div>
       </div>
       <div class="card allproduct-preview">
-        <img src="assets/img/สติ๊กเกอร์.jpg" class="card-img-top" alt="..." draggable="false">
+        <img src="assets/img/sticker.jpg" class="card-img-top" alt="..." draggable="false">
         <div class="p-2">
           <p class="card-text">สติ๊กเกอร์</p>
         </div>

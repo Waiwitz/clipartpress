@@ -28,7 +28,7 @@
 
       <div class="d-flex mb-5" id="rs-productList">
         <!-- ประเภท -->
-        <ul class="cate-select-group me-3 card">
+        <ul class="cate-select-group me-3">
           <li href="/product/all" class="cate-button cate-active" data-target="allSection">
             สินค้าทั้งหมด</li>
           <!-- <li class="cate-button" data-target="cardSection">นามบัตร</li>
@@ -52,7 +52,7 @@
             <div class="promo-sign">
               <% promotions.forEach((promo) => { %>
               <% if (promo.product_id === product.product_id) { %>
-              <%= promo.promo_name %>
+                <i class="fa-solid fa-bullhorn text-light me-2"></i><%= promo.promo_name %>
               <% } %>
               <% }) %>
             </div>
@@ -104,7 +104,7 @@
             <div class="promo-sign">
               <% promotions.forEach((promo) => { %>
               <% if (promo.product_id === product.product_id) { %>
-              <%= promo.promo_name %>
+                <i class="fa-solid fa-bullhorn text-light me-2"></i><%= promo.promo_name %>
               <% } %>
               <% }) %>
             </div>

@@ -33,6 +33,9 @@
                             <label class="form-label" for="couponName">ชื่อโปรโมชั่น<span
                                     class="text-danger ms-1">*</span></label>
                             <input type="text" id="couponName" class="form-control" name="promoName" required />
+                            <div class="invalid-feedback">
+                                กรุณากรอกชื่อโปรโมชั่น
+                            </div>
                         </div>
                         <div class="col">
                             <label class="form-label" for="inlineFormSelectPref">สถานะ</label>
@@ -40,6 +43,7 @@
                                 <option value="1">เปิดใช้งาน</option>
                                 <option value="0">ปิด</option>
                             </select>
+
                         </div>
                     </div>
                     <div class="row mb-4">
@@ -47,19 +51,25 @@
                             <label class="form-label" for="start">วันที่เริ่ม <span
                                     class="text-danger ms-2">*</span></label> <br>
                             <input type="datetime-local" id="start" class="form-control" name="start" required />
+                            <div class="invalid-feedback">
+                                กรุณากรอกวันที่เริ่ม
+                            </div>
                         </div>
                         <div class="col">
                             <label class="form-label" for="start">วันที่สิ้นสุด <span
                                     class="text-danger ms-2">*</span></label> <br>
                             <input type="datetime-local" id="end" class="form-control" name="end" required />
+                            <div class="invalid-feedback">
+                                กรุณากรอกวันที่สิ้นสุด
+                            </div>
                         </div>
                     </div>
                     <div class="row mb-4">
                         <div class="col-6">
                             <h6 class="">สินค้าที่ร่วมรายการ <span class="text-danger ms-2">*</span></h6>
                             <select multiple="multiple" id="product-check" name="product[]" class="w-100" required>
-                                <% let labelEn = ['card','flyer','leaflet','sticker','bill','envelope'] %>
-                                <% let label = ['นามบัตร','ใบปลิว','แผ่นพับ','สติ๊กเกอร์','ใบบิล','ซองจดหมาย'] %>
+                                <% let labelEn = ['bill','sticker','envelope'] %>
+                                <% let label = ['ใบบิล','สติ๊กเกอร์','ซองจดหมาย'] %>
 
                                 <% labelEn.forEach((item,index) => { %>
                                 <optgroup label="<%= label[index] %>">
@@ -78,6 +88,9 @@
                                 <% }) %>
 
                             </select>
+                            <div class="invalid-feedback mt-2">
+                                กรุณาเลือกสินค้าที่ร่วมรายการอย่างน้อย 1 อย่าง
+                            </div>
                         </div>
                     </div>
                     <div class="mt-5 mb-4 border-bottom">
@@ -100,9 +113,12 @@
                                 <input type="number" id="minAmount" class="form-control" name="typeValue" min="0"
                                     required />
                                 <span class="input-group-text" id="unittype">%</span>
+                                <div class="invalid-feedback">
+                                    กรุณากรอกจำนวนส่วนลดหรือส่วนแถม
+                                </div>
                             </div>
                         </div>
-                        <div class="col">
+                        <div class="col mb-3">
                             <label class="form-label me-2">เงื่อนไขโปรโมชั่น :</label>
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="radio" name="condition" id="condition1"
@@ -118,6 +134,9 @@
                                 <input type="number" id="minAmount" class="form-control" name="conditionValue"
                                     required />
                                 <span class="input-group-text" id="unitCondition">฿</span>
+                                <div class="invalid-feedback">
+                                    กรุณากรอกจำนวนยอดขั้นต่ำหรือจำนวนสินค้าขั้นต่ำ
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -209,7 +228,11 @@
                     filter: true,
                     placeholder: 'เลือกสินค้าที่ร่วมรายการ',
                     type: 'optgroup',
-
+                    onClick: function (view) {
+                        $(view).addClass('form-control'); // Apply Bootstrap form-control class
+                        $(view).closest('.ms-container').addClass(
+                            'form-group'); // Apply Bootstrap form-group class
+                    }
                     // hideOptgroupCheckboxes: false
                 });
             })

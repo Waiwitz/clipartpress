@@ -22,15 +22,17 @@
             บัญชีของคุณยังไม่ได้ยืนยัน
         </div>
         <% } %>
-        <div class="d-flex">
-            <%- include('../partials/usermenu') %>
-            <div class="w-100">
+        <div class="row">
+            <div class="col-3">
+                <%- include('../partials/usermenu') %>
+            </div>
+            <div class="col-md ">
                 <button type="button" class="btn btn-secondary m-3" data-mdb-toggle="modal"
                     data-mdb-target="#exampleModal">
                     เพิ่มที่อยู่
                 </button>
                 <% if(address.length > 0) {%>
-                <div class="d-flex flex-wrap w-100">
+                <div class="col-md w-100">
                     <% address.forEach((data,index) => { %>
                     <div class="card" style="width: 350px;">
                         <div class="card-header d-flex justify-content-between ">
@@ -76,95 +78,90 @@
                     <% }); %>
                 </div>
                 <% } else { %>
-                    <div class="w-100 mt-5   text-center">
-                        <b class="fs-4">ยังไม่มีที่อยู่</b>
-                    </div>
+                <div class="w-100 mt-5   text-center">
+                    <b class="fs-4">ยังไม่มีที่อยู่</b>
+                </div>
                 <% } %>
             </div>
         </div>
     </div>
-                    <!-- Modal -->
-                    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
-                    aria-hidden="true">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="exampleModalLabel">เพิ่มที่อยู่</h5>
-                                <button type="button" class="btn-close" data-mdb-dismiss="modal"
-                                    aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <form action="/address" method="post" class="needs-validation" novalidate>
-                                    <div class="row mb-2">
-                                        <div class="col">
-                                            <div class="form-outline mb-4">
-                                                <input type="text" id="form1Example1" class="form-control" name="name"
-                                                    required />
-                                                <label class="form-label" for="form1Example1">ชื่อ-นามสกุล</label>
-                                                <div class="invalid-feedback">
-                                                    กรุณากรอกชื่อ-นามสกุล
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col">
-                                            <div class="form-outline mb-4">
-                                                <input type="tel" id="form1Example1" class="form-control"
-                                                    name="telephone" required max="10" pattern="[0-9]{10}">
-                                                <label class="form-label" for="form1Example1">เบอร์โทรศัพท์</label>
-                                                <div class="invalid-feedback">
-                                                    เบอร์โทรศัพท์ต้องเป็นตัวเลขและไม่เกิน 10 ตัว
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row mb-2">
-                                        <div class="col">
-                                            <div class="form-outline mb-4">
-                                                <input type="text" id="form1Example1" class="form-control"
-                                                    name="province" required />
-                                                <label class="form-label" for="form1Example1">จังหวัด</label>
-                                                <div class="invalid-feedback">
-                                                    กรุณากรอกจังหวัด
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col">
-                                            <div class="form-outline mb-4">
-                                                <input type="text" id="form1Example1" class="form-control"
-                                                    name="zipcode" required />
-                                                <label class="form-label" for="form1Example1">รหัสไปรษณีย์</label>
-                                                <div class="invalid-feedback">
-                                                    กรุณากรอกรหัสไปรษณีย์
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-outline mb-5">
-                                        <textarea class="form-control" id="textAreaExample" rows="4" name="address"
-                                            required></textarea>
-                                        <label class="form-label" for="textAreaExample">ที่อยู่ บ้านเลขที่, หมู่ที่,
-                                            ตำบล, อำเภอ</label>
-                                        <div class="invalid-feedback">
-                                            กรุณากรอกที่อยู่ที่จะใช้ในการจัดส่ง
-                                        </div>
-                                    </div>
-                                    <div class="mb-3 form-check mt-3">
-                                        <input type="checkbox" class="form-check-input" id="df_address" value="1"
-                                            name="df_address">
-                                        <label class="form-check-label" for="df_address">เลือกเป็นที่อยู่หลัก</label>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary"
-                                            data-mdb-dismiss="modal">ยกเลิก</button>
-                                        <button type="submit" class="btn btn-primary">บันทึก</button>
-                                    </div>
-                                </form>
-                            </div>
-
-                        </div>
-                    </div>
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">เพิ่มที่อยู่</h5>
+                    <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
                 </div>
+                <div class="modal-body">
+                    <form action="/address" method="post" class="needs-validation" novalidate>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <div class="form-outline mb-4">
+                                    <input type="text" id="form1Example1" class="form-control" name="name" required />
+                                    <label class="form-label" for="form1Example1">ชื่อ-นามสกุล</label>
+                                    <div class="invalid-feedback">
+                                        กรุณากรอกชื่อ-นามสกุล
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-outline mb-4">
+                                    <input type="tel" id="form1Example1" class="form-control" name="telephone" required
+                                        max="10" pattern="[0-9]{10}">
+                                    <label class="form-label" for="form1Example1">เบอร์โทรศัพท์</label>
+                                    <div class="invalid-feedback">
+                                        เบอร์โทรศัพท์ต้องเป็นตัวเลขและไม่เกิน 10 ตัว
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <div class="form-outline mb-4">
+                                    <input type="text" id="form1Example1" class="form-control" name="province"
+                                        required />
+                                    <label class="form-label" for="form1Example1">จังหวัด</label>
+                                    <div class="invalid-feedback">
+                                        กรุณากรอกจังหวัด
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-outline mb-4">
+                                    <input type="text" id="form1Example1" class="form-control" name="zipcode"
+                                        required />
+                                    <label class="form-label" for="form1Example1">รหัสไปรษณีย์</label>
+                                    <div class="invalid-feedback">
+                                        กรุณากรอกรหัสไปรษณีย์
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-outline mb-5">
+                            <textarea class="form-control" id="textAreaExample" rows="4" name="address"
+                                required></textarea>
+                            <label class="form-label" for="textAreaExample">ที่อยู่ บ้านเลขที่, หมู่ที่,
+                                ตำบล, อำเภอ</label>
+                            <div class="invalid-feedback">
+                                กรุณากรอกที่อยู่ที่จะใช้ในการจัดส่ง
+                            </div>
+                        </div>
+                        <div class="mb-3 form-check mt-3">
+                            <input type="checkbox" class="form-check-input" id="df_address" value="1" name="df_address">
+                            <label class="form-check-label" for="df_address">เลือกเป็นที่อยู่หลัก</label>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">ยกเลิก</button>
+                            <button type="submit" class="btn btn-primary">บันทึก</button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
     <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">

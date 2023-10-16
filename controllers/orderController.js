@@ -22,17 +22,14 @@ const placeOrder = (req, res) => {
                     let SumQty = 0
                     const cartsItem = [];
                     rows.forEach((row) => {
-                        // Check if the cart item already exists in cartsItem array
                         const existingCartItem = cartsItem.find((item) => item.cart_id === row.cart_id);
                         if (existingCartItem) {
-                            // Add the option to the existing cart item
                             existingCartItem.options.push({
                                 option_id: row.option_id,
                                 option_name: row.option_name,
                                 option_type: row.option_type
                             });
                         } else {
-                            // Create a new cart item and add it to cartsItem array
                             const cartItem = {
                                 cart_id: row.cart_id,
                                 user_id: row.user_id,
@@ -112,9 +109,12 @@ const placeOrder = (req, res) => {
                                 });
                             })
                         }
-                        console.log(SumPrice);
-                        console.log(discount);
-                        dbConnection.promise().query('INSERT INTO orders SET order_date = NOW(), order_status = "waitpay", discount = ?, user_id = ?, coupon_id = ?, shipment_price = ?, payment_method_id = ?', [discount, req.session.user_id, coupon, shipment_price, paymentMethod])
+                        // console.log(SumPrice);
+                        // console.log(discount);
+                        const today = new Date();
+                        const tomorrow = new Date(today);
+                        tomorrow.setDate(today.getDate() + 1);
+                        dbConnection.promise().query('INSERT INTO orders SET order_date = NOW(), order_status = "waitpay", discount = ?, require_date = ? ,user_id = ?, coupon_id = ?, shipment_price = ?, payment_method_id = ?', [discount, tomorrow, req.session.user_id, coupon, shipment_price, paymentMethod])
                             .then(([order]) => {
                                 const order_id = order.insertId;
                                 dbConnection.promise().query('SELECT * FROM address WHERE address_id = ?', selectAddress).then(([address]) => {
@@ -212,7 +212,7 @@ const AdminCancel = (req, res) => {
     dbConnection.promise().query('INSERT INTO cancelOrder SET reason = ?, order_id = ?', [reason, oid], (err) => {
         if (err) throw err;
     });
-    req.flash(``);
+    req.flash(`success_msg`, 'ยกเลิกออเดอร์เรียบร้อยแล้ว');
     res.redirect(`/admin/order/${oid}`);
 }
 
@@ -262,7 +262,7 @@ const updatePaymentStatus = (req, res) => {
         message: 'data updated'
     });
 };
-
+ 
 const updateOrderShipment = (req, res) => {
     const oid = req.params.oid;
     const trackingNumber = req.body.trackingNumber;
@@ -274,6 +274,17 @@ const updateOrderShipment = (req, res) => {
     res.redirect(`/admin/order/${oid}`);
 }
 
+
+const confirmShiped = (req, res) => {
+    const oid = req.params.oid;
+    dbConnection.promise().query('UPDATE orders SET order_status = "success" WHERE order_id = ?', oid, (err, results) => {
+        console.log(err);
+        res.redirect(`/admin/order/${oid}`);
+    });
+    req.flash('success_msg', 'เปลี่ยนสถานะเป็นจัดส่งสำเร็จแล้ว')
+    res.redirect(`/admin/order/${oid}`);
+}
+
 module.exports = {
     placeOrder: placeOrder,
     changePayment: changePayment,
@@ -282,5 +293,6 @@ module.exports = {
     cancel: cancel,
     AdminCancel: AdminCancel,
     updatePaymentStatus: updatePaymentStatus,
-    updateOrderShipment: updateOrderShipment
+    updateOrderShipment: updateOrderShipment,
+    confirmShiped: confirmShiped,
 }

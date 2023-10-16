@@ -72,7 +72,7 @@
                             <td>
                                 <% if(coupon.status === 1) { %>
                                 <% if (new Date() >= coupon.start_date && new Date() <= coupon.end_date) { %>
-                                    เปิดใช้งาน
+                                เปิดใช้งาน
                                 <% } else { %>
                                 หมดอายุ
                                 <% } %>
@@ -121,6 +121,9 @@
                                     <label class="form-label" for="form6Example1">ชื่อคูปอง<span
                                             class="text-danger ms-1">*</span></label>
                                     <input type="text" class="form-control" name="couponName" required />
+                                    <div class="invalid-feedback">
+                                        กรุณากรอกชื่อคูปอง
+                                    </div>
                                 </div>
                                 <div class="col">
                                     <label class="form-label" for="couponCode">โค้ด <span
@@ -130,6 +133,9 @@
                                             style="pointer-events: all;"></i>
                                         <input type="text" class="form-control form-icon-trailing" id="couponCode"
                                             name="couponCode" maxlength="6" required />
+                                        <div class="invalid-feedback">
+                                            กรุณากรอกโค้ดคูปอง
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col">
@@ -146,7 +152,7 @@
                                         <label class="form-label me-2">ประเภทส่วนลด :</label>
                                         <div class="form-check me-3">
                                             <input class="form-check-input" type="radio" name="couponType" id="type1"
-                                                value="percent" required />
+                                                value="percent" checked required />
                                             <label class="form-check-label" for="type1">เปอร์เซ็นต์</label>
                                         </div>
                                         <div class="form-check">
@@ -158,16 +164,22 @@
                                     <div class="input-group">
                                         <input type="number" id="product-name" class="form-control" name="discountValue"
                                             required />
-                                        <span class="input-group-text" id="unittype"></span>
+                                        <span class="input-group-text" id="unittype">%</span>
+                                        <div class="invalid-feedback">
+                                            กรุณากรอกจำนวนยอดขั้นต่ำหรือจำนวนสินค้าขั้นต่ำ
+                                        </div>
                                     </div>
 
                                 </div>
-                                <div class="col">
+                                <div class="col mt-1">
                                     <label class="form-label" for="form6Example1">ยอดสั่งซื้อขั้นต่ำ<span
                                             class="text-danger ms-1"></span></label>
                                     <div class="input-group">
                                         <input type="number" class="form-control" name="minAmount" required />
                                         <span class="input-group-text" id="unittype">฿</span>
+                                        <div class="invalid-feedback">
+                                            กรุณากรอกจำนวนยอดสั่งซื้อขั้นต่ำ
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -176,22 +188,36 @@
                                     <label class="form-label">วันที่เริ่ม <span
                                             class="text-danger ms-2">*</span></label> <br>
                                     <input type="datetime-local" class="form-control" name="startDate" required />
+                                    <div class="invalid-feedback">
+                                        กรุณากรอกวันที่เริ่ม
+                                    </div>
                                 </div>
                                 <div class="col">
                                     <label class="form-label">วันที่สิ้นสุด <span
                                             class="text-danger ms-2">*</span></label> <br>
                                     <input type="datetime-local" class="form-control" name="endDate" required />
+                                    <div class="invalid-feedback">
+                                        กรุณากรอกจวันที่สิ้นสุด
+                                    </div>
                                 </div>
                             </div>
                             <div class="row mb-4">
                                 <div class="col">
                                     <label class="form-label" for="userLimit">จำกัดการใช้ต่อบัญชี</label>
                                     <br>
-                                    <input type="number" id="" class="form-control" name="userLimit" />
+                                    <input type="number" id="" class="form-control" name="userLimit" min="0" max="1000"
+                                        value="0" required />
+                                    <div class="invalid-feedback">
+                                        กรุณากรอกจำนวนจำกัดต่อบัญชี
+                                    </div>
                                 </div>
                                 <div class="col">
                                     <label class="form-label" for="couponAmount">จำนวนคูปอง</label> <br>
-                                    <input type="number" id="" class="form-control" name="couponAmount" />
+                                    <input type="number" id="" class="form-control" name="couponAmount" min="0"
+                                        max="1000" value="0" required />
+                                    <div class="invalid-feedback">
+                                        กรุณากรอกจำนวนคูปอง
+                                    </div>
                                 </div>
                             </div>
                             <div class="row mb-4">
@@ -230,6 +256,9 @@
                                 <label class="form-label" for="couponName">ชื่อคูปอง<span
                                         class="text-danger ms-1">*</span></label>
                                 <input type="text" id="couponName" class="form-control" name="newCouponName" required />
+                                <div class="invalid-feedback">
+                                    กรุณากรอกชื่อคูปอง
+                                </div>
                             </div>
                             <div class="col">
                                 <label class="form-label" for="couponCode">โค้ด <span
@@ -239,6 +268,9 @@
                                         style="pointer-events: all;"></i>
                                     <input type="text" id="newCouponCode" class="form-control form-icon-trailing"
                                         name="newCouponCode" maxlength="6" required />
+                                    <div class="invalid-feedback">
+                                        กรุณากรอกโค้ดคูปอง
+                                    </div>
                                 </div>
                             </div>
                             <div class="col">
@@ -268,6 +300,9 @@
                                     <input type="number" id="discountValue" class="form-control" name="newDiscountValue"
                                         required />
                                     <span class="input-group-text" id="newunittype">@</span>
+                                    <div class="invalid-feedback">
+                                        กรุณากรอกจำนวนยอดขั้นต่ำหรือจำนวนสินค้าขั้นต่ำ
+                                    </div>
                                 </div>
 
                             </div>
@@ -278,6 +313,9 @@
                                     <input type="number" id="minAmount" class="form-control" name="newMinAmount"
                                         value="0" required />
                                     <span class="input-group-text">฿</span>
+                                    <div class="invalid-feedback">
+                                        กรุณากรอกยอดสั่งซื้อขั้นต่ำ
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -286,21 +324,33 @@
                                 <label class="form-label" for="start">วันที่เริ่ม <span
                                         class="text-danger ms-2">*</span></label> <br>
                                 <input type="datetime-local" id="start" class="form-control" name="newStartDate" />
+                                <div class="invalid-feedback">
+                                    กรุณากรอกวันที่เริ่ม
+                                </div>
                             </div>
                             <div class="col">
                                 <label class="form-label" for="start">วันที่สิ้นสุด <span
                                         class="text-danger ms-2">*</span></label> <br>
                                 <input type="datetime-local" id="end" class="form-control" name="newEndDate" />
+                                <div class="invalid-feedback">
+                                    กรุณากรอกวันที่สิ้นสุด
+                                </div>
                             </div>
                         </div>
                         <div class="row mb-4">
                             <div class="col">
                                 <label class="form-label" for="userLimit">จำกัดการใช้ต่อบัญชี</label> <br>
                                 <input type="number" id="userLimit" class="form-control" name="newUserLimit" />
+                                <div class="invalid-feedback">
+                                    กรุณากรอกจำนวนจำกัดต่อบัญชี
+                                </div>
                             </div>
                             <div class="col">
                                 <label class="form-label" for="couponAmount">จำนวนคูปอง</label> <br>
                                 <input type="number" id="couponAmount" class="form-control" name="newCouponAmount" />
+                                <div class="invalid-feedback">
+                                    กรุณากรอกจำนวนคูปอง
+                                </div>
                             </div>
                         </div>
                         <div class="row mb-4">
@@ -392,21 +442,20 @@
         $('#newRandomCode').click(function () {
             $('#newCouponCode').val(generateCouponCode(6));
         })
-
         $('input[type=radio][name=couponType]').change(function () {
             if (this.value == 'percent') {
                 $('#unittype').text('%')
             } else if (this.value == 'value') {
                 $('#unittype').text('฿')
             }
-        })
+        });
         $('input[type=radio][name=newCouponType]').change(function () {
             if (this.value == 'percent') {
                 $('#newunittype').text('%')
             } else if (this.value == 'value') {
                 $('#newunittype').text('฿')
             }
-        })
+        });
         $(".copyCode").click(function () {
             var code = $(this).data('code');
             var textArea = document.createElement("textarea");

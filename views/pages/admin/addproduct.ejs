@@ -44,6 +44,9 @@
                                             required class="form-control" />
                                         <img src="/assets/img/white-bg.jpg" alt="" id="option_preview[0]"
                                             draggable="false" class="img_option">
+                                        <div class="invalid-feedback mt-2">
+                                            กรุณาอัปโหลดรูปภาพสินค้า
+                                        </div>
                                     </div>
                                 </div>
                                 <!-- <span class="mx-4"> รองรับไฟล์</span><br>
@@ -56,6 +59,9 @@
                                             required />
                                         <label class="form-label" for="form6Example1">ชื่อสินค้า<span
                                                 class="text-danger ms-1">*</span></label>
+                                        <div class="invalid-feedback">
+                                            กรุณากรอกชื่อสินค้า
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col">
@@ -78,8 +84,8 @@
                                     </select>
                                 </div>
 
-                                <div class="w-100 ps-0 ">
-                                    <div class="form-outline">
+                                <div class="w-100 ps-0 mt-2">
+                                    <div class="form-outline ">
                                         <textarea class="form-control" id="description" rows="4"
                                             name="product_description" required></textarea>
                                         <label class="form-label" for="description">รายละเอียดสินค้า <span
@@ -167,8 +173,8 @@
                                                 <div class="d-flex mb-2 sizeTierRow" style="height: 36px;">
                                                     <div class="me-2">
                                                         <div class="form-outline" style="width: 85px;">
-                                                            <input type="text" class="form-control" name="unit[0][]" placeholder="เช่น 1x1"
-                                                                required>
+                                                            <input type="text" class="form-control" name="unit[0][]"
+                                                                placeholder="เช่น 1x1" required>
                                                             <label class="form-label">ขนาด<span
                                                                     class="text-danger ms-2">*</span></label>
                                                         </div>
@@ -327,9 +333,9 @@
             <div class="d-flex mb-2 sizeTierRow" style="height: 36px;">
                                                     <div class="me-2">
                                                         <div class="form-outline" style="width: 85px;">
-                                                            <input type="number" class="form-control" name="unit[${sizeTierCount}][]"
+                                                            <input type="text" class="form-control" name="unit[${sizeTierCount}][]" placeholder="เช่น 1x1"
                                                                 required>
-                                                            <label class="form-label">กว้าง<span
+                                                            <label class="form-label">ขนาด<span
                                                                     class="text-danger ms-2">*</span></label>
                                                         </div>
                                                     </div>
@@ -431,7 +437,7 @@
             $("#categories").change(function () {
                 var selectedCategory = $(this).val();
                 var form = '';
-               if (selectedCategory === "sticker") {
+                if (selectedCategory === "sticker") {
                     stickerEng.forEach((item, index) => {
                         form += `<div class="border p-4 rounded option-box mb-2">
                             <input type="hidden" name="option_type[${index}]">

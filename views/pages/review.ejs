@@ -29,19 +29,29 @@
                         </div>
                         <div class="col mb-2">
                             <h4><%= product.productName %></h4>
-                            <select class="star-rating" name="rating[<%= index %>]">
-                                <option value="">เลือกคะแนน</option>
-                                <option value="5" <%= reviews.length > 0 && reviews[0].rate == 5 ? 'selected' : '' %>>
-                                    ดีมาก</option>
-                                <option value="4" <%= reviews.length > 0 && reviews[0].rate == 4 ? 'selected' : '' %>>ดี
-                                </option>
-                                <option value="3" <%= reviews.length > 0 && reviews[0].rate == 3 ? 'selected' : '' %>>
-                                    พอใช้</option>
-                                <option value="2" <%= reviews.length > 0 && reviews[0].rate == 2 ? 'selected' : '' %>>
-                                    แย่</option>
-                                <option value="1" <%= reviews.length > 0 && reviews[0].rate == 1 ? 'selected' : '' %>>
-                                    แย่มาก</option>
-                            </select>
+                            <div>
+                                <select class="star-rating" name="rating[<%= index %>]" oninvalid="this.setCustomValidity('กรุณาเลือกคะแนน')" required>
+                                    <option value="">เลือกคะแนน</option>
+                                    <option value="5"
+                                        <%= reviews.length > 0 && reviews[0].rate == 5 ? 'selected' : '' %>>
+                                        ดีมาก</option>
+                                    <option value="4"
+                                        <%= reviews.length > 0 && reviews[0].rate == 4 ? 'selected' : '' %>>ดี
+                                    </option>
+                                    <option value="3"
+                                        <%= reviews.length > 0 && reviews[0].rate == 3 ? 'selected' : '' %>>
+                                        พอใช้</option>
+                                    <option value="2"
+                                        <%= reviews.length > 0 && reviews[0].rate == 2 ? 'selected' : '' %>>
+                                        แย่</option>
+                                    <option value="1"
+                                        <%= reviews.length > 0 && reviews[0].rate == 1 ? 'selected' : '' %>>
+                                        แย่มาก</option>
+                                </select>
+                                <div class="invalid-feedback mt-2">
+                                    กรุณาเลือกคะแนน
+                                </div>
+                            </div>
                             <div class="form-outline mt-3 w-100">
                                 <textarea class="form-control w-100" name="detail[<%= index %>]" id="textAreaExample"
                                     rows="5" data-mdb-showcounter="true"
@@ -65,6 +75,7 @@
 
 <%- include('../partials/footer') %>
 <%- include('../partials/chat') %>
+<script src="/js/validateBs.js"></script>
 <script src="/node_modules//star-rating.js/dist/star-rating.min.js"></script>
 <script>
     var stars = new StarRating('.star-rating');

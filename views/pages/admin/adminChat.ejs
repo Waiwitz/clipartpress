@@ -61,11 +61,11 @@
                         <input class="input-message shadow-6-strong" id="input-message-<%= user.user_id %>" type="text"
                             placeholder="พิมพ์ข้อความ.." name="message-text" maxlength="300">
                         <div class="d-flex chat-action">
-                            <div class="upload-img">
+                            <!-- <div class="upload-img">
                                 <i class="fa-solid fa-image ms-1"></i>
                                 <input type="file" name="option_img[]" onchange="previewImage(event, [0])"
                                     accept="image/png, image/jpeg" multiple />
-                            </div>
+                            </div> -->
                             <button class="send-ms" type="submit">
                                 <i class="fa-sharp fa-solid fa-paper-plane" style="color: #425c8a;"></i>
                             </button>
@@ -108,13 +108,12 @@
             var ms = document.getElementsByClassName(`message-${userId}`);
             ms.scrollTop = ms.scrollHeight;
         });
-
-        socket.on('newMessage', (message) => {
-            console.log(`Admin Received message: ${message.message}`);
-            getMessage(message.message, message.sender);
-        });
     });
 
+    socket.on('newMessage', (message) => {
+        console.log(`Admin Received message: ${message.message}`);
+        getMessage(message.message, message.sender);
+    });
 
     function getChatHistory(userId) {
         $.ajax({

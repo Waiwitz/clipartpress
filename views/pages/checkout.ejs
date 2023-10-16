@@ -49,6 +49,14 @@
     <form action="/placeOrder/" method="post">
         <input type="hidden" name="product_id" value="<%= JSON.stringify(cartsItem.product_id) %>">
         <div class="container-lg mt-5 mb-5 p-auto">
+            <div>
+                <h2>เช็คเอาท์</h2>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">หน้าแรก</a></li>
+                    <li class="breadcrumb-item"><a href="/cart">ตะกร้าสินค้า</a></li>
+                    <li class="breadcrumb-item active">เช็คเอาท์</li>
+                </ol>
+            </div>
             <% if(success_msg != "") { %>
             <% success_msg.forEach((item) => { %>
             <div class="alert alert-success">
@@ -67,8 +75,9 @@
             <% let SumPrice = 0; %>
             <% let SumQty = 0; %>
             <% if(cartsItem.length > 0) { %>
-            <div class="d-flex flex-wrap">
-                <div class="col-8 overflow-y-scroll" style="height: 700px;">
+
+            <div class="row">
+                <div class="col-md-8 overflow-y-scroll" style="height: 350px;">
                     <% cartsItem.forEach((item) => { %>
                     <% qty = item.quantity %>
                     <% price = item.price %>
@@ -104,28 +113,28 @@
                                     <%  let min_reach = promo.min_reach;%>
                                     <% if (new Date() >= promo.start_date && new Date() <= promo.end_date) { %>
                                     <!-- แถมเมื่อยอดถึง -->
-                                    <% if (promo.promo_type == 'giveaway' && promo.promo_condition == 'value') { %>
+                                    <% if (promo.promo_type == 'giveaway' && promo.promo_condition == 'value' && item.product_id == promo.product_id) { %>
                                     <% if (item.price >= promo.min_reach) {%>
                                     <% qty = item.quantity + promo.type_value%>
                                     <% textQty = `<b>${qty}</b><br><s>${item.quantity}</s>` %>
                                     <% } %>
 
                                     <!-- แถมเมื่อชิ้นถึง -->
-                                    <% } else if (promo.promo_type == 'giveaway' && promo.promo_condition == 'qty') { %>
+                                    <% } else if (promo.promo_type == 'giveaway' && promo.promo_condition == 'qty' && item.product_id == promo.product_id) { %>
                                     <% if (item.quantity >= promo.min_reach) {%>
                                     <% qty = item.quantity + promo.type_value%>
                                     <% textQty = `<b>${qty}</b><br><s>${item.quantity}</s>` %>
                                     <% } %>
 
                                     <!-- ลดเมื่อยอดถึง -->
-                                    <%  }else if (promo.promo_type == 'discount' && promo.promo_condition == 'value') { %>
+                                    <%  }else if (promo.promo_type == 'discount' && promo.promo_condition == 'value' && item.product_id == promo.product_id) { %>
                                     <% if (item.price >= promo.min_reach) {%>
                                     <% price = item.price - (item.price * promo.type_value / 100)%>
                                     <% textPrice = `<b>${money.format(price)}</b><br><s>${money.format(item.price)}</s>` %>
                                     <% } %>
 
                                     <!-- ลดเมื่อชิ้นถึง -->
-                                    <% } else if (promo.promo_type == 'discount' && promo.promo_condition == 'qty') { %>
+                                    <% } else if (promo.promo_type == 'discount' && promo.promo_condition == 'qty' && item.product_id == promo.product_id) { %>
                                     <% if (item.quantity >= promo.min_reach) {%>
                                     <% price = item.price - (item.price * promo.type_value / 100) %>
                                     <% textPrice = `<b>${money.format(price)}</b><br><s>${money.format(item.price)}</s>` %>
@@ -148,8 +157,8 @@
                     </div>
                     <% }) %>
                 </div>
-                <div class="col-4">
-                    <div class="card mt-0 overflow-y-scroll position-sticky" style="height: 700px;">
+                <div class="col-md-4">
+                    <div class="card mt-0 overflow-y-scroll position-sticky" style="height: fit-content;">
                         <div class="p-2">
                             <div class="px-4 pt-3 d-flex justify-content-between">
                                 <b class="fs-5">ที่อยู่จัดส่ง</b>

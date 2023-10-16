@@ -35,6 +35,9 @@
                                     class="text-danger ms-1">*</span></label>
                             <input type="text" id="promoName" class="form-control" name="promoName"
                                 value="<%= promotions.promo_name %>" required />
+                            <div class="invalid-feedback">
+                                กรุณากรอกชื่อโปรโมชั่น
+                            </div>
                         </div>
                         <div class="col">
                             <label class="form-label" for="inlineFormSelectPref">สถานะ</label>
@@ -55,16 +58,57 @@
                         <div class="col">
                             <label class="form-label" for="start">วันที่เริ่ม <span
                                     class="text-danger ms-2">*</span></label> <br>
-
                             <input type="datetime-local" id="start" class="form-control" name="start"
                                 value="<%= start %>" required />
+                            <div class="invalid-feedback">
+                                กรุณากรอกวันที่เริ่ม
+                            </div>
                         </div>
                         <div class="col">
                             <label class="form-label" for="start">วันที่สิ้นสุด <span
                                     class="text-danger ms-2">*</span></label> <br>
                             <input type="datetime-local" id="end" class="form-control" name="end" value="<%= end %>"
                                 required />
+                            <div class="invalid-feedback">
+                                กรุณากรอกวันที่สิ้นสุด
+                            </div>
                         </div>
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col-6">
+                            <h6 class="">สินค้าที่ร่วมรายการ <span class="text-danger ms-2">*</span></h6>
+                            <select multiple="multiple" id="product-check" name="product[]" class="w-100" required>
+                                <% let labelEn = ['bill','sticker','envelope'] %>
+                                <% let label = ['ใบบิล','สติ๊กเกอร์','ซองจดหมาย'] %>
+
+                                <% labelEn.forEach((item,index) => { %>
+                                <optgroup label="<%= label[index] %>">
+                                    <% if (products.some(product => product.categories === item)) { %>
+                                    <% products.forEach((product) => { %>
+                                    <% const promo = allpromo.find(promo => promo.product_id == product.product_id && promo.deleted_at == null) %>
+                                    <% const selectedProductIds = selectedProduct.map(product => product.product_id); %>
+                                    <% if(product.categories === item) { %>
+                                    <option value="<%= product.product_id %>"
+                                        <%= promo && !selectedProductIds.includes(product.product_id) ? 'disabled' : '' %>>
+                                        <%= product.productName %>
+                                        <%= promo && !selectedProductIds.includes(product.product_id) ? '(มีโปรโมรชั่นแล้ว)' : '' %>
+                                    </option>
+                                    <% } %>
+                                    <% }); %>
+                                    <% } else { %>
+                                    <option disabled>ยังไม่มีสินค้าประเภทนี้</option>
+                                    <% } %>
+                                </optgroup>
+                                <% }) %>
+
+                            </select>
+                            <div class="invalid-feedback mt-2">
+                                กรุณาเลือกสินค้าที่ร่วมรายการอย่างน้อย 1 อย่าง
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-5 mb-4 border-bottom">
+                        <h4>กำหนดโปรโมชั่น</h4>
                     </div>
                     <div class="row mb-4">
                         <div class="col">
@@ -91,9 +135,12 @@
                                     ชิ้น
                                     <% } %>
                                 </span>
+                                <div class="invalid-feedback">
+                                    กรุณากรอกจำนวนส่วนลดหรือส่วนแถม
+                                </div>
                             </div>
                         </div>
-                        <div class="col">
+                        <div class="col mb-3">
                             <label class="form-label me-2">เงื่อนไขโปรโมชั่น :</label>
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="radio" name="condition" id="condition1"
@@ -115,81 +162,10 @@
                                     <% }else if (promotions.promo_condition == 'qty') { %>
                                     ชิ้น
                                     <% } %></span>
-
+                                <div class="invalid-feedback">
+                                    กรุณากรอกจำนวนยอดขั้นต่ำหรือจำนวนสินค้าขั้นต่ำ
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                    <div class="row mb-4">
-                        <div class="col-6">
-                            <h6 class="">สินค้าที่ร่วมรายการ <span class="text-danger ms-2">*</span></h6>
-                            <select multiple="multiple" id="product-check" name="product[]" class="w-100" required>
-                                <optgroup label="นามบัตร">
-                                    <% if (products.some(product => product.categories === 'card')) { %>
-                                    <% products.forEach((product) => { %>
-                                    <% if(product.categories === 'card') { %>
-                                    <option value="<%= product.product_id %>"><%= product.productName %></option>
-                                    <% } %>
-                                    <% }); %>
-                                    <% } else { %>
-                                    <option disabled>ยังไม่มีสินค้าประเภทนี้</option>
-                                    <% } %>
-                                </optgroup>
-                                <optgroup label="ใบปลิว">
-                                    <% if (products.some(product => product.categories === 'flyer')) { %>
-                                    <% products.forEach((product) => { %>
-                                    <% if(product.categories === 'flyer') { %>
-                                    <option value="<%= product.product_id %>"><%= product.productName %></option>
-                                    <% } %>
-                                    <% }); %>
-                                    <% } else { %>
-                                    <option disabled>ยังไม่มีสินค้าประเภทนี้</option>
-                                    <% } %>
-                                </optgroup>
-                                <optgroup label="แผ่บพับ">
-                                    <% if (products.some(product => product.categories === 'leaflet')) { %>
-                                    <% products.forEach((product) => { %>
-                                    <% if(product.categories === 'leaflet') { %>
-                                    <option value="<%= product.product_id %>"><%= product.productName %></option>
-                                    <% } %>
-                                    <% }); %>
-                                    <% } else { %>
-                                    <option disabled>ยังไม่มีสินค้าประเภทนี้</option>
-                                    <% } %>
-                                </optgroup>
-                                <optgroup label="สติ๊กเกอร์">
-                                    <% if (products.some(product => product.categories === 'sticker')) { %>
-                                    <% products.forEach((product) => { %>
-                                    <% if(product.categories === 'sticker') { %>
-                                    <option value="<%= product.product_id %>"><%= product.productName %></option>
-                                    <% } %>
-                                    <% }); %>
-                                    <% } else { %>
-                                    <option disabled>ยังไม่มีสินค้าประเภทนี้</option>
-                                    <% } %>
-                                </optgroup>
-                                <optgroup label="ใบบิล">
-                                    <% if (products.some(product => product.categories === 'bill')) { %>
-                                    <% products.forEach((product) => { %>
-                                    <% if(product.categories === 'bill') { %>
-                                    <option value="<%= product.product_id %>"><%= product.productName %></option>
-                                    <% } %>
-                                    <% }); %>
-                                    <% } else { %>
-                                    <option disabled>ยังไม่มีสินค้าประเภทนี้</option>
-                                    <% } %>
-                                </optgroup>
-                                <optgroup label="ซองจดหมาย">
-                                    <% if (products.some(product => product.categories === 'envelope')) { %>
-                                    <% products.forEach((product) => { %>
-                                    <% if(product.categories === 'envelope') { %>
-                                    <option value="<%= product.product_id %>"><%= product.productName %></option>
-                                    <% } %>
-                                    <% }); %>
-                                    <% } else { %>
-                                    <option disabled>ยังไม่มีสินค้าประเภทนี้</option>
-                                    <% } %>
-                                </optgroup>
-                            </select>
                         </div>
                     </div>
                     <div class="row mb-4">
@@ -290,6 +266,11 @@
                     filter: true,
                     placeholder: 'เลือกสินค้าที่ร่วมรายการ',
                     type: 'optgroup',
+                    onClick: function (view) {
+                        $(view).addClass('form-control'); // Apply Bootstrap form-control class
+                        $(view).closest('.ms-container').addClass(
+                            'form-group'); // Apply Bootstrap form-group class
+                    }
 
                     // hideOptgroupCheckboxes: false
                 });

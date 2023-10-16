@@ -4,17 +4,17 @@
     <div class="mb-5 secondHead-admin">
         <div class="secondHead-content">
             <h1>ออเดอร์ #<%= orders[0].order_id %> - <% if (orders[0].order_status === 'waitpay') {%>
-                รอชำระ
+                <span class="fs-1 text-warning">รอชำระ</span>
                 <%} else if (orders[0].order_status === 'pending') {%>
-                รอตรวจสอบ
+                <span class="fs-1 text-warning">รอตรวจสอบ</span>
                 <% } else if (orders[0].order_status === 'produce') {%>
-                กำลังผลิต
+                <span class="fs-1 text-info">กำลังผลิต</span>
                 <% } else if (orders[0].order_status === 'shipping') {%>
-                กำลังจัดส่ง
+                <span class="fs-1 text-secondary">กำลังจัดส่ง</span>
                 <% } else if (orders[0].order_status === 'success') {%>
-                จัดส่งสำเร็จ
+                <span class="fs-1 text-success">จัดส่งสำเร็จ</span>
                 <% } else if (orders[0].order_status === 'cancel') {%>
-                ยกเลิก
+                <span class="fs-1 text-cancel">ยกเลิก</span>
                 <% } %></h1>
         </div>
     </div>
@@ -47,9 +47,22 @@
         <% if (orders[0].discount != null) { %>
         <% couponDiscount = orders[0].discount; %>
         <% } %>
-        <div class="text-end mb-4">
-            <button class="btn btn-danger fs-6" data-bs-toggle="modal"
-                data-bs-target="#cancelOrder">ยกเลิกออเดอร์</button>
+        <div class="w-100 d-flex justify-content-between">
+            <a href="/purchaseorder/<%= orders[0].order_id %>">
+                <button class="btn btn-warning fs-6"><i class="fa-solid fa-print"></i> พิมพ์ใบสั่งซื้อ</button>
+            </a>
+            <% if (orders[0].order_status == 'waitpay' || orders[0].order_status == 'pending') { %>
+            <div>
+                <button class="btn btn-danger fs-6" data-bs-toggle="modal"
+                    data-bs-target="#cancelOrder">ยกเลิกออเดอร์</button>
+            </div>
+            <% } %>
+            <% if (orders[0].order_status == 'shipping') { %>
+            <div class="">
+                <button class="btn btn-success btn-sm mx-5 fs-6 w-25" data-bs-toggle="modal"
+                    data-bs-target="#confirmShiped"><i class="fa-solid fa-circle-check"></i> ยืนยันจัดส่งสำเร็จ</button>
+            </div>
+            <% } %>
         </div>
         <div class="row mt-2">
             <div class="col">
@@ -67,7 +80,7 @@
                             <% let sumprice = 0; %>
                             <% let shipmentprice = orders[0].shipment_price; %>
                             <% orders[0].order_detail.forEach((order, index) => { %>
-                            <div class="row my-2 py-2">
+                            <div class="row my-2 py-2 border-bottom">
                                 <div class="col-2 h-100">
                                     <div class="myorder-product-img">
                                         <img src="<%= order.picture %>" alt="" class="imageFitBox">
@@ -95,6 +108,11 @@
                                 <div class="col-2">
                                     <h5>ราคา</h5>
                                     <p><%= money.format(order.price) %></p>
+                                </div>
+                                <div class="text-end">
+                                    <a href="/design<%= order.design_file %>">
+                                        <i class="fa-solid fa-file"></i> ไฟล์ออกแบบ
+                                      </a>                                      
                                 </div>
                             </div>
                             <% sumprice += order.price %>
@@ -148,10 +166,33 @@
             </div>
             <div class="col-4">
                 <div class="card">
+                    <div class="card-body">
+                        <h4>ข้อมูลผู้ซื้อ</h4>
+                        <h6>ชื่อ : <%= user.name %></h6>
+                        <h6>อีเมล : <%= user.email %></h6>
+                        <h6>เบอร์โทรศัพท์ : <%= user.telephone %></h6>
+                    </div>
+                </div>
+                <div class="card">
                     <div class="card-body mb-2">
                         <div id="paymentCol">
                             <div>
-                                <h4>การชำระเงิน</h4>
+                                <div class="d-flex justify-content-between">
+                                    <h4>การชำระเงิน</h4>
+                                    <% if (payments.length > 0 && payments[0].payment_status === 'waitpay') {%>
+                                    <div class="alert-warning p-1 rounded text-center">
+                                        ลูกค้ายังไม่ได้ชำระเงิน
+                                    </div>
+                                    <%} else if (orders[0].order_status === 'pending') {%>
+                                    <div class="alert-info p-1 rounded text-center">
+                                        รอตรวจสอบ
+                                    </div>
+                                    <% } else if (payments.length > 0 && payments[0].payment_status === 'approved') {%>
+                                    <div class="alert-success p-1 rounded text-center">
+                                        ชำระเงินแล้ว
+                                    </div>
+                                    <% } %>
+                                </div>
                                 <div class="text-start pt-2">
                                     <% const bankname = banklist.find(row => row.en == paymentSelect[0].method_name) %>
                                     <% if (bankname) { %>
@@ -166,16 +207,22 @@
                                 <div class="alert-warning p-2 rounded w-100 text-center">
                                     ลูกค้ายังไม่ได้ชำระเงิน
                                 </div>
-                                <%} else if (orders[0].order_status === 'pending') {%>
-                                <div class="alert-info text-center p-2 rounded mb-2">
-                                    <p class="mb-0">ลูกค้าแจ้งชำระเงินเข้ามาแล้ว <br>
-                                        วันที่ชำระ : <%= datetimeLocal(payments[0].paid_date) %></p>
+                                <%} else if (orders[0].order_status == 'pending' && payments[0].payment_status == 'pending' && payments.length > 0 ) {%>
+                                <!-- <div class="alert-info text-center p-2 rounded mb-2">
+                                    <p class="mb-0">ลูกค้าแจ้งชำระเงินเข้ามาแล้ว</p>
+                                </div> -->
+                                <div class="d-flex justify-content-between">
+                                    วันที่โอน : <%= datetimeLocal(payments[0].paid_date) %>
+                                    <div class="slipRow " role="button" data-bs-toggle="modal"
+                                        data-bs-target="#slipShow" data-img="<%= payments[0].slip %>"
+                                        style="width: 50px; height: 50px;">
+                                        <img src="<%= payments[0].slip %>"" alt=" slip"
+                                            class="object-cover w-100 h-100">
+                                    </div>
                                 </div>
-
-                                <button class="btn btn-info btn-sm fs-6 w-100" data-bs-toggle="modal"
-                                    data-bs-target="#confirmPayment"><i
-                                        class="fa-regular fa-eye me-2"></i>ดูหลักฐาน</button>
-                                <% } else if (payments[0].payment_status == 'approved') {%>
+                                <button class="btn btn-info btn-sm mt-3 fs-6 w-100" data-bs-toggle="modal"
+                                    data-bs-target="#confirmPayment">ยืนยันการชำระ</button>
+                                <% } else if (payments.length > 0 && payments[0].payment_status == 'approved') {%>
                                 <div class="alert-info w-100 text-center p-2 rounded">
                                     ลูกค้าชำระเงินแล้ว
                                 </div>
@@ -188,7 +235,7 @@
                     <div class="card-body">
                         <div id="shipmentCol">
                             <h4>การจัดส่ง</h4>
-                            <div class="mb-3">
+                            <div class="">
                                 <% shipment.forEach((addr) => { %>
                                 <b id="ad-name"><%= addr.name %></b> <br>
                                 <span class="card-text" id="ad-info">
@@ -198,12 +245,12 @@
                                 <% }) %>
                             </div>
 
-                            <h6>การจัดส่ง: <%= shipment[0].shipment_name %></h6>
-                            <% if (payments[0].payment_status == 'approved') { %>
+                            <h6 class="border-top my-3 pt-2">การจัดส่ง: <%= shipment[0].shipment_name %></h6>
+                            <% if (payments.length > 0 && payments[0].payment_status == 'approved') { %>
                             <div role="button" class="editOrder-btn btn btn-primary fs-6 w-100" data-bs-toggle="modal"
                                 data-bs-target="#updateModal" data-id="<%= orders[0].order_id %>"
                                 data-tracking="<%= orders[0].tracking_number %>">
-                                <% if (orders[0].order_status == 'shipping') { %>
+                                <% if (orders[0].order_status == 'shipping' || orders[0].order_status == 'success') { %>
                                 แก้ไขเลขพัสดุ
                                 <% } else { %>
                                 จัดส่งสินค้าและใส่หมายเลขพัสดุ
@@ -227,15 +274,15 @@
                     </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form action="/cancelorder/<%= orders[0].order_id %>" class="needs-validation" method="post" novalidate>
+                <form action="/adminCancel/<%= orders[0].order_id %>" class="needs-validation" method="post" novalidate>
                     <div class="modal-body" id="cancel-modal-body">
                         <div class="mb-3">
                             <label class="form-label" for="reason">เหตุผลที่ยกเลิก<span
                                     class="text-danger ms-1">*</span></label>
                             <select class="form-select" name="reason" id="reason" required>
-                                <option value="เปลี่ยนใจในการสั่งซื้อ">วัสดุไม่เพียงพอ</option>
-                                <option value="ต้องการเปลี่ยนออฟชั่นสินค้า">ไม่รับผลิตในขณะนี้</option>
-                                <option value="ต้องการเปลี่ยนที่อยู่จัดส่ง">ต้องการเปลี่ยนที่อยู่จัดส่ง</option>
+                                <option value="วัสดุไม่เพียงพอ">วัสดุไม่เพียงพอ</option>
+                                <option value="ไม่รับผลิตในขณะนี้">ไม่รับผลิตในขณะนี้</option>
+                                <!-- <option value="ต้องการเปลี่ยนที่อยู่จัดส่ง">ต้องการเปลี่ยนที่อยู่จัดส่ง</option> -->
                                 <option value="other">อื่นๆ</option>
                             </select>
                         </div>
@@ -285,16 +332,16 @@
     <div class="modal fade" id="confirmPayment" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header border-bottom-0">
+                <div class="modal-header">
+                    <h4>ยืนยันการชำระ</h4>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <% if (payments.length > 0) { %>
                     <div class="w-100">
-                        <div class="slipRow m-auto" role="button" data-bs-toggle="modal" data-bs-target="#slipShow"
-                            data-img="<%= payments[0].slip %>" style="width: 200px; height: 250px;">
-                            <img src="<%= payments[0].slip %>"" alt=" slip" class="object-cover w-100 h-100">
-                        </div>
+                        <p>คุณต้องการยืนยันการชำระนี้หรือไม่ ?</p>
+                        <span>หากกด<b class="text-success"> ยืนยัน </b>จะเปลี่ยนสถานะออเดอร์เป็นกำลังผลิต</span><br>
+                        <span>หากกด<b class="text-danger"> ปฏิเสธ </b>จะเปลี่ยนสถานะออเดอร์เป็นรอการชำระ</span>
                         <div class="mt-4 text-center action-row">
                             <button class="btn btn-success actionBtn" data-id="<%= payments[0].payment_id %>"
                                 data-status="approved">ยืนยัน</button>
@@ -307,14 +354,34 @@
             </div>
         </div>
     </div>
-
+    <div class="modal fade" id="confirmShiped" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <form action="/confirmShiped/<%= orders[0].order_id %>" method="post">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4>ยืนยันจัดส่งสำเร็จ</h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="w-100">
+                            <p>คุณต้องการยืนยันจัดส่งสำเร็จหรือไม่ ?</p>
+                            <span>หากกด<b class="text-success"> ยืนยัน
+                                </b>จะเปลี่ยนสถานะออเดอร์เป็นจัดส่งสำเร็จ</span><br>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">ปฏิเสธ</button>
+                        <button class="btn btn-success" type="submit">ยืนยัน</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
     <div class="modal fade" id="slipShow" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header border-bottom-0">
-                    <button class="btn btn-link fs-6" data-bs-toggle="modal" data-bs-target="#confirmPayment">
-                        < ย้อนกลับ</button> <button type="button" class="btn-close" data-bs-dismiss="modal"
-                            aria-label="Close">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
                     </button>
                 </div>
                 <div class="modal-body">

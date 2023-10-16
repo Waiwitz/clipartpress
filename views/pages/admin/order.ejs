@@ -144,8 +144,8 @@
                             <% let vat = sumprice * 7 / 100; %>
                             <td> <%= money.format((sumprice + shipmentprice + vat) - couponDiscount) %></td>
                             <td>
-                                <a href="/admin/order/<%= order.order_id %>" class="btn btn-primary">
-                                    <i class="fa-solid fa-eye fs-5"></i>
+                                <a href="/admin/order/<%= order.order_id %>" class="btn btn-secondary">
+                                    <i class="fa-solid fa-pen-to-square fs-5"></i>
                                 </a>
                             </td>
                         </tr>

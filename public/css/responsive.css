@@ -29,12 +29,20 @@
     .product_list_card {
         height: 200px;
     }
-    .itemlist .price ,  .itemlist .des  {
+
+    .itemlist .price,
+    .itemlist .des {
         display: none;
     }
 
     .cate-select-group {
         width: 100%;
+        display: flex !important;
+        justify-content: center;
+    }
+
+    .cate-button {
+        margin: 0 0.5em !important;
     }
 
     .myorder-tab span {
@@ -48,6 +56,14 @@
 }
 
 @media only screen and (max-width: 680px) {
+    p,
+    span,
+    b,
+    s,
+    a,
+    li {
+        font-size: 16px;
+    }
 
     .order-item .col,
     .order-item .col-7 {

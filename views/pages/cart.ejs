@@ -48,11 +48,18 @@
                 <% const findPromo = promotions.some(row => row.product_id == item.product_id) %>
                 <% let textPrice = money.format(item.price); %>
                 <% let textQty = item.quantity; %>
-                <div class="card mx-0 overflow-hidden p-2">
-                    <div class="card-body p-2 overflow-hidden">
+                <div class="card mx-0 overflow-hidden p-2 <%= item.product_status == 0 || item.product_deleted_at !== null ? 'product-refrain' : '' %> ">
+                    <% if (item.product_status == 0 || item.product_deleted_at !== null) { %>
+                    <div class="alert-info rounded-2 position-absolute bottom-0 end-0 p-2 mb-2 me-2"
+                        style="z-index: 3;">
+                        ไม่มีสินค้านี้แล้วหรืองดผลิตชั่วคราว
+                    </div>
+                    <% } %>
+                    <div class="card-body product_list_card p-2 overflow-hidden">
                         <div class="row">
                             <div class="col-2">
-                                <div class="cart-product-picture">
+                                <div
+                                    class="cart-product-picture">
                                     <img src="<%= item.picture %>" alt="" class="imageFitBox" draggable="false">
                                 </div>
                             </div>
@@ -63,7 +70,6 @@
                                     <% item.options.forEach((option) => {  %>
                                     <% let type; %>
                                     <% if (option.option_type == 'papertype') type = 'กระดาษ' %>
-                                    <% if (option.option_type == 'die-cut') type = 'การไดคัท' %>
                                     <% if (option.option_type == 'color') type = 'สีกระดาษ' %>
                                     <% if (option.option_type == 'tear') type = 'แนวฉีก' %>
                                     <% if (option.option_type == 'printside') type = 'ด้านพิมพ์' %>
@@ -77,28 +83,28 @@
                                 <%  let min_reach = promo.min_reach;%>
                                 <% if (new Date() >= promo.start_date && new Date() <= promo.end_date) { %>
                                 <!-- แถมเมื่อยอดถึง -->
-                                <% if (promo.promo_type == 'giveaway' && promo.promo_condition == 'value') { %>
+                                <% if (promo.promo_type == 'giveaway' && promo.promo_condition == 'value' && item.product_id == promo.product_id) { %>
                                 <% if (item.price >= promo.min_reach) {%>
                                 <% qty = item.quantity + promo.type_value%>
                                 <% textQty = `<b>${qty}</b><br><s>${item.quantity}</s>` %>
                                 <% } %>
 
                                 <!-- แถมเมื่อชิ้นถึง -->
-                                <% } else if (promo.promo_type == 'giveaway' && promo.promo_condition == 'qty') { %>
+                                <% } else if (promo.promo_type == 'giveaway' && promo.promo_condition == 'qty' && item.product_id == promo.product_id) { %>
                                 <% if (item.quantity >= promo.min_reach) {%>
                                 <% qty = item.quantity + promo.type_value%>
                                 <% textQty = `<b>${qty}</b><br><s>${item.quantity}</s>` %>
                                 <% } %>
 
                                 <!-- ลดเมื่อยอดถึง -->
-                                <%  }else if (promo.promo_type == 'discount' && promo.promo_condition == 'value') { %>
+                                <%  }else if (promo.promo_type == 'discount' && promo.promo_condition == 'value' && item.product_id == promo.product_id) { %>
                                 <% if (item.price >= promo.min_reach) {%>
                                 <% price = item.price - (item.price * promo.type_value / 100)%>
                                 <% textPrice = `<b>${money.format(price)}</b><br><s>${money.format(item.price)}</s>` %>
                                 <% } %>
 
                                 <!-- ลดเมื่อชิ้นถึง -->
-                                <% } else if (promo.promo_type == 'discount' && promo.promo_condition == 'qty') { %>
+                                <% } else if (promo.promo_type == 'discount' && promo.promo_condition == 'qty' && item.product_id == promo.product_id) { %>
                                 <% if (item.quantity >= promo.min_reach) {%>
                                 <% price = item.price - (item.price * promo.type_value / 100) %>
                                 <% textPrice = `<b>${money.format(price)}</b><br><s>${money.format(item.price)}</s>` %>
@@ -117,6 +123,7 @@
                                 <%- textPrice %>
                             </div>
                             <div class="col-1 text-end">
+                                <% if (item.product_status == 1 && item.product_deleted_at == null) { %>
                                 <a href="/editproduct-cart/<%= item.product_id %>/<%= item.cart_id %>/<%= item.cart_detail_id %>"
                                     class="text-drak d-block mb-5">
                                     <i class="fa-solid fa-pen-to-square"></i> แก้ไข
@@ -125,6 +132,7 @@
                                     data-mdb-target="#deleteModal" data-cart-id="<%= item.cart_id %>">
                                     ลบ
                                 </button>
+                                <% } %>
                             </div>
                         </div>
                     </div>

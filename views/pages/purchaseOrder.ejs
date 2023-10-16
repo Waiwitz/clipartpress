@@ -1,0 +1,185 @@
+<%- include('../partials/head') %>
+<%     function datetimeLocal(datetime) { %>
+<%   const dt = new Date(datetime); %>
+<%    dt.setMinutes(dt.getMinutes() - dt.getTimezoneOffset()); %>
+<%   return dt.toISOString().slice(0, 10) + ' ' + dt.toISOString().slice(11, 16); %>
+<%  } %>
+<style>
+    body {
+        background: rgb(255, 255, 255);
+    }
+
+    .A4 {
+        width: 21cm;
+        height: 29.7cm;
+    }
+
+    @media print {
+        body {
+            background: white;
+            margin: 0 !important;
+            box-shadow: 0 !important;
+        }
+    }
+
+    p,
+    span,
+    b,
+    s,
+    a,
+    li {
+        font-size: 16px !important;
+    }
+
+    p {
+        margin: 0;
+    }
+
+    .info {
+        width: 90px;
+    }
+</style>
+
+<body class="A4 shadow-4-strong mx-auto p-5">
+    <div class="row">
+        <div class="col d-flex">
+            <img src="/assets/img/logo.png" alt="clipartpress" width="120">
+            <div class="align-self-center mt-3 ms-3">
+                <h4>โรงพิมพ์ คลิปอาร์ต เพรส</h4>
+                <p class="m-0">21 แขวงบางบอน เขตบางบอน กรุงเทพมหานคร 10150 <br>
+                    โทรศัพท์ 08-3719-9973 แฟกซ์ 0-2415-8102 <br>
+                    เลขประจำตัวผู้เสียภาษี --</p>
+
+            </div>
+        </div>
+    </div>
+    <h3 class="text-center my-5 fw-semibold">ใบสั่งซื้อสินค้า</h3>
+    <div class="row">
+        <div class="col">
+            <div>
+                <b class="fs-6">ข้อมูลการจัดส่งสินค้า</b>
+                <div class="d-flex">
+                    <small class="info">ชื่อ</small>
+                    : <small class="ms-2"><%= shipment[0].name %></small>
+                </div>
+                <div class="d-flex">
+                    <small class="info">ที่อยู่</small>
+                    : <small class="ms-2"> <%= shipment[0].address %> <%= shipment[0].province %>
+                        <%= shipment[0].postcode %></small>
+                </div>
+                <div class="d-flex">
+                    <small class="info">โทรศัพท์</small>
+                    : <small class="ms-2"><%= shipment[0].telephone %></small>
+                </div>
+                <!-- <div class="d-flex">
+                    <small class="address-info">อีเมล</small>
+                    : <small><%= shipment[0].email %></small>
+                </div> -->
+            </div>
+        </div>
+        <div class="col-4">
+            <div>
+                <b class="fs-6">รายละเอียดการสั่งซื้อสินค้า</b>
+                <div class="d-flex">
+                    <small class="info">วันที่สั่งซื้อ</small>
+                    : <small class="ms-2"><%= datetimeLocal(orders[0].orderdate) %></small>
+                </div>
+                <div class="d-flex">
+                    <small class="info">เลขที่ใบสั่งซื้อ</small>
+                    : <small class="ms-2"><%= orders[0].order_id %></small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="mt-4">
+                <b class="fs-6">วิธีการจัดส่ง</b><br>
+                <small><%= shipment[0].shipment_name %></small>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="mt-4">
+                <b class="fs-6">วิธีชำระเงิน</b><br>
+                <% const bankname = banklist.find(row => row.en == paymentSelect[0].method_name) %>
+                <% if (bankname) { %>
+                <small>โอนเงินผ่าน<%= bankname.th %></small>
+                <% } else { %>
+                <small>โอนเงินผ่านพร้อมเพย์</small>
+                <% } %>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col" class="fw-bold fs-6">สินค้า</th>
+                    <th scope="col" class="fw-bold fs-6">จำนวน</th>
+                    <th scope="col" class="fw-bold fs-6">ราคา</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% let sumprice = 0; %>
+                <% let shipmentprice = orders[0].shipment_price; %>
+                <% orders[0].order_detail.forEach((order, index) => { %>
+                <tr>
+                    <th scope="row">
+                        <div class="d-flex">
+                            <div class="me-2" style="width: 50px; height: 50px;">
+                                <img src="<%= order.picture %>" alt="" class="imageFitBox">
+                            </div>
+                            <div>
+                                <%= order.productName %> <br>
+                                <small class="mb-2"> ขนาดของชิ้นงาน : <%= order.size %></small><br>
+                                <% order.options.forEach((option) => { %>
+                                <% let type; %>
+                                <% if (option.option_type == 'papertype') type = 'กระดาษ' %>
+                                <% if (option.option_type == 'die-cut') type = 'การไดคัท' %>
+                                <% if (option.option_type == 'color') type = 'สีกระดาษ' %>
+                                <% if (option.option_type == 'tear') type = 'แนวฉีก' %>
+                                <% if (option.option_type == 'printside') type = 'ด้านพิมพ์' %>
+                                <small class="mb-2"> <%= type %> : <%= option.option_name %></small> <br>
+                                <% }) %>
+                            </div>
+                        </div>
+                    </th>
+                    <td> <small><%= order.quantity %></small></td>
+                    <td> <small><%= money.format(order.price) %></small></td>
+                </tr>
+                <% sumprice += order.price %>
+                <% }) %>
+                <% let vat = sumprice * 7 / 100; %>
+            </tbody>
+        </table>
+    </div>
+    <div class="row justify-content-end">
+        <div class="col-5 mt-4">
+            <div class="border-bottom">
+                <div class="d-flex justify-content-between mb-1">
+                    <small>ยอดรวม</small>
+                    <small> <%= money.format(sumprice) %></small>
+                </div>
+                <div class="d-flex justify-content-between mb-1">
+                    <small>ค่าจัดส่ง</small>
+                    <small> <%= money.format(shipmentprice) %></small>
+                </div>
+                <div class="d-flex justify-content-between mb-1">
+                    <small>VAT 7%</small>
+                    <small> <%= money.format(vat) %></small>
+                </div>
+                <% if (orders[0].coupon_id != null) { %>
+                <div class="d-flex justify-content-between">
+                    <small>VAT 7%</small>
+                    <small> <%= money.format(orders[0].discount) %></small>
+                </div>
+                <% } %>
+            </div>
+            <div class="d-flex justify-content-between my-1">
+                <p>ยอดรวมทั้งหมด</p>
+                <p><%= money.format((sumprice + shipmentprice + vat) - orders[0].discount) %></p>
+            </div>
+        </div>
+    </div>
+</body>
