@@ -100,7 +100,7 @@ let Routes = (app) => {
 
     router.get("/resetpassword", loginController.checkLoggedOut, (req, res) => {
         const token = req.query.token;
-        // console.log(token);
+        // console.log(token); 
         if (token == undefined) {
             res.redirect('/')
         } else {
@@ -409,22 +409,12 @@ let Routes = (app) => {
     router.post('/deleteCart', cart.deleteCart)
 
     router.get('/checkout', verifyToken, async (req, res) => {
-        await dbConnection.promise().query(`SELECT c.*, p.*, cd.*, cso.*, o.* , po.deleted_at 
-        FROM cart c JOIN product p ON p.product_id = c.product_id 
+        await dbConnection.promise().query(`SELECT c.*, p.*, cd.*, cso.*, o.* FROM cart c 
+        JOIN product p ON p.product_id = c.product_id 
         JOIN cart_detail cd ON cd.cart_detail_id = c.cart_detail_id 
-                JOIN cart_selected_options cso ON cso.cart_detail_id = cd.cart_detail_id 
-                JOIN options o ON o.option_id = cso.option_id 
-                JOIN product_options po ON po.option_id = cso.option_id 
-                WHERE c.user_id = '${req.session.user_id}' 
-                AND c.deleted_at IS NULL
-                AND p.deleted_at IS NULL
-                AND o.deleted_at IS NULL
-                AND NOT EXISTS (
-                    SELECT deleted_at
-                    FROM product_options po
-                    WHERE po.option_id = cso.option_id
-                    AND po.deleted_at IS NOT NULL
-                  )`)
+        JOIN cart_selected_options cso ON cso.cart_detail_id = cd.cart_detail_id 
+        JOIN options o ON o.option_id = cso.option_id 
+        WHERE c.user_id = '${req.session.user_id}' AND c.deleted_at IS NULL`)
             .then(async ([rows]) => {
                 await dbConnection.promise().query('SELECT pm.*, p.*, phm.* FROM promotions pm JOIN product_has_promotion phm ON phm.promo_id = pm.promo_id ' +
                         'JOIN product p ON p.product_id = phm.product_id WHERE pm.deleted_at IS null AND phm.deleted_at IS null')
@@ -432,17 +422,14 @@ let Routes = (app) => {
                         await dbConnection.promise().query('SELECT * FROM address WHERE user_id = ? AND deleted_at is NULL ORDER BY address.default_address DESC', [req.session.user_id]).then(async ([address]) => {
                             const cartsItem = [];
                             rows.forEach((row) => {
-                                // Check if the cart item already exists in cartsItem array
                                 const existingCartItem = cartsItem.find((item) => item.cart_id === row.cart_id);
                                 if (existingCartItem) {
-                                    // Add the option to the existing cart item
                                     existingCartItem.options.push({
                                         option_id: row.option_id,
                                         option_name: row.option_name,
                                         option_type: row.option_type
                                     });
                                 } else {
-                                    // Create a new cart item and add it to cartsItem array
                                     const cartItem = {
                                         cart_id: row.cart_id,
                                         user_id: row.user_id,
@@ -818,6 +805,7 @@ let Routes = (app) => {
                             product_id: rows.product_id,
                             productName: rows.productName,
                             picture: rows.picture,
+                            categories: rows.categories,
                             options: [{
                                 option_id: rows.option_id,
                                 option_name: rows.option_name,
@@ -842,19 +830,19 @@ let Routes = (app) => {
                             quantity: rows.quantity,
                             product_id: rows.product_id,
                             productName: rows.productName,
+                            categories: rows.categories,
                             picture: rows.picture,
                             options: [{
                                 option_id: rows.option_id,
                                 option_name: rows.option_name,
                                 option_type: rows.option_type,
-                            }, ],
+                            }, ], 
                         }, ],
                     };
                     orderItem.push(item);
-                };
-            });
-            dbConnection.promise().query('SELECT p.*, pm.*, ors.*, u.name FROM payment p JOIN payment_method pm ON pm.payment_method_id = p.payment_method_id ' +
-                'JOIN orders ors ON ors.order_id = p.order_id JOIN users u ON u.user_id = ors.user_id').then(([payments]) => {
+                }; 
+            }); 
+            dbConnection.promise().query('SELECT amount, paid_date FROM payment WHERE payment_status = "approved"').then(([payments]) => {
                 res.render('pages/admin/admin_dashborad', {
                     currentLink: "dashborad",
                     Title: 'Clipart Press || แดชบอร์ด',
@@ -1389,7 +1377,7 @@ let Routes = (app) => {
                 currentLink: "shipment",
                 shipments: rows
             })
-        })
+        });
     })
     router.get('/admin/shipment/addshipment', checkAdmin,(req, res) => {
         res.render('pages/admin/addShipment', {

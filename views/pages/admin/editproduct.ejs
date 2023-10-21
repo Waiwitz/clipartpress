@@ -103,6 +103,199 @@
                         </div>
 
                     </div>
+
+                    <div class="">
+                        <div class="mx-4 mt-4 border-bottom d-flex justify-content-between">
+                            <h4>ออฟชั่นสินค้า</h4>
+                        </div>
+                        <div class="card-body" id="option-mutiselect">
+
+                        </div>
+                    </div>
+                    <div id="option-form">
+                        <div class="">
+                            <div>
+                                <div class="mx-4 mt-4 border-bottom">
+                                    <h4>ราคา</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-3 mb-3 tier">
+                                            <div class="rounded border p-2 mb-2 me-2"
+                                                style="width: fit-content; height: 540px;">
+                                                <div class="m-2">
+                                                    <h5>ราคาไซต์งาน</h5>
+                                                    <hr>
+                                                    <!-- <select class="form-select parcel-select" id="parcel-0"
+                                                        name="option_type[0][]" required>
+                                                        <option value=" 9x5.5">9 x 5.5 cm</option>
+                                                        <option value="4x4">9 x 5 cm</option>
+                                                        <option value="5x5">8 x 5.5 cm</option>
+                                                        </optgroup>
+                                                    </select> -->
+                                                    <div id="sizeTier">
+                                                        <div class="d-flex mb-2 sizeCount"
+                                                            id="<%= sizeTier[0].tierSize_id %>">
+                                                            <input type="hidden" name="sizeId[0][]"
+                                                                value="<%= sizeTier[0].tierSize_id %>">
+                                                            <div class="me-2">
+                                                                <div class="form-outline" style="width: 85px;">
+                                                                    <input type="text" class="form-control"
+                                                                        name="unit[0][]" required
+                                                                        value="<%= sizeTier[0].size_unit %>">
+                                                                    <label class="form-label">ค่าขนาด<span
+                                                                            class="text-danger ms-2">*</span></label>
+                                                                </div>
+                                                            </div>
+                                                            <!-- <span class="p-1 ">X</span>
+                                                            <div class="ms-2">
+                                                                <div class="form-outline" style="width: 85px;">
+                                                                    <input type="number" class="form-control" name="height[0][]"
+                                                                        required step="0.01" min="0"
+                                                                        value="<%= sizeTier[0].height %>">
+                                                                    <label class="form-label">ยาว<span
+                                                                            class="text-danger ms-2">*</span></label>
+                                                                </div>
+                                                            </div> -->
+                                                            <div class="ms-2">
+                                                                <div class="form-outline" style="width: 85px;">
+                                                                    <input type="number" class="form-control"
+                                                                        name="sizePrice[0][]" required step="0.01"
+                                                                        min="0" value="<%= sizeTier[0].size_price %>">
+                                                                    <label class="form-label">ราคา<span
+                                                                            class="text-danger ms-2">*</span></label>
+                                                                </div>
+                                                            </div>
+                                                            <button type="button" id="addSizeTier"
+                                                                class="ms-2 btn btn-secondary">
+                                                                <i class="fa-solid fa-plus"></i>
+                                                            </button>
+                                                        </div>
+                                                        <% for( let i = 1; i < sizeTier.length; i++ ) { %>
+                                                        <div class="d-flex mb-2 sizeCount"
+                                                            id="<%= sizeTier[i].tierSize_id %>">
+                                                            <input type="hidden" name="sizeId[<%= i %>][]"
+                                                                value="<%= sizeTier[i].tierSize_id %>">
+                                                            <div class="me-2">
+                                                                <div class="form-outline" style="width: 85px;">
+                                                                    <input type="text" class="form-control"
+                                                                        name="unit[<%= i %>][]" required
+                                                                        value="<%= sizeTier[i].size_unit %>">
+                                                                    <label class="form-label">ค่าขนาด<span
+                                                                            class="text-danger ms-2">*</span></label>
+                                                                </div>
+                                                            </div>
+                                                            <!-- <span class="p-1 ">X</span> -->
+                                                            <!-- <div class="ms-2">
+                                                                <div class="form-outline" style="width: 85px;">
+                                                                    <input type="number" class="form-control"
+                                                                        name="height[<%= i %>][]" required step="0.01" min="0"
+                                                                        value="<%= sizeTier[i].height %>">
+                                                                    <label class="form-label">ยาว<span
+                                                                            class="text-danger ms-2">*</span></label>
+                                                                </div>
+                                                            </div> -->
+                                                            <div class="ms-2">
+                                                                <div class="form-outline" style="width: 85px;">
+                                                                    <input type="number" class="form-control"
+                                                                        name="sizePrice[<%= i %>][]" required
+                                                                        step="0.01" min="0"
+                                                                        value="<%= sizeTier[i].size_price %>">
+                                                                    <label class="form-label">ราคา<span
+                                                                            class="text-danger ms-2">*</span></label>
+                                                                </div>
+                                                            </div>
+                                                            <button type="button" class="ms-2 btn btn-danger existSize"
+                                                                data-mdb-toggle="modal" data-mdb-target="#deleteRow"
+                                                                data-id="<%= sizeTier[i].tierSize_id %>">
+                                                                <i class="fa-solid fa-trash"
+                                                                    style="color: #ffffff;"></i></button>
+                                                        </div>
+                                                        <% } %>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col mb-3">
+                                            <div class="rounded border p-2 mb-2 me-2"
+                                                style="width: fit-content; height: 540px;">
+                                                <div class="m-2">
+                                                    <h5>ระดับราคาตามจำนวน</h5>
+                                                    <hr>
+                                                    <div id="PriceTier">
+                                                        <div class="d-flex mb-2 qtyCount"
+                                                            id="<%= qtyTier[0].tierQty_id %>">
+                                                            <input type="hidden" name="qtyId[0][]"
+                                                                value="<%= qtyTier[0].tierQty_id %>">
+                                                            <div class="form-outline me-2"
+                                                                style="width: 85px; height: 36px;">
+                                                                <input type="number" class="form-control p-1"
+                                                                    name="qty[0][]" required style="height: 36px;"
+                                                                    step="0.01" min="0"
+                                                                    value="<%= qtyTier[0].quantity %>">
+                                                                <label class="form-label">จำนวน<span
+                                                                        class="text-danger ms-2">*</span></label>
+                                                            </div>
+                                                            <div class="form-outline"
+                                                                style="width: 85px; height: 36px;">
+                                                                <input type="number" class="form-control p-1"
+                                                                    name="qtyPrice[0][]" required step="0.01" min="0"
+                                                                    value="<%= qtyTier[0].qty_price %>">
+                                                                <label class="form-label">ราคา<span
+                                                                        class="text-danger ms-2">*</span></label>
+                                                            </div>
+                                                            <button type="button" id="add-price-0"
+                                                                class="addPrice ms-2 btn btn-secondary"
+                                                                data-target="PriceRow-0">
+                                                                <i class="fa-solid fa-plus"></i>
+                                                            </button>
+                                                        </div>
+                                                        <% for( let j = 1; j < qtyTier.length; j++ ) { %>
+                                                        <div class="d-flex mb-2 qtyCount"
+                                                            id="<%= qtyTier[j].tierQty_id %>">
+                                                            <input type="hidden" name="qtyId[<%= j %>][]"
+                                                                value="<%= qtyTier[j].tierQty_id %>">
+                                                            <div class="form-outline me-2"
+                                                                style="width: 85px; height: 36px;">
+                                                                <input type="number" class="form-control p-1"
+                                                                    name="qty[<%= j %>][]" required
+                                                                    style="height: 36px;" step="0.01" min="0"
+                                                                    value="<%= qtyTier[j].quantity %>">
+                                                                <label class="form-label">จำนวน<span
+                                                                        class="text-danger ms-2">*</span></label>
+                                                            </div>
+                                                            <div class="form-outline"
+                                                                style="width: 85px; height: 36px;">
+                                                                <input type="number" class="form-control p-1"
+                                                                    name="qtyPrice[<%= j %>][]" required step="0.01"
+                                                                    min="0" value="<%= qtyTier[j].qty_price %>">
+                                                                <label class="form-label">ราคา<span
+                                                                        class="text-danger ms-2">*</span></label>
+                                                            </div>
+                                                            <button type="button" class="ms-2 btn btn-danger existQty"
+                                                                data-mdb-toggle="modal" data-mdb-target="#deleteRow"
+                                                                data-id="<%= qtyTier[j].tierQty_id %>">
+                                                                <i class="fa-solid fa-trash"
+                                                                    style="color: #ffffff;"></i></button>
+                                                        </div>
+                                                        <% } %>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="w-100 fixed-bottom bg-white border-top" style="z-index: 0;">
+                            <div class="m-2 me-5 d-flex justify-content-end">
+                                <button type="reset" class="btn btn-outline-black me-2 my-2 fs-6">รีเซ็ต</button>
+                                <button type="submit" class="btn btn-primary fs-6 my-2"
+                                    style="width: 150px;">บันทึก</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
 
@@ -110,182 +303,6 @@
                     style="width: 150px;">ถัดไป <div class="spinner-border spinner-border-sm" role="status">
                     </div></button> -->
 
-            </div>
-            <div id="option-form">
-                <div class="card">
-                    <div>
-                        <div class="mx-4 mt-4 border-bottom">
-                            <h4>ราคา</h4>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-3 mb-3 tier">
-                                    <div class="rounded border p-2 mb-2 me-2"
-                                        style="width: fit-content; height: 540px;">
-                                        <div class="m-2">
-                                            <h5>ราคาไซต์งาน</h5>
-                                            <hr>
-                                            <!-- <select class="form-select parcel-select" id="parcel-0"
-                                                name="option_type[0][]" required>
-                                                <option value=" 9x5.5">9 x 5.5 cm</option>
-                                                <option value="4x4">9 x 5 cm</option>
-                                                <option value="5x5">8 x 5.5 cm</option>
-                                                </optgroup>
-                                            </select> -->
-                                            <div id="sizeTier">
-                                                <div class="d-flex mb-2 sizeCount" id="<%= sizeTier[0].tierSize_id %>">
-                                                    <input type="hidden" name="sizeId[0][]"
-                                                        value="<%= sizeTier[0].tierSize_id %>">
-                                                    <div class="me-2">
-                                                        <div class="form-outline" style="width: 85px;">
-                                                            <input type="text" class="form-control" name="unit[0][]"
-                                                                required value="<%= sizeTier[0].size_unit %>">
-                                                            <label class="form-label">ค่าขนาด<span
-                                                                    class="text-danger ms-2">*</span></label>
-                                                        </div>
-                                                    </div>
-                                                    <!-- <span class="p-1 ">X</span>
-                                                    <div class="ms-2">
-                                                        <div class="form-outline" style="width: 85px;">
-                                                            <input type="number" class="form-control" name="height[0][]"
-                                                                required step="0.01" min="0"
-                                                                value="<%= sizeTier[0].height %>">
-                                                            <label class="form-label">ยาว<span
-                                                                    class="text-danger ms-2">*</span></label>
-                                                        </div>
-                                                    </div> -->
-                                                    <div class="ms-2">
-                                                        <div class="form-outline" style="width: 85px;">
-                                                            <input type="number" class="form-control"
-                                                                name="sizePrice[0][]" required step="0.01" min="0"
-                                                                value="<%= sizeTier[0].size_price %>">
-                                                            <label class="form-label">ราคา<span
-                                                                    class="text-danger ms-2">*</span></label>
-                                                        </div>
-                                                    </div>
-                                                    <button type="button" id="addSizeTier"
-                                                        class="ms-2 btn btn-secondary">
-                                                        <i class="fa-solid fa-plus"></i>
-                                                    </button>
-                                                </div>
-                                                <% for( let i = 1; i < sizeTier.length; i++ ) { %>
-                                                <div class="d-flex mb-2 sizeCount" id="<%= sizeTier[i].tierSize_id %>">
-                                                    <input type="hidden" name="sizeId[<%= i %>][]"
-                                                        value="<%= sizeTier[i].tierSize_id %>">
-                                                    <div class="me-2">
-                                                        <div class="form-outline" style="width: 85px;">
-                                                            <input type="text" class="form-control"
-                                                                name="unit[<%= i %>][]" required
-                                                                value="<%= sizeTier[i].size_unit %>">
-                                                            <label class="form-label">ค่าขนาด<span
-                                                                    class="text-danger ms-2">*</span></label>
-                                                        </div>
-                                                    </div>
-                                                    <!-- <span class="p-1 ">X</span> -->
-                                                    <!-- <div class="ms-2">
-                                                        <div class="form-outline" style="width: 85px;">
-                                                            <input type="number" class="form-control"
-                                                                name="height[<%= i %>][]" required step="0.01" min="0"
-                                                                value="<%= sizeTier[i].height %>">
-                                                            <label class="form-label">ยาว<span
-                                                                    class="text-danger ms-2">*</span></label>
-                                                        </div>
-                                                    </div> -->
-                                                    <div class="ms-2">
-                                                        <div class="form-outline" style="width: 85px;">
-                                                            <input type="number" class="form-control"
-                                                                name="sizePrice[<%= i %>][]" required step="0.01"
-                                                                min="0" value="<%= sizeTier[i].size_price %>">
-                                                            <label class="form-label">ราคา<span
-                                                                    class="text-danger ms-2">*</span></label>
-                                                        </div>
-                                                    </div>
-                                                    <button type="button" class="ms-2 btn btn-danger existSize"
-                                                        data-mdb-toggle="modal" data-mdb-target="#deleteRow"
-                                                        data-id="<%= sizeTier[i].tierSize_id %>">
-                                                        <i class="fa-solid fa-trash"
-                                                            style="color: #ffffff;"></i></button>
-                                                </div>
-                                                <% } %>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col mb-3">
-                                    <div class="rounded border p-2 mb-2 me-2"
-                                        style="width: fit-content; height: 540px;">
-                                        <div class="m-2">
-                                            <h5>ระดับราคาตามจำนวน</h5>
-                                            <hr>
-                                            <div id="PriceTier">
-                                                <div class="d-flex mb-2 qtyCount" id="<%= qtyTier[0].tierQty_id %>">
-                                                    <input type="hidden" name="qtyId[0][]"
-                                                        value="<%= qtyTier[0].tierQty_id %>">
-                                                    <div class="form-outline me-2" style="width: 85px; height: 36px;">
-                                                        <input type="number" class="form-control p-1" name="qty[0][]"
-                                                            required style="height: 36px;" step="0.01" min="0"
-                                                            value="<%= qtyTier[0].quantity %>">
-                                                        <label class="form-label">จำนวน<span
-                                                                class="text-danger ms-2">*</span></label>
-                                                    </div>
-                                                    <div class="form-outline" style="width: 85px; height: 36px;">
-                                                        <input type="number" class="form-control p-1"
-                                                            name="qtyPrice[0][]" required step="0.01" min="0"
-                                                            value="<%= qtyTier[0].qty_price %>">
-                                                        <label class="form-label">ราคา<span
-                                                                class="text-danger ms-2">*</span></label>
-                                                    </div>
-                                                    <button type="button" id="add-price-0"
-                                                        class="addPrice ms-2 btn btn-secondary"
-                                                        data-target="PriceRow-0">
-                                                        <i class="fa-solid fa-plus"></i>
-                                                    </button>
-                                                </div>
-                                                <% for( let j = 1; j < qtyTier.length; j++ ) { %>
-                                                <div class="d-flex mb-2 qtyCount" id="<%= qtyTier[j].tierQty_id %>">
-                                                    <input type="hidden" name="qtyId[<%= j %>][]"
-                                                        value="<%= qtyTier[j].tierQty_id %>">
-                                                    <div class="form-outline me-2" style="width: 85px; height: 36px;">
-                                                        <input type="number" class="form-control p-1"
-                                                            name="qty[<%= j %>][]" required style="height: 36px;"
-                                                            step="0.01" min="0" value="<%= qtyTier[j].quantity %>">
-                                                        <label class="form-label">จำนวน<span
-                                                                class="text-danger ms-2">*</span></label>
-                                                    </div>
-                                                    <div class="form-outline" style="width: 85px; height: 36px;">
-                                                        <input type="number" class="form-control p-1"
-                                                            name="qtyPrice[<%= j %>][]" required step="0.01" min="0"
-                                                            value="<%= qtyTier[j].qty_price %>">
-                                                        <label class="form-label">ราคา<span
-                                                                class="text-danger ms-2">*</span></label>
-                                                    </div>
-                                                    <button type="button" class="ms-2 btn btn-danger existQty"
-                                                        data-mdb-toggle="modal" data-mdb-target="#deleteRow"
-                                                        data-id="<%= qtyTier[j].tierQty_id %>">
-                                                        <i class="fa-solid fa-trash"
-                                                            style="color: #ffffff;"></i></button>
-                                                </div>
-                                                <% } %>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="mx-4 mt-4 border-bottom d-flex justify-content-between">
-                        <h4>ออฟชั่นสินค้า</h4>
-                    </div>
-                    <div class="card-body" id="option-mutiselect">
-
-                    </div>
-                </div>
-
-                <button type="submit" class="btn btn-primary btn-block float-end fs-6 my-5 back"
-                    style="width: 150px;">บันทึก</button>
             </div>
         </form>
 

@@ -49,7 +49,7 @@
         <% } %>
         <div class="w-100 d-flex justify-content-between">
             <a href="/purchaseorder/<%= orders[0].order_id %>">
-                <button class="btn btn-warning fs-6"><i class="fa-solid fa-print"></i> พิมพ์ใบสั่งซื้อ</button>
+                <button class="btn btn-warning fs-6 ms-3"><i class="fa-solid fa-print"></i> พิมพ์ใบสั่งซื้อ</button>
             </a>
             <% if (orders[0].order_status == 'waitpay' || orders[0].order_status == 'pending') { %>
             <div>
@@ -58,10 +58,8 @@
             </div>
             <% } %>
             <% if (orders[0].order_status == 'shipping') { %>
-            <div class="">
                 <button class="btn btn-success btn-sm mx-5 fs-6 w-25" data-bs-toggle="modal"
                     data-bs-target="#confirmShiped"><i class="fa-solid fa-circle-check"></i> ยืนยันจัดส่งสำเร็จ</button>
-            </div>
             <% } %>
         </div>
         <div class="row mt-2">
@@ -312,7 +310,7 @@
                     <div class="modal-body">
                         <div class="col pb-3">
                             <div class="form-outline" id="trackingNumberInput">
-                                <input type="text" class="form-control" name="trackingNumber" id="trackingNumber">
+                                <input type="text" class="form-control" name="trackingNumber" id="trackingNumber" required>
                                 <label for="number" class="form-label">เลขพัสดุ</label>
                                 <div class="invalid-feedback">
                                     กรุณากรอกเลขพัสดุ
@@ -393,6 +391,7 @@
         </div>
     </div>
 </body>
+<script src="/js/validateBs.js"></script>
 <script>
     document.querySelectorAll('.form-outline').forEach((formOutline) => {
         new mdb.Input(formOutline).init();

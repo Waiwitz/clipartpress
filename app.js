@@ -234,7 +234,7 @@ io.of("/admin/chat/*").on("connection", (socket) => {
  
 router(app)
 // app.use("/", require("./routes"));
-const port = 3000
+const port = 3000;
 server.listen(port, () => {
     console.log(`App listening at port ${port}`)
-});
+}); 

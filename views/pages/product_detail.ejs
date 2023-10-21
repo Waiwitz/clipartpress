@@ -1,5 +1,9 @@
 <%- include('../partials/header') %>
-
+<%     function datetimeLocal(datetime) { %>
+    <%   const dt = new Date(datetime); %>
+    <%    dt.setMinutes(dt.getMinutes() - dt.getTimezoneOffset()); %>
+    <%   return dt.toISOString().slice(0, 10) + ' ' + dt.toISOString().slice(11, 16); %>
+    <%  } %>
 <body class="h-100">
     <div class="container-lg mt-5">
         <div class="row justify-content-between">
@@ -14,8 +18,9 @@
                 </div>
                 <% if (promotions.some(promo => promo.product_id == product.product_id)) { %>
                 <div class="card">
-                    <div class="card-header">
+                    <div class="card-header ">
                         <h3 class="mb-0">โปรโมชั่น</h3>
+                        <span>เริ่มโปรโมชั่น <%= datetimeLocal(promotions[0].start_date) %>  <br>สิ้นสุดโปรโมชั่น <%= datetimeLocal(promotions[0].end_date) %></span>
                     </div>
                     <div class="card-body">
                         <% promotions.forEach((promo) => { %>
@@ -236,8 +241,14 @@
                                 <h4>การออกแบบ</h4>
                                 <hr>
                                 <div>
+                                    <% let accept; %>
+                                    <% if(product.categories === 'sticker' || product.categories === 'envelope'){ %>
+                                    <% accept = '.xsl, application/pdf' %>
+                                    <% } else if (product.categories === 'bill') {%>
+                                    <% accept = 'application/pdf'%>
+                                    <% } %>
                                     <input type="file" class="btn d-block" id="customFile" name="designfile" required
-                                        accept="application/pdf" />
+                                        accept="<%= accept%>" />
                                     <label for="" class="form-label mt-3">
                                         <%= product.categories === 'sticker' ? 'ประเภทไฟล์ที่รับ : .pdf' : '' %>
                                         <%= product.categories === 'bill' ? 'ประเภทไฟล์ที่รับ : .pdf, .xls' : '' %>
@@ -499,7 +510,7 @@
                         $('#sum-price').empty().replaceWith(
                             `<s class="fw-bold me-2" id="sum-price">${THmoney.format(sumPrice)}</s>`);
                         let warning = `<div class='alert-success p-3'>
-                             ได้รัับส่วนลด ${promo.type_value} % แล้ว
+                             ได้รับส่วนลด ${promo.type_value} % แล้ว
                                  </div>`
                         $('#promo-check').empty().append(warning)
                     } else {

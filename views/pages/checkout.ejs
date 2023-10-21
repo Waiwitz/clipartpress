@@ -569,18 +569,19 @@
                         const coupons = data.coupons;
                         const orders = data.orders
                         const findCode = coupons.find(row => code_input === row.coupon_code);
-                        const coupon_amount = orders.filter(row => row.coupon_id === findCode
-                            .coupon_id);
-                        const user_limit = orders.filter(row => row.user_id ==
-                            `<%= session.user_id %>` && row.coupon_id === findCode.coupon_id
-                        );
-
                         console.log(findCode);
                         setTimeout(function () {
                             $('#applyCode').prop('disabled', false)
                             $('#coupon').prop('disabled', false)
 
                             if (findCode) {
+                                const coupon_amount = orders.filter(row => row
+                                    .coupon_id === findCode
+                                    .coupon_id);
+                                const user_limit = orders.filter(row => row.user_id ==
+                                    `<%= session.user_id %>` && row.coupon_id ===
+                                    findCode.coupon_id
+                                );
                                 const totalPrice = $('#sumPrice').val();
                                 const start_date = new Date(findCode.start_date);
                                 const end_date = new Date(findCode.end_date);

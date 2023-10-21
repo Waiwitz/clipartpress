@@ -25,77 +25,209 @@
         <% }); %>
         <% } %>
         <form action="/addproduct" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
-            <div id="product-form">
-                <div class="card">
-                    <div class="mx-4 mt-4 border-bottom">
-                        <h4>รายละเอียดสินค้า</h4>
-                    </div>
-                    <div class="card-body">
-                        <div class="d-flex">
-                            <div>
-                                <div class="product-preview-upload me-4 mb-2" style="margin-top: 33px;">
-                                    <div class="option-img">
-                                        <div class="upload-icon">
-                                            <i class="fa-regular fa-image"></i>
-                                            <p>คลิกเพื่อเลือกรูปสินค้า</p>
-                                        </div>
-                                        <input type="file" name="imgproduct" id="imgproduct"
-                                            onchange="previewImage(event, [0])" accept="image/png, image/jpeg" multiple
-                                            required class="form-control" />
-                                        <img src="/assets/img/white-bg.jpg" alt="" id="option_preview[0]"
-                                            draggable="false" class="img_option">
-                                        <div class="invalid-feedback mt-2">
-                                            กรุณาอัปโหลดรูปภาพสินค้า
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- <span class="mx-4"> รองรับไฟล์</span><br>
-                                <span class="mx-4"> PNG, JPEG</span> -->
-                            </div>
-                            <div class="row w-100">
-                                <div class="col p-0">
-                                    <div class="form-outline" style="margin-top: 33px;">
-                                        <input type="text" id="product-name" class="form-control" name="product_name"
-                                            required />
-                                        <label class="form-label" for="form6Example1">ชื่อสินค้า<span
-                                                class="text-danger ms-1">*</span></label>
-                                        <div class="invalid-feedback">
-                                            กรุณากรอกชื่อสินค้า
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col">
-                                    <label class="form-label" for="inlineFormSelectPref">ประเภท <span
-                                            class="text-danger ms-2">*</span></label> <br>
-                                    <select class="form-select" id="categories" style="height: 35px;" name="categories"
-                                        required>
-                                        <option value="bill">ใบบิล</option>
-                                        <option value="sticker">สติ๊กเกอร์</option>
-                                        <option value="envelope">ซองจดหมาย</option>
-                                    </select>
-                                </div>
-
-                                <div class="col ps-0">
-                                    <label class="form-label" for="inlineFormSelectPref">สถานะ <span
-                                            class="text-danger ms-2">*</span></label> <br>
-                                    <select class="form-select" style="height: 35px;" name="status" required>
-                                        <option value="1">เปิดรับทำ</option>
-                                        <option value="0">งดรับทำ</option>
-                                    </select>
-                                </div>
-
-                                <div class="w-100 ps-0 mt-2">
-                                    <div class="form-outline ">
-                                        <textarea class="form-control" id="description" rows="4"
-                                            name="product_description" required></textarea>
-                                        <label class="form-label" for="description">รายละเอียดสินค้า <span
-                                                class="text-danger ms-1">*</span></label>
-                                    </div>
-                                </div>
-                            </div>
-
+            <div class="card" id="product-form">
+                <div class="">
+                    <div class="">
+                        <div class="mx-4 mt-4 border-bottom">
+                            <h4>รายละเอียดสินค้า</h4>
                         </div>
+                        <div class="card-body">
+                            <div class="d-flex">
+                                <div>
+                                    <div class="product-preview-upload me-4 mb-2" style="margin-top: 33px;">
+                                        <div class="option-img">
+                                            <div class="upload-icon">
+                                                <i class="fa-regular fa-image"></i>
+                                                <p>คลิกเพื่อเลือกรูปสินค้า</p>
+                                            </div>
+                                            <input type="file" name="imgproduct" id="imgproduct"
+                                                onchange="previewImage(event, [0])" accept="image/png, image/jpeg"
+                                                multiple required class="form-control" />
+                                            <img src="/assets/img/white-bg.jpg" alt="" id="option_preview[0]"
+                                                draggable="false" class="img_option">
+                                            <div class="invalid-feedback mt-2">
+                                                กรุณาอัปโหลดรูปภาพสินค้า
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- <span class="mx-4"> รองรับไฟล์</span><br>
+                                <span class="mx-4"> PNG, JPEG</span> -->
+                                </div>
+                                <div class="row w-100">
+                                    <div class="col p-0">
+                                        <div class="form-outline" style="margin-top: 33px;">
+                                            <input type="text" id="product-name" class="form-control"
+                                                name="product_name" required />
+                                            <label class="form-label" for="form6Example1">ชื่อสินค้า<span
+                                                    class="text-danger ms-1">*</span></label>
+                                            <div class="invalid-feedback">
+                                                กรุณากรอกชื่อสินค้า
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <label class="form-label" for="inlineFormSelectPref">ประเภท <span
+                                                class="text-danger ms-2">*</span></label> <br>
+                                        <select class="form-select" id="categories" style="height: 35px;"
+                                            name="categories" required>
+                                            <option value="bill">ใบบิล</option>
+                                            <option value="sticker">สติ๊กเกอร์</option>
+                                            <option value="envelope">ซองจดหมาย</option>
+                                        </select>
+                                    </div>
 
+                                    <div class="col ps-0">
+                                        <label class="form-label" for="inlineFormSelectPref">สถานะ <span
+                                                class="text-danger ms-2">*</span></label> <br>
+                                        <select class="form-select" style="height: 35px;" name="status" required>
+                                            <option value="1">เปิดรับทำ</option>
+                                            <option value="0">งดรับทำ</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="w-100 ps-0 mt-2">
+                                        <div class="form-outline ">
+                                            <textarea class="form-control" id="description" rows="4"
+                                                name="product_description" required></textarea>
+                                            <label class="form-label" for="description">รายละเอียดสินค้า <span
+                                                    class="text-danger ms-1">*</span></label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="">
+                        <div class="mx-4 mt-4 border-bottom d-flex justify-content-between">
+                            <h4>ออฟชั่นสินค้า</h4>
+                        </div>
+                        <div class="card-body" id="option-mutiselect">
+                            <div class="border p-4 rounded option-box mb-2">
+                                <h5 class="d-inline">${card[index]}</h5> <span class="text-danger ms-2">*</span>
+                                <select multiple="multiple" class="option-checkbox w-100" name="option[${index}][]"
+                                    multiple required>
+                                    <% options.forEach((option) => { %>
+                                    <% if (option.parcel_type === 'pumping') { %>
+                                    <option value="<%= option.option_id  %>"><%= option.option_name %></option>
+                                    <% } %>
+                                    <% }); %>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="option-form">
+                        <div class="m-1">
+                            <div>
+                                <div class="mx-4 mt-4 border-bottom">
+                                    <h4>ราคา</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-3 mb-3 tier">
+                                            <div class="rounded border p-2 mb-2 me-2"
+                                                style="width: fit-content; height: 540px;">
+                                                <div class="m-2">
+                                                    <h5>ราคาไซต์งาน</h5>
+                                                    <hr>
+                                                    <!-- <select class="form-select parcel-select" id="parcel-0"
+                                                        name="option_type[0][]" required>
+                                                        <option value=" 9x5.5">9 x 5.5 cm</option>
+                                                        <option value="4x4">9 x 5 cm</option>
+                                                        <option value="5x5">8 x 5.5 cm</option>
+                                                        </optgroup>
+                                                    </select> -->
+                                                    <div id="sizeTier">
+                                                        <div class="d-flex mb-2 sizeTierRow" style="height: 36px;">
+                                                            <div class="me-2">
+                                                                <div class="form-outline" style="width: 85px;">
+                                                                    <input type="text" class="form-control"
+                                                                        name="unit[0][]" placeholder="เช่น 1x1"
+                                                                        required>
+                                                                    <label class="form-label">ขนาด<span
+                                                                            class="text-danger ms-2">*</span></label>
+                                                                </div>
+                                                            </div>
+                                                            <!-- <span class="p-1 ">X</span> -->
+                                                            <!-- <div class="ms-2">
+                                                                <div class="form-outline" style="width: 85px;">
+                                                                    <input type="number" class="form-control" name="height[0][]"
+                                                                        required step="0.01" min="0">
+                                                                    <label class="form-label">ยาว<span
+                                                                            class="text-danger ms-2">*</span></label>
+                                                                </div>
+                                                            </div> -->
+                                                            <div class="ms-2">
+                                                                <div class="form-outline" style="width: 85px;">
+                                                                    <input type="number" class="form-control"
+                                                                        name="sizePrice[0][]" required step="0.01"
+                                                                        min="0">
+                                                                    <label class="form-label">ราคา<span
+                                                                            class="text-danger ms-2">*</span></label>
+                                                                </div>
+                                                            </div>
+                                                            <button type="button" id="addSizeTier"
+                                                                class="ms-2 btn btn-secondary" data-target="PriceRow-0">
+                                                                <i class="fa-solid fa-plus"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col mb-3">
+                                            <div class="rounded border p-2 mb-2 me-2"
+                                                style="width: fit-content; height: 540px;">
+                                                <div class="m-2">
+                                                    <h5>ระดับราคาตามจำนวน</h5>
+                                                    <hr>
+                                                    <div id="PriceTier">
+                                                        <div class="d-flex mb-2 qtyTierRow">
+                                                            <div class="form-outline me-2"
+                                                                style="width: 85px; height: 36px;">
+                                                                <input type="number" class="form-control p-1"
+                                                                    name="qty[0][]" required style="height: 36px;"
+                                                                    step="0.01" min="0">
+                                                                <label class="form-label">จำนวน<span
+                                                                        class="text-danger ms-2">*</span></label>
+                                                            </div>
+                                                            <div class="form-outline"
+                                                                style="width: 85px; height: 36px;">
+                                                                <input type="number" class="form-control p-1"
+                                                                    name="qtyPrice[0][]" required step="0.01" min="0">
+                                                                <label class="form-label">ราคา<span
+                                                                        class="text-danger ms-2">*</span></label>
+                                                            </div>
+                                                            <button type="button" id="add-price-0"
+                                                                class="addPrice ms-2 btn btn-secondary"
+                                                                data-target="PriceRow-0">
+                                                                <i class="fa-solid fa-plus"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+
+                                    <!-- <div class="w-100 mt-4">
+                                        <button type="button" id="add-tier" class="btn btn-secondary mx-2 fs-6 w-100">
+                                            <i class="fa-solid fa-plus"></i>
+                                            เพิ่มตาราง
+                                        </button>
+                                    </div> -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="w-100 fixed-bottom bg-white border-top" style="z-index: 0;">
+                            <div class="m-2 me-5 d-flex justify-content-end">
+                                <button type="reset" class="btn btn-outline-black me-2 my-2 fs-6">รีเซ็ต</button>
+                                <button type="submit" class="btn btn-primary fs-6 my-2"
+                                    style="width: 150px;">บันทึก</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <!-- 
@@ -147,129 +279,7 @@
                     style="width: 150px;">ถัดไป <div class="spinner-border spinner-border-sm" role="status">
                     </div></button> -->
 
-            </div>
-            <div id="option-form">
-                <div class="card">
-                    <div>
-                        <div class="mx-4 mt-4 border-bottom">
-                            <h4>ราคา</h4>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-3 mb-3 tier">
-                                    <div class="rounded border p-2 mb-2 me-2"
-                                        style="width: fit-content; height: 540px;">
-                                        <div class="m-2">
-                                            <h5>ราคาไซต์งาน</h5>
-                                            <hr>
-                                            <!-- <select class="form-select parcel-select" id="parcel-0"
-                                                name="option_type[0][]" required>
-                                                <option value=" 9x5.5">9 x 5.5 cm</option>
-                                                <option value="4x4">9 x 5 cm</option>
-                                                <option value="5x5">8 x 5.5 cm</option>
-                                                </optgroup>
-                                            </select> -->
-                                            <div id="sizeTier">
-                                                <div class="d-flex mb-2 sizeTierRow" style="height: 36px;">
-                                                    <div class="me-2">
-                                                        <div class="form-outline" style="width: 85px;">
-                                                            <input type="text" class="form-control" name="unit[0][]"
-                                                                placeholder="เช่น 1x1" required>
-                                                            <label class="form-label">ขนาด<span
-                                                                    class="text-danger ms-2">*</span></label>
-                                                        </div>
-                                                    </div>
-                                                    <!-- <span class="p-1 ">X</span> -->
-                                                    <!-- <div class="ms-2">
-                                                        <div class="form-outline" style="width: 85px;">
-                                                            <input type="number" class="form-control" name="height[0][]"
-                                                                required step="0.01" min="0">
-                                                            <label class="form-label">ยาว<span
-                                                                    class="text-danger ms-2">*</span></label>
-                                                        </div>
-                                                    </div> -->
-                                                    <div class="ms-2">
-                                                        <div class="form-outline" style="width: 85px;">
-                                                            <input type="number" class="form-control"
-                                                                name="sizePrice[0][]" required step="0.01" min="0">
-                                                            <label class="form-label">ราคา<span
-                                                                    class="text-danger ms-2">*</span></label>
-                                                        </div>
-                                                    </div>
-                                                    <button type="button" id="addSizeTier"
-                                                        class="ms-2 btn btn-secondary" data-target="PriceRow-0">
-                                                        <i class="fa-solid fa-plus"></i>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col mb-3">
-                                    <div class="rounded border p-2 mb-2 me-2"
-                                        style="width: fit-content; height: 540px;">
-                                        <div class="m-2">
-                                            <h5>ระดับราคาตามจำนวน</h5>
-                                            <hr>
-                                            <div id="PriceTier">
-                                                <div class="d-flex mb-2 qtyTierRow">
-                                                    <div class="form-outline me-2" style="width: 85px; height: 36px;">
-                                                        <input type="number" class="form-control p-1" name="qty[0][]"
-                                                            required style="height: 36px;" step="0.01" min="0">
-                                                        <label class="form-label">จำนวน<span
-                                                                class="text-danger ms-2">*</span></label>
-                                                    </div>
-                                                    <div class="form-outline" style="width: 85px; height: 36px;">
-                                                        <input type="number" class="form-control p-1"
-                                                            name="qtyPrice[0][]" required step="0.01" min="0">
-                                                        <label class="form-label">ราคา<span
-                                                                class="text-danger ms-2">*</span></label>
-                                                    </div>
-                                                    <button type="button" id="add-price-0"
-                                                        class="addPrice ms-2 btn btn-secondary"
-                                                        data-target="PriceRow-0">
-                                                        <i class="fa-solid fa-plus"></i>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
 
-
-
-                            <!-- <div class="w-100 mt-4">
-                                <button type="button" id="add-tier" class="btn btn-secondary mx-2 fs-6 w-100">
-                                    <i class="fa-solid fa-plus"></i>
-                                    เพิ่มตาราง
-                                </button>
-                            </div> -->
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="mx-4 mt-4 border-bottom d-flex justify-content-between">
-                        <h4>ออฟชั่นสินค้า</h4>
-                    </div>
-                    <div class="card-body" id="option-mutiselect">
-                        <div class="border p-4 rounded option-box mb-2">
-                            <h5 class="d-inline">${card[index]}</h5> <span class="text-danger ms-2">*</span>
-                            <select multiple="multiple" class="option-checkbox w-100" name="option[${index}][]" multiple
-                                required>
-                                <% options.forEach((option) => { %>
-                                <% if (option.parcel_type === 'pumping') { %>
-                                <option value="<%= option.option_id  %>"><%= option.option_name %></option>
-                                <% } %>
-                                <% }); %>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <button type="submit" class="btn btn-primary btn-block float-end fs-6 my-5 back"
-                    style="width: 150px;">บันทึก</button>
             </div>
         </form>
     </div>

@@ -256,7 +256,8 @@
                             <div class="form-outline">
                                 <input type="text" class="form-control" name="ownerName" pattern="[A-Za-zก-๙ ]+$"
                                     maxlength="10" required>
-                                <label for="number" class="form-label">ชื่อผู้รับ</label>
+                                <label for="number" class="form-label">ชื่อผู้รับ <span
+                                        class="text-danger ms-1">*</span></label>
                                 <div class="invalid-feedback">
                                     ชื่อต้องเป็นตัวอักษรเท่านั้น
                                 </div>
@@ -267,7 +268,8 @@
                             <div class="form-outline mb-5">
                                 <input type="text" class="form-control bankNumber" name="number" required
                                     minlength="10">
-                                <label for="name" class="form-label">เลข</label>
+                                <label for="name" class="form-label">เลขบัญชี <span
+                                    class="text-danger ms-1">*</span></label>
                                 <div class="invalid-feedback">
                                     กรุณากรอกเลขบัญชีให้ครบ
                                 </div>

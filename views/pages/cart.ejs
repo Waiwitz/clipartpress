@@ -48,7 +48,8 @@
                 <% const findPromo = promotions.some(row => row.product_id == item.product_id) %>
                 <% let textPrice = money.format(item.price); %>
                 <% let textQty = item.quantity; %>
-                <div class="card mx-0 overflow-hidden p-2 <%= item.product_status == 0 || item.product_deleted_at !== null ? 'product-refrain' : '' %> ">
+                <div
+                    class="card mx-0 overflow-hidden p-2 <%= item.product_status == 0 || item.product_deleted_at !== null ? 'product-refrain' : '' %> ">
                     <% if (item.product_status == 0 || item.product_deleted_at !== null) { %>
                     <div class="alert-info rounded-2 position-absolute bottom-0 end-0 p-2 mb-2 me-2"
                         style="z-index: 3;">
@@ -58,8 +59,7 @@
                     <div class="card-body product_list_card p-2 overflow-hidden">
                         <div class="row">
                             <div class="col-2">
-                                <div
-                                    class="cart-product-picture">
+                                <div class="cart-product-picture">
                                     <img src="<%= item.picture %>" alt="" class="imageFitBox" draggable="false">
                                 </div>
                             </div>
@@ -180,6 +180,10 @@
                                 </span>
                             </div>
                         </div>
+                        <span class="text-warning text-end w-100"><b>
+ราคายังไม่รวมค่าจัดส่ง
+                            </b></span>
+
                     </div>
                     <div class="card-footer">
                         <a href="/checkout">

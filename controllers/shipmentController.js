@@ -16,7 +16,7 @@ const addShipment = (req, res) => {
     } else {
         status = '1';
     }
-    try {
+    try { 
         if (shipment_type == 'qty') {
             dbConnection.promise().query('INSERT INTO shipments SET shipment_name = ?, shipment_type = ?, start_price = ?, status = ?', [shipment_name, shipment_type, start_price, status]).then(([shipment]) => {
                 const shipmentId = shipment.insertId;
@@ -26,7 +26,7 @@ const addShipment = (req, res) => {
             })
         } else if (shipment_type == 'free') {
             dbConnection.promise().query('INSERT INTO shipments SET shipment_name = ?, shipment_type = ?, start_price = ?, status = ?', [shipment_name, shipment_type, start_price, status], (error) => {
-                if (error) throw error
+                console.log(error);
             })
         }
         req.flash('success_msg', 'เพิ่มขนส่งสำเร็จ');

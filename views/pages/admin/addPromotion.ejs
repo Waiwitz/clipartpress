@@ -21,7 +21,7 @@
         </div>
     </div>
     <div style="padding-bottom: 100px;"></div>
-    <div class="box-admin">
+    <div class="box-admin mb-5">
         <form action="/addpromotion" method="post" class="needs-validation" novalidate>
             <div class="card">
                 <div class="mx-4 mt-4 border-bottom">
@@ -150,8 +150,13 @@
                             </div>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary btn-block float-end fs-6 mt-5 back"
-                        style="width: 150px;">บันทึก</button>
+                    <div class="w-100 fixed-bottom bg-white border-top" style="z-index: 0;">
+                        <div class="m-2 me-5 d-flex justify-content-end">
+                            <button type="reset" class="btn btn-outline-black me-2 my-2 fs-6">รีเซ็ต</button>
+                            <button type="submit" class="btn btn-primary fs-6 my-2"
+                                style="width: 150px;">บันทึก</button>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- <div class="mx-4 mt-4 border-bottom">
@@ -182,86 +187,88 @@
 
             </div>
         </form>
-        <!-- <div class="modal fade" id="pickProduct" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header border-0">
-                    <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <select class="form-select w-75" id="product-cate" style="height: 35px;" name="categories" required>
-                        <option value="card">นามบัตร</option>
-                        <option value="flyer">ใบปลิว</option>
-                        <option value="leaflet">แผ่บพับ</option>
-                        <option value="sticker">สติ๊กเกอร์</option>
-                        <option value="bill">ใบบิล</option>
-                        <option value="letter">ซองจดหมาย</option>
-                    </select>
-                    <div class="row">
-                        <% products.forEach((product, index) => { %>
-                        <div class="col text-center">
-                            <h5><%= product.productName %></h5>
-                            <img src="<%= product.picture %>" alt="" width="100"> <br>
-                            <input type="checkbox" name="product" id="product<%= product.product_id %>"
-                                value="<%= product.product_id %>" data-img="<%= product.picture %>"
-                                data-name="<%= product.productName %>" data-type="<%= product.categories %>"
-                                style="width: 30px; height: 30px;">
+    </div>
+    <!-- <div class="modal fade" id="pickProduct" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header border-0">
+                        <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <select class="form-select w-75" id="product-cate" style="height: 35px;" name="categories"
+                            required>
+                            <option value="card">นามบัตร</option>
+                            <option value="flyer">ใบปลิว</option>
+                            <option value="leaflet">แผ่บพับ</option>
+                            <option value="sticker">สติ๊กเกอร์</option>
+                            <option value="bill">ใบบิล</option>
+                            <option value="letter">ซองจดหมาย</option>
+                        </select>
+                        <div class="row">
+                            <% products.forEach((product, index) => { %>
+                            <div class="col text-center">
+                                <h5><%= product.productName %></h5>
+                                <img src="<%= product.picture %>" alt="" width="100"> <br>
+                                <input type="checkbox" name="product" id="product<%= product.product_id %>"
+                                    value="<%= product.product_id %>" data-img="<%= product.picture %>"
+                                    data-name="<%= product.productName %>" data-type="<%= product.categories %>"
+                                    style="width: 30px; height: 30px;">
+                            </div>
+                            <% }); %>
                         </div>
-                        <% }); %>
+                    </div>
+                    <div class="modal-footer ">
+                        <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">Close</button>
+                        <button type="button" id="addProduct" class="btn btn-primary">Save changes</button>
                     </div>
                 </div>
-                <div class="modal-footer ">
-                    <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">Close</button>
-                    <button type="button" id="addProduct" class="btn btn-primary">Save changes</button>
-                </div>
             </div>
-        </div>
-    </div> -->
-        <script src="/js/validateBs.js"></script>
-        <script>
-            document.querySelectorAll('.form-outline').forEach((formOutline) => {
-                new mdb.Input(formOutline).init();
+        </div> -->
+    <script src="/js/validateBs.js"></script>
+    <script>
+        document.querySelectorAll('.form-outline').forEach((formOutline) => {
+            new mdb.Input(formOutline).init();
+        });
+
+        $(function () {
+            $('#product-check').multipleSelect({
+                filter: true,
+                placeholder: 'เลือกสินค้าที่ร่วมรายการ',
+                type: 'optgroup',
+                onClick: function (view) {
+                    $(view).addClass('form-control'); // Apply Bootstrap form-control class
+                    $(view).closest('.ms-container').addClass(
+                        'form-group'); // Apply Bootstrap form-group class
+                }
+                // hideOptgroupCheckboxes: false
             });
+        })
 
-            $(function () {
-                $('#product-check').multipleSelect({
-                    filter: true,
-                    placeholder: 'เลือกสินค้าที่ร่วมรายการ',
-                    type: 'optgroup',
-                    onClick: function (view) {
-                        $(view).addClass('form-control'); // Apply Bootstrap form-control class
-                        $(view).closest('.ms-container').addClass(
-                            'form-group'); // Apply Bootstrap form-group class
-                    }
-                    // hideOptgroupCheckboxes: false
-                });
-            })
+        $('input[type=radio][name=promoType]').change(function () {
+            if (this.value == 'discount') {
+                $('#unittype').text('%')
+            } else if (this.value == 'giveaway') {
+                $('#unittype').text('ชิ้น')
+            }
+        })
 
-            $('input[type=radio][name=promoType]').change(function () {
-                if (this.value == 'discount') {
-                    $('#unittype').text('%')
-                } else if (this.value == 'giveaway') {
-                    $('#unittype').text('ชิ้น')
-                }
-            })
+        $('input[type=radio][name=condition]').change(function () {
+            if (this.value == 'qty') {
+                $('#minAmText').text('ยอดจำนวนสินค้าขั้นต่ำ')
+                $('#unitCondition').text('ชิ้น')
+            } else if (this.value == 'value') {
+                $('#minAmText').text('ยอดสั่งซื้อขั้นต่ำ')
+                $('#unitCondition').text('฿')
+            }
+        })
+        $('#addProduct').click(function () {
+            $('input[name="product"]:checked').each(function () {
+                const id = $(this).val();
+                const img = $(this).data('img')
+                const name = $(this).data('name')
+                const type = $(this).data('type')
 
-            $('input[type=radio][name=condition]').change(function () {
-                if (this.value == 'qty') {
-                    $('#minAmText').text('ยอดจำนวนสินค้าขั้นต่ำ')
-                    $('#unitCondition').text('ชิ้น')
-                } else if (this.value == 'value') {
-                    $('#minAmText').text('ยอดสั่งซื้อขั้นต่ำ')
-                    $('#unitCondition').text('฿')
-                }
-            })
-            $('#addProduct').click(function () {
-                $('input[name="product"]:checked').each(function () {
-                    const id = $(this).val();
-                    const img = $(this).data('img')
-                    const name = $(this).data('name')
-                    const type = $(this).data('type')
-
-                    const row = ` <tr class='product${id}'>
+                const row = ` <tr class='product${id}'>
                             <td class="img-fluid" style="width: 130px;">
                                 <img src="${img}" alt="" >
                             </td>
@@ -278,23 +285,23 @@
                                 </button>
                             </td>
                         </tr>`
-                    $('tbody').append(row)
-                })
-                $('#pickProduct').modal('hide')
+                $('tbody').append(row)
             })
+            $('#pickProduct').modal('hide')
+        })
 
-            $(document).on('click', '.delete', function () {
-                const id = `product` + $(this).data('id');
-                console.log(id);
-                $(`#${id}`).prop('checked', false);
-                $(this).closest('tr').remove();
-            });
+        $(document).on('click', '.delete', function () {
+            const id = `product` + $(this).data('id');
+            console.log(id);
+            $(`#${id}`).prop('checked', false);
+            $(this).closest('tr').remove();
+        });
 
-            $(document).on('change', 'input[type="checkbox"]', function () {
-                const id = `product` + $(this).data('id');
-                if (!$(this).prop('checked')) {
-                    $(this).closest(`tr.${id}`).remove();
-                }
-            });
-        </script>
+        $(document).on('change', 'input[type="checkbox"]', function () {
+            const id = `product` + $(this).data('id');
+            if (!$(this).prop('checked')) {
+                $(this).closest(`tr.${id}`).remove();
+            }
+        });
+    </script>
 </body>
