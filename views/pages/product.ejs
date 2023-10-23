@@ -74,7 +74,7 @@
             </div>
             <div class="price">
               <% const findPrice = priceTiers.filter(price => price.product_id === product.product_id) %>
-              <% let sum = (findPrice[0].size_price + findPrice[0].qty_price) * findPrice[0].quantity %>
+              <% let sum = findPrice[0].price * findPrice[0].quantity %>
               <span>ราคาเริ่มต้น <%= parseFloat(sum).toFixed(0) %> บาท ต่อ <%= findPrice[0].quantity %> ชิ้น</span>
             </div>
             <a href="/product/item/<%= product.product_id %>">
@@ -126,7 +126,7 @@
             </div>
             <div class="price">
               <% const findPrice = priceTiers.filter(price => price.product_id === product.product_id) %>
-              <% let sum = (findPrice[0].size_price + findPrice[0].qty_price) * findPrice[0].quantity %>
+              <% let sum = findPrice[0].price * findPrice[0].quantity %>
               <span>ราคาเริ่มต้น <%= parseFloat(sum).toFixed(0) %> บาท ต่อ <%= findPrice[0].quantity %> ชิ้น</span>
             </div>
             <a href="/product/item/<%= product.product_id %>">

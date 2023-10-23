@@ -4,10 +4,14 @@
     .form-control {
         padding: 5.12px;
     }
+
+    th {
+        padding: 10px !important;
+    }
 </style>
 
 <body style="background-color: #f8f8f8;">
-    <div class="box-admin">
+    <div class="box-admin mb-5">
         <h1>เพิ่มสินค้า</h1>
         <% if(success_msg != "") { %>
         <% success_msg.forEach((item) => { %>
@@ -116,8 +120,71 @@
                             </div>
                         </div>
                     </div>
+
                     <div id="option-form">
-                        <div class="m-1">
+                        <div class="mx-4 mt-4 border-bottom">
+                            <h4>ราคา</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="m-1">
+                                <div class="d-flex">
+                                </div>
+                                <table class="table table-bordered">
+                                    <thead class="table-borderless">
+                                        <tr id="headtable">
+                                            <th class="col-1" colspan="2">
+                                            </th>
+                                            <th>
+                                                <button type="button" id="addSize" class="btn px-2 btn-secondary"
+                                                    data-target="PriceRow-0">
+                                                    <i class="fa-solid fa-plus"></i> เพิ่มขนาด
+                                                </button>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="qtyCol">
+                                        <tr id="sizeTbRow">
+                                            <th class="fs-5 text-center" colspan="2">จำนวน</th>
+                                            <th>
+                                                <div class="me-2">
+                                                    <div class="form-outline" style="width: 80px;">
+                                                        <input type="text" class="form-control" name="unit[0]"
+                                                            placeholder="เช่น 1x1" required>
+                                                        <label class="form-label">ขนาด<span
+                                                                class="text-danger ms-2">*</span></label>
+                                                    </div>
+                                                </div>
+                                            </th>
+                                        </tr>
+                                        <tr class="priceRow" id="priceRow-0">
+                                            <th class="qtyCol text-center">
+                                                <button type="button" id="addQty" class="btn px-3 btn-secondary"
+                                                    data-target="PriceRow-0">
+                                                    <i class="fa-solid fa-plus"></i> จำนวน
+                                                </button>
+                                            </th>
+                                            <th>
+                                                <div class="form-outline me-2" style="width: 85px; height: 36px;">
+                                                    <input type="number" class="form-control p-1" name="qty[0][0]"
+                                                        required style="height: 36px;" step="0.01" min="0">
+                                                    <label class="form-label">จำนวน<span
+                                                            class="text-danger ms-2">*</span></label>
+                                                </div>
+                                            </th>
+                                            <th class="m-auto">
+                                                <div class="form-outline" style="width: 80px; height: 36px;">
+                                                    <input type="number" class="form-control p-1" name="qtyPrice[0][0]"
+                                                        required step="0.01" min="0">
+                                                    <label class="form-label">ราคา<span
+                                                            class="text-danger ms-2">*</span></label>
+                                                </div>
+                                            </th>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <!-- <div class="m-1">
                             <div>
                                 <div class="mx-4 mt-4 border-bottom">
                                     <h4>ราคา</h4>
@@ -130,13 +197,6 @@
                                                 <div class="m-2">
                                                     <h5>ราคาไซต์งาน</h5>
                                                     <hr>
-                                                    <!-- <select class="form-select parcel-select" id="parcel-0"
-                                                        name="option_type[0][]" required>
-                                                        <option value=" 9x5.5">9 x 5.5 cm</option>
-                                                        <option value="4x4">9 x 5 cm</option>
-                                                        <option value="5x5">8 x 5.5 cm</option>
-                                                        </optgroup>
-                                                    </select> -->
                                                     <div id="sizeTier">
                                                         <div class="d-flex mb-2 sizeTierRow" style="height: 36px;">
                                                             <div class="me-2">
@@ -148,15 +208,6 @@
                                                                             class="text-danger ms-2">*</span></label>
                                                                 </div>
                                                             </div>
-                                                            <!-- <span class="p-1 ">X</span> -->
-                                                            <!-- <div class="ms-2">
-                                                                <div class="form-outline" style="width: 85px;">
-                                                                    <input type="number" class="form-control" name="height[0][]"
-                                                                        required step="0.01" min="0">
-                                                                    <label class="form-label">ยาว<span
-                                                                            class="text-danger ms-2">*</span></label>
-                                                                </div>
-                                                            </div> -->
                                                             <div class="ms-2">
                                                                 <div class="form-outline" style="width: 85px;">
                                                                     <input type="number" class="form-control"
@@ -210,90 +261,24 @@
                                         </div>
                                     </div>
 
-
-
-                                    <!-- <div class="w-100 mt-4">
-                                        <button type="button" id="add-tier" class="btn btn-secondary mx-2 fs-6 w-100">
-                                            <i class="fa-solid fa-plus"></i>
-                                            เพิ่มตาราง
-                                        </button>
-                                    </div> -->
                                 </div>
                             </div>
-                        </div>
-                        <div class="w-100 fixed-bottom bg-white border-top" style="z-index: 0;">
-                            <div class="m-2 me-5 d-flex justify-content-end">
-                                <button type="reset" class="btn btn-outline-black me-2 my-2 fs-6">รีเซ็ต</button>
-                                <button type="submit" class="btn btn-primary fs-6 my-2"
-                                    style="width: 150px;">บันทึก</button>
-                            </div>
-                        </div>
+                        </div> -->
                     </div>
+
                 </div>
-                <!-- 
-                <div class="card">
-                    <div class="mx-4 mt-4 border-bottom">
-                        <h4>กำหนดส่วนลด</h4>
-                    </div>
-                    <div class="card-body">
-                        <div class="row row-cols-lg-auto mb-4">
-                            <div class="col">
-                                <label class="form-label" for="dc-num">ส่วนลด(%)</label> <br>
-                                <input type="number" id="discount" class="form-control" name="discount" value="0"
-                                    min="0" max="100" required />
-                            </div>
-                            <div class="col">
-                                <label class="form-label" for="dc-start">วันที่เริ่ม</label> <br>
-                                <input type="datetime-local" id="dc-start" class="form-control" name="dc_start" />
-                            </div>
-                            <div class="col">
-                                <label class="form-label" for="dc-end">วันที่สิ้นสุด</label> <br>
-                                <input type="datetime-local" id="dc-end" class="form-control" name="dc_end" />
-                            </div>
-                        </div>
-                    </div>
-                </div> -->
-
-                <!-- <div class="card mb-4 spec" id="spec">
-                <div class="mx-4 mt-4 border-bottom">
-                    <h4>กำหนดสเปคสินค้า</h4>
+            </div>
+            <div class="w-100 fixed-bottom bg-white border-top" style="z-index: 0;">
+                <div class="m-2 me-5 d-flex justify-content-end">
+                    <button type="reset" class="btn btn-outline-black me-2 my-2 fs-6">รีเซ็ต</button>
+                    <button type="submit" class="btn btn-primary fs-6 my-2" style="width: 150px;">บันทึก</button>
                 </div>
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <div class="form-outline me-2" style="width: 200px;">
-                            <input type="text" class="spec-name form-control" name="spec_name[0][]" required>
-                            <label class="form-label">ชื่อสเปค</label>
-                        </div>
-                        <select multiple="multiple" class="option-checkbox w-100" name="option[0][]" multiple>
-             
-                        </select>
-                        <button type="button" id="add-spec" class="btn btn-secondary mx-2">
-                            <i class="fa-solid fa-plus"></i>
-                        </button>
-                    </div>
-                    <div id="newRow"></div>
-                </div>
-            </div> -->
-
-                <!-- <button type="button" class="btn btn-primary btn-block my-5 float-end next disabled fs-6"
-                    style="width: 150px;">ถัดไป <div class="spinner-border spinner-border-sm" role="status">
-                    </div></button> -->
-
-
             </div>
         </form>
     </div>
 
     <script src="/js/validateBs.js"></script>
     <script>
-        // $('.needs-validation').submit(function (event) {
-        //     if ($('.option-checkbox').val() == null) {
-        //         $('.ms-choice').css('border: red solid;');
-        //         event.preventDefault();
-        //     } 
-        // });
-
-
         function previewImage(event, index) {
             var input = event.target;
             var imgPreview = document.getElementById('option_preview[' + index + ']');
@@ -323,91 +308,183 @@
         var qtyTierCount = 0;
         var img = 0
 
-        $("#discount").on("change", function () {
-            var inputValue = $(this).val();
+  
 
-            if (parseFloat(inputValue) > 0) {
-                $('#dc-start').prop("disabled", false);
-                $('#dc-end').prop("disabled", false);
-            } else {
-                $('#dc-start').prop("disabled", true);
-                $('#dc-end').prop("disabled", true);
-            }
-        });
+        $('#addSize').prop('disabled', sizeTierCount >= 7);
+        $('#addQty').prop('disabled', qtyTierCount >= 9);
 
-        $('#addSizeTier').prop('disabled', sizeTierCount >= 9);
-        $(document).on('click', '#addSizeTier', function () {
-            if (sizeTierCount < 9) {
-                sizeTierCount++;
-                var newSzieRow = `
-            <div class="d-flex mb-2 sizeTierRow" style="height: 36px;">
-                                                    <div class="me-2">
-                                                        <div class="form-outline" style="width: 85px;">
-                                                            <input type="text" class="form-control" name="unit[${sizeTierCount}][]" placeholder="เช่น 1x1"
-                                                                required>
-                                                            <label class="form-label">ขนาด<span
-                                                                    class="text-danger ms-2">*</span></label>
-                                                        </div>
-                                                    </div>
-                                    
-                                                    <div class="ms-2">
-                                                        <div class="form-outline" style="width: 85px;">
-                                                            <input type="number" class="form-control" name="sizePrice[${sizeTierCount}][]"
-                                                                required step="0.01" min="0">
-                                                            <label class="form-label">ราคา<span
-                                                                    class="text-danger ms-2">*</span></label>
-                                                        </div>
-                                                    </div>
-                                                    <button type="button" class="ms-2 btn btn-danger remove-sizePrice"><i class="fa-solid fa-trash" style="color: #ffffff;"></i></button>
-                                                </div>
-          `;
-                $('#sizeTier').append(newSzieRow);
-                document.querySelectorAll('.form-outline').forEach((formOutline) => {
-                    new mdb.Input(formOutline).init();
-                });
-                $('#addSizeTier').prop('disabled', sizeTierCount >= 9);
-            }
-        });
+        // $(document).on('click', '#addSizeTier', function () {
+        //     if (sizeTierCount < 6) {
+        //         sizeTierCount++;
+        //         var newSzieRow = `
+        //     <div class="d-flex mb-2 sizeTierRow" style="height: 36px;">
+        //                                             <div class="me-2">
+        //                                                 <div class="form-outline" style="width: 85px;">
+        //                                                     <input type="text" class="form-control" name="unit[${sizeTierCount}][]" placeholder="เช่น 1x1"
+        //                                                         required>
+        //                                                     <label class="form-label">ขนาด<span
+        //                                                             class="text-danger ms-2">*</span></label>
+        //                                                 </div>
+        //                                             </div>
 
-        $('.addPrice').prop('disabled', qtyTierCount >= 9);
-        $(document).on('click', '.addPrice', function () {
-            if (qtyTierCount < 9) {
+        //                                             <div class="ms-2">
+        //                                                 <div class="form-outline" style="width: 85px;">
+        //                                                     <input type="number" class="form-control" name="sizePrice[${sizeTierCount}][]"
+        //                                                         required step="0.01" min="0">
+        //                                                     <label class="form-label">ราคา<span
+        //                                                             class="text-danger ms-2">*</span></label>
+        //                                                 </div>
+        //                                             </div>
+        //                                             <button type="button" class="ms-2 btn btn-danger remove-sizePrice"><i class="fa-solid fa-trash" style="color: #ffffff;"></i></button>
+        //                                         </div>
+        //   `;
+
+
+
+        //         var sizeTh = `<th>
+        //                                         <div class="me-2">
+        //                                             <div class="form-outline" style="width: 100px;">
+        //                                                 <input type="text" class="form-control" name="unit[${sizeTierCount}][]"
+        //                                                     placeholder="เช่น 1x1" required>
+        //                                                 <label class="form-label">ขนาด<span
+        //                                                         class="text-danger ms-2">*</span></label>
+        //                                             </div>
+        //                                         </div>
+        //                                     </th>`
+
+
+        //         $('.priceRow').each(function (index, e) {
+
+        //         })
+
+        //         $('#sizeTbRow').append(sizeTh);
+        //         document.querySelectorAll('.form-outline').forEach((formOutline) => {
+        //             new mdb.Input(formOutline).init();
+        //         });
+        //         $('#addSizeTier').prop('disabled', sizeTierCount >= 6);
+        //     }
+        // });
+        $(document).ready(function () {
+            // Counter for row IDs
+            var rowCount = 1;
+
+            $("#addQty").click(function () {
+                var newRow = $("#priceRow-0").clone();
                 qtyTierCount++
-                // var count = $(this).closest('.tier').index('.tier');
-                var form = `
-          <div class="d-flex mb-2 qtyTierRow">
-              <div class="form-outline me-2" style="width: 85px; height: 36px;">
-                  <input type="number" class="form-control p-1" name="qty[${qtyTierCount}][]" required style="height: 36px;" step="0.01" min="0">
-                  <label class="form-label">จำนวน<span class="text-danger ms-2">*</span></label>
-              </div>
-              <div class="form-outline" style="width: 85px; height: 36px;">
-                  <input type="number" class="form-control p-1" name="qtyPrice[${qtyTierCount}][]" required step="0.01" min="0">
-                  <label class="form-label">ราคา<span class="text-danger ms-2">*</span></label>
-              </div>
-              <button type="button" class="ms-2 btn btn-danger remove-price"><i class="fa-solid fa-trash" style="color: #ffffff;"></i></button>
-          </div>`;
+                console.log(qtyTierCount);
+                newRow.attr('id', 'priceRow-' + qtyTierCount);
+                newRow.find('input[name^="qty[0]"]').attr('name', 'qty[' + qtyTierCount + '][]');
+                newRow.find('input[name^="qtyPrice[0]"]').attr('name', 'qtyPrice[' + qtyTierCount +
+                    '][]');
+                newRow.find('.qtyCol').append(
+                    '<button type="button" class="btn btn-danger px-2 remove-qtyRow"><i class="fa-solid fa-trash"></i> ลบแถว</button>'
+                );
+                newRow.find('#addQty').remove();
+                // newRow.append(
+                //     '<td><button type="button" class="px-2 btn btn-danger remove-qtyRow"><i class="fa-solid fa-trash" style="color: #ffffff;"></i></button></td>'
+                //     );
 
-                // const row = $(this).data('target');
-                // console.log(row);
-                $(`#PriceTier`).append(form);
+                $("#qtyCol").append(newRow);
+                rowCount++;
+
                 document.querySelectorAll('.form-outline').forEach((formOutline) => {
                     new mdb.Input(formOutline).init();
                 });
-                $('.addPrice').prop('disabled', qtyTierCount >= 9);
-            }
+                $('#addQty').prop('disabled', qtyTierCount >= 9);
+            });
+
+            $("#addSize").click(function () {
+                sizeTierCount++
+                var newSizeHeader =
+                    `<th class="size-column">
+                        <div class="me-1 d-flex">
+                            <div class="form-outline" style="width: 80px; height: 36px;">
+                                <input type="text" class="form-control" name="unit[${sizeTierCount}]" placeholder="เช่น 1x1" required>
+                                <label class="form-label">ขนาด<span class="text-danger ms-2">*</span></label>
+                            </div>
+                        </div>
+                    </th>`;
+
+                var deletebtn =
+                    `<th>
+            <button type="button" class="ms-2 px-1 btn btn-danger remove-sizePrice" data-target="${sizeTierCount}">
+                <i class="fa-solid fa-trash"></i> ลบคอลัมน์
+            </button>
+        </th>`;
+                $('#headtable').append(deletebtn)
+                $("#sizeTbRow").append(newSizeHeader);
+
+                // Add a corresponding "ราคา" column to each "จำนวน" row
+                $(".priceRow").each(function (index) {
+                    $(this).append(
+                        '<th><div class="form-outline" style="width: 80px; height: 36px;"><input type="number" class="form-control p-1" name="qtyPrice[' +
+                        index +
+                        '][]" required step="0.01" min="0"><label class="form-label">ราคา<span class="text-danger ms-2">*</span></label></div></th>'
+                    );
+                });
+
+                document.querySelectorAll('.form-outline').forEach((formOutline) => {
+                    new mdb.Input(formOutline).init();
+                });
+                $('#addSize').prop('disabled', sizeTierCount >= 7);
+            });
         });
 
 
-        $(document).on('click', '.remove-sizePrice', function () {
-            $(this).closest('.d-flex').remove();
-            sizeTierCount--
-            if (sizeTierCount < 10) {
-                $('#addSizeTier').prop('disabled', false);
-            }
+        // $('.addPrice').prop('disabled', qtyTierCount >= 9);
+        // $(document).on('click', '.addPrice', function () {
+        //     if (qtyTierCount < 9) {
+        //         qtyTierCount++
+        //         // var count = $(this).closest('.tier').index('.tier');
+        //         var form = `
+        //   <div class="d-flex mb-2 qtyTierRow">
+        //       <div class="form-outline me-2" style="width: 85px; height: 36px;">
+        //           <input type="number" class="form-control p-1" name="qty[${qtyTierCount}][]" required style="height: 36px;" step="0.01" min="0">
+        //           <label class="form-label">จำนวน<span class="text-danger ms-2">*</span></label>
+        //       </div>
+        //       <div class="form-outline" style="width: 85px; height: 36px;">
+        //           <input type="number" class="form-control p-1" name="qtyPrice[${qtyTierCount}][]" required step="0.01" min="0">
+        //           <label class="form-label">ราคา<span class="text-danger ms-2">*</span></label>
+        //       </div>
+        //       <button type="button" class="ms-2 btn btn-danger remove-price"><i class="fa-solid fa-trash" style="color: #ffffff;"></i></button>
+        //   </div>`;
+
+        //         // const row = $(this).data('target');
+        //         // console.log(row);
+        //         $(`#PriceTier`).append(form);
+        //         document.querySelectorAll('.form-outline').forEach((formOutline) => {
+        //             new mdb.Input(formOutline).init();
+        //         });
+        //         $('.addPrice').prop('disabled', qtyTierCount >= 9);
+        //     }
+        // });
+
+
+        $(document).on("click", ".remove-sizePrice", function () {
+            // Find the index of the column to remove
+            var columnIndex = $(this).closest("th.size-column").index();
+
+            // Remove the corresponding header column
+            $("#headtable th").eq(columnIndex).remove();
+
+            // Remove the corresponding columns from each "จำนวน" row (including the first row)
+            $(".priceRow").each(function () {
+                $(this).find("th").eq(columnIndex).remove();
+            });
+
+            // Remove the newSizeHeader column
+            $("#sizeTbRow th.size-column").eq(columnIndex).remove();
+
+            // Decrease the sizeTierCount
+            sizeTierCount--;
+
+            // Enable the "Add Size" button if needed
+            $('#addSize').prop('disabled', sizeTierCount >= 7);
         });
 
-        $(document).on('click', '.remove-price', function () {
-            $(this).closest('.d-flex').remove();
+
+        $(document).on('click', '.remove-qtyRow', function () {
+            $(this).closest('tr').remove();
             qtyTierCount--
             if (qtyTierCount < 9) {
                 $('.addPrice').prop('disabled', false);
