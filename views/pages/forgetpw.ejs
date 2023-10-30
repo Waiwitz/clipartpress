@@ -13,12 +13,15 @@
         </div>
         <div class="w-50 m-auto">
             <h3 class="mb-3">ลืมรหัสผ่าน</h3>
-            <form method="post" action="/identify">
+            <form method="post" action="/identify" class="needs-validation" novalidate>
                 <!-- username input -->
                 <p>กรอกอีเมลที่ใช้ในการสมัครสมาชิก ระบบจะส่งลิ้งค์รีเซ็ทรหัสผ่านให้คุณทางอีเมล</p>
-                <div class="form-outline mb-4">
-                    <input type="email" id="email" class="form-control" name="email" value="" />
+                <div class="form-outline mb-5">
+                    <input type="email" id="email" class="form-control" name="email" value="" required/>
                     <label class="form-label" for="form1Example1">อีเมล</label>
+                    <div class="invalid-feedback">
+                        กรุณาอีเมล
+                      </div>
                 </div>
                 <!-- Submit button -->
                 <button type="submit" class="btn btn-primary btn-block">ยืนยัน</button>

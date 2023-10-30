@@ -86,7 +86,7 @@
                                 <% } %></td>
                             <td>
                                 <button type="button" class="btn btn-danger btn-edit delete" data-mdb-toggle="modal"
-                                    data-mdb-target="#deleteModal" data-user-id="<%= users.user_id %>">
+                                    data-mdb-target="#deleteModal" data-user-id="<%= users.user_id %>" data-name="<%= users.name %>">
                                     ปิดบัญชี
                                 </button>
                             </td>
@@ -163,7 +163,7 @@
                 <div class="modal-body">
                     <form action="/deleteType" id="userform" method="post">
                         <div>
-                            <p>ต้องการปิดบัญชีของ <i class="getname"></i> ใช่หรือไม่ ?</p>
+                            <p>ต้องการปิดบัญชีของ <b class="getname"></b> ใช่หรือไม่ ?</p>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary " data-mdb-dismiss="modal">ยกเลิก</button>

@@ -194,11 +194,11 @@
                                             <% for( let j = 0; j < qty[i].price.length; j++ ) { %>
                                             <th class="m-auto">
                                                 <input type="hidden" class="form-control"
-                                                    name="qtyPriceId[<%= i %>]"
+                                                    name="qtyPriceId[<%= i %>][]"
                                                     value="<%= qty[i].price[j].tierPrice_id %>">
                                                 <div class="form-outline" style="width: 80px; height: 36px;">
                                                     <input type="number" class="form-control p-1"
-                                                        name="qtyPrice[<%= i %>][0]"
+                                                        name="qtyPrice[<%= i %>][]"
                                                         value="<%= qty[i].price[j].price %>" required step="0.01"
                                                         min="0">
                                                     <label class="form-label">ราคา<span
@@ -418,13 +418,13 @@
                 console.log(qtyTierCount);
                 newRow.attr('id', 'priceRow-' + qtyTierCount);
                 newRow.find('input[name^="qtyId[0]"]').attr('name', 'qtyId[' + qtyTierCount + '][]')
-                    .val("none");
+                    .val("0");
                 newRow.find('input[name^="qty[0]"]').attr('name', 'qty[' + qtyTierCount + '][]').val(
                     null);
                 newRow.find('input[name^="qtyPrice[0]"]').attr('name', 'qtyPrice[' + qtyTierCount +
                     '][]').val(null);
                 newRow.find('input[name^="qtyPriceId[0]"]').attr('name', 'qtyPriceId[' + qtyTierCount +
-                    '][]').val("none");
+                    '][]').val("0");
                 newRow.find('.qtyCol').append(
                     '<button type="button" class="btn btn-danger px-2 remove-qtyRow"><i class="fa-solid fa-trash"></i> ลบแถว</button>'
                 );
@@ -446,7 +446,7 @@
                 sizeTierCount++
                 var newSizeHeader =
                     `<th class="size-column">
-                        <input type="hidden" class="form-control" name="sizeId[${sizeTierCount}]" value="none">
+                        <input type="hidden" class="form-control" name="sizeId[${sizeTierCount}]" value="0">
                         <div class="me-1 d-flex">
                             <div class="form-outline" style="width: 80px; height: 36px;">
                                 <input type="text" class="form-control" name="unit[${sizeTierCount}]" placeholder="เช่น 1x1" required>
@@ -468,7 +468,7 @@
                 $(".priceRow").each(function (index) {
                     $(this).append(
                         `
-                        <th><input type="hidden" class="form-control" name="qtyPriceId[${index}]" value="none">
+                        <th><input type="hidden" class="form-control" name="qtyPriceId[${index}][]" value="0">
                             <div class="form-outline" style="width: 80px; height: 36px;">
                             <input type="number" class="form-control p-1" name="qtyPrice[${index}][]" required step="0.01" min="0">
                             <label class="form-label">ราคา<span class="text-danger ms-2">*</span></label>

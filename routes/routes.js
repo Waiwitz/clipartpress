@@ -91,7 +91,7 @@ let Routes = (app) => {
     router.get('/identify', loginController.checkLoggedOut, (req, res) => {
         res.render('pages/forgetpw', {
             currentMenu: 'ลืมรหัสผ่าน',
-            errors: req.flash("errors"),
+            errors: req.flash("errors"), 
             Title: 'Clipart Press',
         });
     });
@@ -275,11 +275,14 @@ let Routes = (app) => {
                                                 promotions: promotions,
                                                 currentLink: "",
                                                 reviews: reviews
-                                            })
+                                            });
                                         })
                                 })
                         });
-                    })
+                    });
+            }).catch((err) => {
+                req.flash('มีข้อผิดพลาดเกิดขึ้น');
+                res.redirect('/product/all/');
             })
     });
 
@@ -1546,23 +1549,40 @@ let Routes = (app) => {
             res.json(rows);
         })
     })
-    // router.get('/admin/chat', (req, res) => {
-    //     dbConnection.query('SELECT DISTINCT u.* FROM users u INNER JOIN chats c ON u.user_id = c.sender_id WHERE c.recipient_id = "admin" AND u.deleted_at is NULL').then(([users]) => {
-    //         res.render('pages/adminChat', {
-    //             currentLink: "chat",
-    //             users: users,
-    //         })
 
-    //     })
-    // })
+
+    router.post('/admin/chat-readed', (req, res) => {
+        const {
+            id
+        } = req.body;
+        console.log("อ่านแล้ว");
+        dbConnection.promise().query('UPDATE chats SET readed = 1 WHERE sender_id = ? OR recipient_id = ?', [id, id]).then(([rows]) => {
+            res.json({
+                message: 'chat readed'
+            });
+        })
+    })
 
     router.get('/admin/chat/*', checkAdmin, (req, res) => {
-        const id = req.params[0];
-        dbConnection.promise().query('SELECT DISTINCT u.* FROM users u INNER JOIN chats c ON u.user_id = c.sender_id WHERE c.recipient_id = "admin" AND u.deleted_at is NULL AND u.user_role = 0').then(([users]) => {
-            dbConnection.promise().query('SELECT * FROM chats WHERE sender_id = ? OR recipient_id = ? ORDER BY created_at ASC', [id, id]).then(([messages]) => {
+        // const id = req.params[0];
+        dbConnection.promise().query('SELECT DISTINCT u.*, c.created_at FROM users u LEFT JOIN chats c ON u.user_id = c.sender_id OR u.user_id = c.recipient_id WHERE c.recipient_id = "admin" AND u.deleted_at is NULL AND u.user_role = 0 ORDER BY c.created_at DESC').then(([users]) => {
+            const userList = [];
+            users.forEach((user) => {
+                const existing = userList.find((item) => item.user_id === user.user_id);
+                if (!existing) {
+                    const item = {
+                        user_id: user.user_id,
+                        username: user.username,
+                        picture: user.picture,
+                    };
+                    userList.push(item);
+                };
+            });
+            console.log(userList);
+            dbConnection.promise().query('SELECT * FROM chats ORDER BY created_at DESC').then(([messages]) => {
                 res.render('pages/admin/adminChat', {
                     currentLink: "chat",
-                    users: users,
+                    users: userList,
                     messages: messages
                 })
             })

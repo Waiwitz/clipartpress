@@ -82,12 +82,12 @@ const addProduct = async (req, res) => {
                     })
                 }
 
-                for (let s = 0; s < sizesArr.length; s++) {
+                for (let s = 0; s < qtyArr.length; s++) {
                     for (let j = 0; j < qtyPrice[s].length; j++) {
                         const price = {
                             price: qtyPrice[s][j],
-                            tierQty_id: qtyArr[j],
-                            size_id: sizesArr[s]
+                            tierQty_id: qtyArr[s],
+                            size_id: sizesArr[j]
                         };
                         dbConnection.query("INSERT INTO pricingTiers_Price SET ?", [price])
                     }
@@ -237,7 +237,7 @@ const updateProduct = async (req, res) => {
                 const sizesArr = [];
                 const qtyArr = [];
                 for (let i = 0; i < sizeId.length; i++) {
-                    if (sizeId[i] != "none") {
+                    if (sizeId[i] != "0") {
                         await dbConnection.promise().query("UPDATE pricingTiers_size SET size_unit = ? WHERE size_id = ?", [unit[i], sizeId[i]], (error) => {
                             if (error) {
                                 console.log(error);
@@ -245,7 +245,7 @@ const updateProduct = async (req, res) => {
                             }
                         })
                         sizesArr.push(sizeId[i])
-                    } else if (sizeId[i] == "none") {
+                    } else if (sizeId[i] == "0") {
                         const sizes = {
                             size_unit: unit[i],
                             // size_price: sizePrice[i],
@@ -259,7 +259,7 @@ const updateProduct = async (req, res) => {
 
                 }
                 for (let j = 0; j < qtyId.length; j++) {
-                    if (qtyId[j] != "none") {
+                    if (qtyId[j] != "0") {
                         dbConnection.promise().query('UPDATE pricingTiers_qty SET quantity = ? WHERE tierQty_id = ?', [qty[j], qtyId[j]], (error) => {
                             if (error) {
                                 console.log(error);
@@ -267,7 +267,7 @@ const updateProduct = async (req, res) => {
                             }
                         });
                         qtyArr.push(qtyId[j])
-                    } else if (qtyId[j] == "none") {
+                    } else if (qtyId[j] == "0") {
                         const qtys = {
                             quantity: qty[j],
                             product_id: productId
@@ -278,26 +278,25 @@ const updateProduct = async (req, res) => {
                         })
                     }
                 }
-                console.log(sizesArr);
-                console.log(qtyArr);
-                for (let s = 0; s < sizesArr.length; s++) {
-                        for (let k = 0; k < qtyPriceId[s].length; k++) {
-                            if (qtyPriceId[s][k] != "none") {
-                                dbConnection.promise().query('UPDATE pricingTiers_Price SET price = ? WHERE tierPrice_id = ?', [qtyPrice[s][k], qtyPriceId[s][k]], (error) => {
-                                    if (error) {
-                                        console.log(error);
-                                        return res.redirect("/admin/product-list");
-                                    }
-                                })
-                            } else if (qtyPriceId[s][k] == "none") {
-                                const price = {
-                                    price: qtyPrice[s][k],
-                                    tierQty_id: qtyArr[s],
-                                    size_id: sizesArr[k]
-                                };
-                                dbConnection.query("INSERT INTO pricingTiers_Price SET ?", [price])
-                            }
+
+                for (let s = 0; s < qtyArr.length; s++) {
+                    for (let k = 0; k < qtyPrice[s].length; k++) {
+                        if (qtyPriceId[s][k] === "0") {
+                            const price = {
+                                price: qtyPrice[s][k],
+                                tierQty_id: qtyArr[s],
+                                size_id: sizesArr[k]
+                            };
+                            dbConnection.query("INSERT INTO pricingTiers_Price SET ?", [price])
+                        } else if (qtyPriceId[s][k] != "0") {
+                            dbConnection.promise().query('UPDATE pricingTiers_Price SET price = ? WHERE tierPrice_id = ?', [qtyPrice[s][k], qtyPriceId[s][k]], (error) => {
+                                if (error) {
+                                    console.log(error);
+                                    return res.redirect("/admin/product-list");
+                                }
+                            })
                         }
+                    }
                 };
                 // newQtyPrice
 

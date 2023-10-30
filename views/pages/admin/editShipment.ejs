@@ -8,7 +8,7 @@
 <body>
     <div class="mb-5 secondHead-admin">
         <div class="secondHead-content">
-            <h1>แก้ไขการขนส่ง</h1>
+            <h1>แก้ไขการจัดส่ง</h1>
             <!-- <ol class="list-unstyled d-flex ">
                 <li class="breadcrumb-item"><a class="link-light" href="#">หน้าแรก</a></li>
                 <li class="active text-light ms-2">/ สินค้า</li>
@@ -84,8 +84,8 @@
                                         <div class="d-flex">
                                             <input type="hidden" name="sp_id[0]"
                                                 value="<%= shipments[0].shipment_price_id %>">
-                                            <span class="form-label mt-1" for="inlineFormSelectPref"
-                                                style="width: 80px;">เมื่อซื้อถึง</span>
+                                            <label class="form-label mt-1" for="inlineFormSelectPref"
+                                                style="width: 80px;">เมื่อซื้อถึง</label>
                                             <div class="input-group mx-1">
                                                 <input type="number" class="form-control qtyinput" name="qty_min[0]"
                                                     min="0" required value="<%= shipments[0].qty_min %>" />
@@ -101,8 +101,8 @@
                                     </td>
                                     <td>
                                         <div class="d-flex">
-                                            <span class="form-label mt-1" for="inlineFormSelectPref"
-                                                style="width: 70px;">ค่าขนส่ง</span>
+                                            <label class="form-label mt-1" for="inlineFormSelectPref"
+                                                style="width: 70px;">ค่าขนส่ง</label>
                                             <div class="input-group">
                                                 <input type="number" class="form-control priceinput" name="price[0]"
                                                     min="0" required value="<%= shipments[0].price %>" />
@@ -128,8 +128,8 @@
                                         <div class="d-flex">
                                             <input type="hidden" name="sp_id[<%= i %>]"
                                                 value="<%= shipments[i].shipment_price_id %>">
-                                            <span class="form-label mt-1" for="inlineFormSelectPref"
-                                                style="width: 80px;">เมื่อซื้อถึง</span>
+                                                <label class="form-label mt-1" for="inlineFormSelectPref"
+                                                style="width: 100px;">เมื่อซื้อถึง</label>
                                             <div class="input-group mx-1">
                                                 <input type="number" class="form-control qtyinput"
                                                     name="qty_min[<%= i %>]" min="0" required
@@ -146,8 +146,8 @@
                                     </td>
                                     <td>
                                         <div class="d-flex">
-                                            <span class="form-label mt-1" for="inlineFormSelectPref"
-                                                style="width: 70px;">ค่าขนส่ง</span>
+                                            <label class="form-label mt-1" for="inlineFormSelectPref"
+                                                style="width: 70px;">ค่าขนส่ง</label>
                                             <div class="input-group">
                                                 <input type="number" class="form-control priceinput"
                                                     name="price[<%= i %>]" min="0" required

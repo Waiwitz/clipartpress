@@ -4,20 +4,21 @@ const app = express();
 require("dotenv").config();
 const dbConnection = require("./config/database");
 const cookieParser = require('cookie-parser');
-const bodyParser = require('body-parser');  
+const bodyParser = require('body-parser');
 const connectFlash = require('connect-flash');
-const session = require('express-session'); 
+const session = require('express-session');
 const router = require('./routes/routes');
 const morgan = require('morgan')
-const path = require('path'); 
+const path = require('path');
 const fs = require('fs');
 const banklist = require('./public/js/banklist.js')
 const cors = require('cors');
+const moment = require('moment-timezone');
 // socket.io
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
 
-app.use(cors()); 
+app.use(cors());
 // const server = require('http').createServer(app, (req, res) => {
 //     const canvas = new fabric.Canvas(null, { width: 300, height: 300 });
 //     const rect = new fabric.Rect({ width: 20, height: 50, fill: '#ff0000' });
@@ -81,6 +82,33 @@ let money = Intl.NumberFormat("th-TH", {
 });
 
 
+const desiredTimezone = 'Asia/Bangkok'; 
+const timestamp = moment.tz(new Date(), desiredTimezone).format('YYYY-MM-DD HH:mm:ss');
+
+
+function timeAgo(timestamp) {
+    const messageTime = moment(timestamp);
+    const currentTime = moment();
+    const minutesAgo = currentTime.diff(messageTime, 'minutes');
+
+    let timeAgoText = '';
+    if (minutesAgo < 1) {
+        timeAgoText = 'เมื่อซักครู่';
+    } else if (minutesAgo < 60) {
+        timeAgoText = `${minutesAgo} นาทีที่แล้ว`;
+    } else {
+        const hoursAgo = currentTime.diff(messageTime, 'hours');
+        if (hoursAgo === 1) {
+            timeAgoText = '1 ชั่วโมงที่แล้ว';
+        } else if (hoursAgo < 24) {
+            timeAgoText = `${hoursAgo} ชั่วโมงที่แล้ว`;
+        } else {
+            timeAgoText = `${messageTime.fromNow()}`;
+        }
+    }
+    return timeAgoText;
+}
+
 app.use(function (req, res, next) {
     res.locals.login = req.session.isLoggedIn;
     res.locals.session = req.session;
@@ -94,7 +122,10 @@ app.use(function (req, res, next) {
     res.locals.message = ''
     res.locals.money = money;
     res.locals.banklist = banklist;
-
+    res.locals.timeAgo = timeAgo;
+    dbConnection.promise().query('SELECT c.readed FROM chats c JOIN users u ON u.user_id = c.sender_id OR u.user_id = c.recipient_id WHERE u.deleted_at is null ORDER BY c.created_at DESC').then(([messages]) => {
+        res.locals.adminMsg = messages
+    })
     // if (req.session.user_id !== null) {
     //     dbConnection.promise().query(`SELECT COUNT(*) as cartCount, p.* FROM cart c JOIN product p ON p.product_id = c.product_id WHERE c.user_id = ${req.session.user_id} AND c.deleted_at IS NULL AND p.deleted_at IS NULL`)
     //         .then(([result]) => {
@@ -105,7 +136,7 @@ app.use(function (req, res, next) {
 });
 
 app.use(function (req, res, next) {
-    if (req.session.user_id !== null) { 
+    if (req.session.user_id !== null) {
         dbConnection.promise().query(`SELECT cart_id FROM cart WHERE user_id = ${req.session.user_id} AND deleted_at IS NULL`)
             .then(([result]) => {
                 res.locals.cartCount = result.length;
@@ -132,6 +163,7 @@ io.use((socket, next) => {
 
 
 // Socket.io connection handling
+const room = [];
 io.on('connection', (socket) => {
     // const userId = socket.request.session.user_id;
 
@@ -149,7 +181,7 @@ io.on('connection', (socket) => {
             message
         } = data;
         console.log(`${socket.request.session.username} posted a message to room ${data.room}: ${data.message}`);
-        dbConnection.query('INSERT INTO chats (message, sender_id, recipient_id) VALUES (?, ?, ?)', [message, sender, receiver], (err, result) => {
+        dbConnection.query('INSERT INTO chats (message, sender_id, recipient_id, readed, created_at) VALUES (?, ?, ?, 0, ?)', [message, sender, receiver, timestamp], (err, result) => {
             if (err) {
                 console.error('Error saving message to the database:', err);
                 return;
@@ -160,8 +192,14 @@ io.on('connection', (socket) => {
             message: data.message,
             room: data.room
         };
+        if (room.find(item => item === data.room) === undefined) {
+            room.push(data.room);
+        }
+        console.log(room);
 
-        socket.to(data.room).emit('newMessage', newMessage); // Emit the message to the admin in the room
+        socket.broadcast.to(data.room).emit('newMessage', newMessage);
+        socket.broadcast.emit('adminMessage', newMessage);
+
     });
 
     //   socket.on('adminMessage', (data) => {
@@ -231,10 +269,10 @@ io.of("/admin/chat/*").on("connection", (socket) => {
 //     })
 
 // });
- 
+
 router(app)
 // app.use("/", require("./routes"));
 const port = 3000;
 server.listen(port, () => {
     console.log(`App listening at port ${port}`)
-}); 
+});

@@ -13,15 +13,21 @@
         </div>
         <div class="w-50 m-auto">
             <h3 class="mb-3">รีเซ็ตรหัสผ่าน</h3>
-            <form method="post" action="/resetpassword?token=<%=token%>">
+            <form method="post" action="/resetpassword?token=<%=token%>" class="needs-validation" novalidate>
                 <!-- username input -->
                 <div class="form-outline mb-4">
-                    <input type="password" id="form1Example1" class="form-control" name="password" value="" />
+                    <input type="password" id="form1Example1" class="form-control" name="password" value="" required/>
                     <label class="form-label" for="form1Example1">รหัสผ่านใหม่</label>
+                    <div class="invalid-feedback">
+                        กรุณากรอกรหัสผ่านใหม่
+                    </div>
                 </div>
                 <div class="form-outline mb-4">
-                    <input type="password" id="form1Example1" class="form-control" name="confirmPw" value="" />
+                    <input type="password" id="form1Example1" class="form-control" name="confirmPw" value="" required/>
                     <label class="form-label" for="form1Example1">ยืนยันรหัสผ่านใหม่</label>
+                    <div class="invalid-feedback">
+                        กรุณายืนยันรหัสผ่านใหม่
+                    </div>
                 </div>
                 <!-- Submit button -->
                 <button type="submit" class="btn btn-primary btn-block">ยืนยัน</button>
@@ -30,3 +36,8 @@
     </div>
 </body>
 <%- include('../partials/footer') %>
+<script>
+    document.querySelectorAll('.form-outline').forEach((formOutline) => {
+        new mdb.Input(formOutline).init();
+    });
+</script>

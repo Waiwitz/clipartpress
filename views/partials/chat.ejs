@@ -54,17 +54,16 @@
     </div>
     <% } %>
   
-    <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"
+    <!-- <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"
         integrity="sha384-c79GN5VsunZvi+Q/WObgk2in0CbZsHnjEqvFxC5DxHn9lTfNce2WW6h2pH6u/kF+" crossorigin="anonymous">
-    </script>
-    <!-- <script src="/socket.io/socket.io.js"></script> -->
+    </script> -->
+    <script src="/socket.io/socket.io.js"></script>
     <script>
         const userId = '<%= session.user_id %>';
     </script>
     <script>
-        var socket = io('http://localhost:3000');
+        var socket = io();
         // Send a message to the admin
-        const messageContainer = document.querySelector('.message').scrollHeight;
         socket.emit('joinRoom', userId);
   
         $(document).ready(function () {
@@ -73,7 +72,7 @@
                 console.log(socket.on('newMessage'));
                 socket.emit('joinRoom', userId);
                 $('.chat-noti').hide();
-                var ms = document.getElementsByClassName(`message`);
+                var ms = document.querySelector(`.message`);
                 ms.scrollTop = ms.scrollHeight;
                 $('.chat-windows').addClass('slideTop')
             });
@@ -105,7 +104,8 @@
           </div>
       `;
                 document.querySelector('.message').appendChild(messageBox);
-                window.scrollTo(0, messageContainer);
+                var ms = document.querySelector(`.message`);
+                ms.scrollTop = ms.scrollHeight;
             } else {
                 return false;
             }

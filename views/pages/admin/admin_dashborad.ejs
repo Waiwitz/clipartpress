@@ -23,7 +23,7 @@
         </div>
     </div>
     <div style="padding-bottom: 100px;"></div>
-    <div class="box-admin">
+    <div class="box-admin mb-5">
         <% const waitpay = orders.filter(row => row.order_status == "waitpay") %>
         <% const pending = orders.filter(row => row.order_status == "pending") %>
         <% const produce = orders.filter(row => row.order_status == "produce") %>
@@ -115,7 +115,15 @@
                 </div>
                 <div class="col m-2 border rounded-1" style="height: 400px;">
                     <div class="p-2">
-                        <h3 class="mx-3 mt-2">สินค้าที่ขายได้</h3>
+                        <div class="d-flex justify-content-between">
+                            <h3 class="mx-3 mt-2">สินค้าที่ขายได้</h3>
+                       
+                            <!-- <select class="form-select align-self-center" id="pm_select"
+                                style="width: 150px; height: fit-content;">
+                                <option value="7"> 7 วัน</option>
+                                <option value="30">30 วัน</option>
+                            </select> -->
+                        </div>
                         <canvas id="productpieChart" class="m-auto"></canvas>
                     </div>
                 </div>
@@ -149,7 +157,7 @@
                                 <% couponDiscount = order.discount; %>
                                 <% } %>
 
-                                <% if (i >= 4) { %>
+                                <% if (i <= 5) { %>
                                 <tr>
                                     <td style="width: 50px;">
                                         <%= index %>
@@ -213,7 +221,6 @@
 
             </div>
         </div>
-    </div>
     </div>
 </body>
 

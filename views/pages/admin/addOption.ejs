@@ -3,7 +3,7 @@
 <body>
     <div class="mb-5 secondHead-admin">
         <div class="secondHead-content">
-            <h1>เพิ่มตัวเลือกสินค้า</h1>
+            <h1>เพิ่มออฟชั่นสินค้า</h1>
             <!-- <ol class="list-unstyled d-flex ">
                 <li class="breadcrumb-item"><a class="link-light" href="#">หน้าแรก</a></li>
                 <li class="active text-light ms-2">/ ตัวเลือกสินค้า</li>
@@ -55,10 +55,10 @@
                                         <div class="form-outline">
                                             <input type="text" name="option[]" class="sub-option-name form-control"
                                                 id="optionName" required>
-                                            <label class="form-label" for="optionName">ชื่อตัวเลือก <span
+                                            <label class="form-label" for="optionName">ชื่อออฟชั่น <span
                                                     class="text-danger ms-1">*</span></label>
                                             <div class="invalid-feedback">
-                                                กรุณากรอกชื่อตัวเลือก
+                                                กรุณากรอกชื่อออฟชั่น
                                             </div>
                                         </div>
                                     </div>
@@ -133,7 +133,7 @@
         $('.option-checkbox').multipleSelect({
             filter: true,
             keepOpen: true,
-            placeholder: 'เลือกสินค้าที่ใช้ตัวเลือกนี้',
+            placeholder: 'เลือกสินค้าที่ใช้ออฟชั่นนี้',
             type: 'optgroup',
             hideOptgroupCheckboxes: false
 
@@ -187,7 +187,7 @@
                                     <div class="form-outline mb-3">
                                         <input type="text" name="option[${specCount}]" class="sub-option-name form-control"
                                             id="optionName" required>
-                                        <label class="form-label" for="optionName">ชื่อตัวเลือก</label>
+                                        <label class="form-label" for="optionName">ชื่อออฟชั่น</label>
                                     </div>
                                     <div class="form-outline">
                                         <input type="number" name="option_price[${specCount}]" value="0"
@@ -224,7 +224,7 @@
             $('.option-checkbox').multipleSelect('refreshOptions', {
                 filter: true,
                 keepOpen: true,
-                placeholder: 'เลือกสินค้าที่ใช้ตัวเลือกนี้',
+                placeholder: 'เลือกสินค้าที่ใช้ออฟชั่นนี้',
                 type: 'optgroup',
                 hideOptgroupCheckboxes: false
             });

@@ -40,7 +40,7 @@
           <span class="align-self-center">ออเดอร์</span>
         </a>
       </li>
-<!-- 
+      <!-- 
       <li class="nav-item ripple <%= currentLink == 'order' || currentLink == "payment" ? 'shadow-4-strong' : " "%> "
         data-mdb-ripple-color="light">
         <div class="admin-navlink admin-dropdown" id="sale-btn" data-mdb-toggle="collapse" data-mdb-target="#sale">
@@ -113,16 +113,18 @@
 
 
 
-      <li class="nav-item ripple <%= currentLink == 'shipment' || currentLink == "payment_method" ? 'shadow-4-strong' : " "%> "
+      <li
+        class="nav-item ripple <%= currentLink == 'shipment' || currentLink == "payment_method" ? 'shadow-4-strong' : " "%> "
         data-mdb-ripple-color="light">
         <div class="admin-navlink admin-dropdown" id="sale-btn" data-mdb-toggle="collapse" data-mdb-target="#setting">
           <i class="fas fa-gears"></i>
           <span class="align-self-center">ตั้งค่าร้านค้า</span>
           <i class="fas fa-caret-down text-end"></i>
         </div>
-        <div class="collapse <%= currentLink == 'shipment' || currentLink == "payment_method" ? 'show' : " "%>" id="setting">
+        <div class="collapse <%= currentLink == 'shipment' || currentLink == "payment_method" ? 'show' : " "%>"
+          id="setting">
           <a class="admin-navlink <%= currentLink == 'shipment' ? 'admin-nav-active' : " "%>" href="/admin/shipment">
-            <span class="ms-5 align-self-center">ค่าจัดส่ง</span>
+            <span class="ms-5 align-self-center">การจัดส่ง</span>
           </a>
           <a class="admin-navlink <%= currentLink == 'payment_method' ? 'admin-nav-active' : " "%>"
             href="/admin/payment_method">
@@ -131,11 +133,23 @@
         </div>
       </li>
 
-      <li class="nav-item ripple" data-mdb-ripple-color="light">
-        <a class="<%= currentLink == "chat" ? 'admin-navlink admin-nav-active' : 'admin-navlink' %>" aria-current="page"
-          href="/admin/chat/*">
-          <i class="fa-solid fa-comment"></i>
-          <span class="align-self-center">แชท</span>
+      <li class="nav-item ripple" id="chatmenu" data-mdb-ripple-color="light">
+        <a class="<%= currentLink == "chat" ? 'admin-navlink admin-nav-active' : 'admin-navlink' %> d-flex justify-content-between"
+          aria-current="page" href="/admin/chat/*">
+          <div class="align-self-center">
+            <i class="fa-solid fa-comment"></i>
+            <span class="align-self-center">แชท</span>
+          </div>
+
+          <% if (adminMsg.length > 0) { %>
+            <% const findReaded = adminMsg.filter(row => row.readed === 0) %>
+            <% console.log(findReaded.length); %>
+          <% if (findReaded.length > 0) { %>
+          <span class=" nonti rounded-circle bg-danger align-self-center">
+
+          </span>
+          <% } %>
+          <% } %>
         </a>
       </li>
       <!-- <li class="nav-item ripple" data-mdb-ripple-color="light">
@@ -160,8 +174,9 @@
     </ul>
   </div>
 </nav>
-
+<script src="/socket.io/socket.io.js"></script>
 <script>
+  var socket = io();
   $(function () {
 
     $('.admin-dropdown').each(function () {
@@ -190,6 +205,10 @@
     }
   });
 
+  socket.on('adminMessage', (message) => {
+    console.log(`Received message: ${message.message}`);
+    $('#chatmenu').load(location.href + " #chatmenu");
+  });
   // $("#mini-nav-btn").toggle(function () {
   //   $('.box-admin').css({'margin-left':'0'});
   // });

@@ -74,23 +74,26 @@ const updateProfile = async (req, res) => {
     } = req.body;
     let profilePicturePath;
     let query;
+    let data;
     if (req.file) {
         profilePicturePath = req.file.path.replace('public', '');
         query = 'UPDATE users SET username = ?, email = ?, picture = ? ,name = ?, telephone = ? WHERE user_id = ?'
         req.session.picture = profilePicturePath;
+        data = [username, email, profilePicturePath, name, telephone, req.session.user_id];
+
     } else {
         query = 'UPDATE users SET username = ?, email = ? ,name = ?, telephone = ? WHERE user_id = ?'
+        data = [username, email, name, telephone, req.session.user_id];
     }
-
+    console.log(req.body);
 
     try {
-        const data = [username, email, profilePicturePath, name, telephone, req.session.user_id];
         dbConnection.query(query, data);
         // return res.render('pages/userprofile', { success_msg: ['แก้ไขโปรไฟล์สำเร็จ'] });
         req.flash("success_msg", 'แก้ไขโปรไฟล์สำเร็จ');
         return res.redirect("/userprofile");
 
-    } catch (err) {
+    } catch (err) { 
         req.flash("errors", err);
         return res.redirect("/userprofile");
     }

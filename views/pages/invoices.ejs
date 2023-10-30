@@ -226,7 +226,7 @@
                                 <div class="text-end">
                                     <a href="/design<%= order.design_file %>">
                                         <i class="fa-solid fa-file"></i> ไฟล์ออกแบบ
-                                      </a>                                      
+                                    </a>
                                 </div>
                             </div>
                             <% }) %>
@@ -383,6 +383,9 @@
 </body>
 
 <script>
+    const currentDate = new Date().toISOString().slice(0, 16);
+    $('#dateTf').attr('min', currentDate);
+
     document.querySelectorAll('.form-outline').forEach((formOutline) => {
         new mdb.Input(formOutline).init();
     });

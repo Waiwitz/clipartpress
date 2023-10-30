@@ -96,7 +96,7 @@
                                     </div>
                                 </a>
                                 <button type="button" class="btn btn-danger btn-sm delete" data-mdb-toggle="modal"
-                                    data-mdb-target="#deleteModal" data-product-id="<%= product.product_id %>">
+                                    data-mdb-target="#deleteModal" data-product-id="<%= product.product_id %>" data-name="<%= product.productName %>">
                                     ลบ
                                 </button>
                             </td>
@@ -152,7 +152,7 @@
                                     </div>
                                 </a>
                                 <button type="button" class="btn btn-danger btn-sm delete" data-mdb-toggle="modal"
-                                    data-mdb-target="#deleteModal" data-product-id="<%= product.product_id %>">
+                                    data-mdb-target="#deleteModal" data-product-id="<%= product.product_id %>" data-name="<%= product.productName %>">
                                     ลบ
                                 </button>
                             </td>
@@ -177,7 +177,7 @@
                 <div class="modal-body">
                     <form action="/deleteProduct" method="post">
                         <div>
-                            <p>ต้องการลบสินค้าใช่หรือไม่ ?</p>
+                            <p>ต้องการลบสินค้า <b class="pd-name-delete"></b> ใช่หรือไม่ ?</p>
                         </div>
                         <input type="hidden" id="id" name="product_id" value="" />
                         <div class="modal-footer">
@@ -265,7 +265,9 @@
 
         $(document).on("click", ".delete", function () {
             var productId = $(this).data("product-id");
+            var name = $(this).data("name");
             $("#id").val(productId);
+            $(".pd-name-delete").text(name)
         });
 
         $(document).ready(function () {

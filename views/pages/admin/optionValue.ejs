@@ -118,7 +118,7 @@
                                     แก้ไข
                                 </button>
                                 <button type="button" class="btn btn-danger btn-sm btn-edit delete"
-                                    data-mdb-toggle="modal" data-mdb-target="#deleteModal"
+                                    data-mdb-toggle="modal" data-mdb-target="#deleteModal" data-name="<%= option.option_name %>"
                                     data-id="<%= option.option_id %>">
                                     ลบ
                                 </button>
@@ -175,7 +175,7 @@
                                     แก้ไข
                                 </button>
                                 <button type="button" class="btn btn-danger btn-sm btn-edit delete"
-                                    data-mdb-toggle="modal" data-mdb-target="#deleteModal"
+                                    data-mdb-toggle="modal" data-mdb-target="#deleteModal" data-name="<%= option.option_name %>"
                                     data-id="<%= option.option_id %>">
                                     ลบ
                                 </button>
@@ -265,7 +265,7 @@
                 <div class="modal-body">
                     <form action="/deleteOption" id="editForm" method="post">
                         <div>
-                            <p>ต้องการลบออฟชั่นนี้ใช่หรือไม่ ?</p>
+                            <p>ต้องการลบออฟชั่น <b id="deleteOptionNanme"></b> ใช่หรือไม่ ?</p>
                         </div>
                         <input type="hidden" id="id" name="option_id" value="" />
                         <div class="modal-footer">
@@ -317,7 +317,9 @@
 
         $(document).on("click", ".delete", function () {
             var id = $(this).data("id");
+            var name = $(this).data("name");
             $("#id").val(id);
+            $("#deleteOptionNanme").empty().text(name);
         });
 
         $(document).on("click", ".update", function () {

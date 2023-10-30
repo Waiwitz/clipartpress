@@ -86,6 +86,13 @@
                                 <%= method.number %>
                             </td>
                             <td>
+                                <% let name; %>
+                                <% const bankname = banklist.find(row => row.en == method.method_name) %>
+                                <% if (bankname) { %>
+                                    <% name = `โอนเงินผ่าน${bankname.th}` %>
+                                <% } else { %>
+                                    <% name = `โอนเงินผ่าน Qr-code พร้อมเพย์` %>
+                                <% } %>
                                 <div class="btn btn-warning btn-sm edit" data-mdb-toggle="modal"
                                     data-mdb-target="#updateModal" data-id="<%= method.payment_method_id %>"
                                     data-metname="<%= method.method_name %>" data-name="<%= method.name %>"
@@ -95,7 +102,7 @@
                                 </div>
                                 <button type="button" class="btn btn-danger btn-sm delete" data-mdb-toggle="modal"
                                     data-mdb-target="#deleteModal" data-id="<%= method.payment_method_id %>"
-                                    data-name="">
+                                    data-name="<%= name %>">
                                     ลบ
                                 </button>
                             </td>
@@ -324,7 +331,7 @@
                         <div class="col pb-3">
                             <div class="form-outline">
                                 <input type="text" class="form-control" name="NewOwnerName" id="NewOwnerName"
-                                    pattern="[A-Za-zก-๙ ]+$" maxlength="10" required>
+                                    pattern="[A-Za-zก-๙ ]+$" maxlength="45" required>
                                 <label for="number" class="form-label">ชื่อผู้รับ</label>
                                 <div class="invalid-feedback">
                                     ชื่อต้องเป็นตัวอักษรเท่านั้น
@@ -560,6 +567,7 @@
             }
         })
         $(document).on("click", ".delete", function () {
+            $('#NameWarning').text($(this).data('name'))
             $('#deleteForm').attr('action', `/deletemethod/${$(this).data("id")}`)
         });
 

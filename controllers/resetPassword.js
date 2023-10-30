@@ -46,8 +46,8 @@ let identify = async (req, res) => {
                     })
                 } else {
                     console.log(row[0]);
-                    res.render('pages/login', {
-                        errors: ['บ่พ้ออีเมลจร้าอีหล่า']
+                    res.render('pages/forgetpw', {
+                        errors: ['ไม่เจออีเมลนี้ในระบบ']
                     });
                 }
             })
@@ -71,7 +71,7 @@ let reset = async (req, res) => {
                          dbConnection.query('UPDATE users SET password = ?,  reset_token = NULL, reset_token_exp = NULL WHERE email = ?', [newPassword, email]);
                         res.redirect(`/success-reset-password?token=${token}`);
                     } else {
-                        req.flash("error_msg", 'อีเมลไม่ตรงกัน กรุณาลองอีกครั้ง');
+                        req.flash("error_msg", 'รหัสผ่านไม่ตรงกัน กรุณาลองอีกครั้ง');
                         return res.redirect(`/resetpassword?token=${token}`);
                     }
                 } else {
